@@ -1,7 +1,7 @@
 {
   "version": 2,
   "build": {
-    "command": "npm run build",
+    "command": "pnpm run docs:build",
     "output": "docs/.vitepress/dist"
   },
   "routes": [
@@ -12,22 +12,6 @@
     {
       "src": "/(.*)",
       "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/*",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Requested-With,Accept"
-      }
-    },
-    {
-      "source": "/*",
-      "headers": {
-        "Access-Control-Allow-Origin": "*"
-      }
     }
   ]
 }
