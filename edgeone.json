@@ -1,49 +1,33 @@
 {
-    "version": 2,
-    "build": {
-      "command": "npm run build",
-      "output": "dist"
+  "version": 2,
+  "build": {
+    "command": "npm run build",
+    "output": "docs/.vitepress/dist"
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
-    "functions": {
-      "api/**/*.js": {
-        "maxDuration": 10
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/*",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Requested-With,Accept"
       }
     },
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/index.html"
-      }
-    ],
-    "headers": [
-      {
-        "source": "/api/(.*)",
-        "headers": [
-          {
-            "key": "Access-Control-Allow-Origin",
-            "value": "*"
-          },
-          {
-            "key": "Access-Control-Allow-Methods",
-            "value": "GET, POST, PUT, DELETE, OPTIONS"
-          },
-          {
-            "key": "Access-Control-Allow-Headers",
-            "value": "Content-Type, Authorization, X-Requested-With, Accept"
-          }
-        ]
-      }
-    ],
-    "cache": {
-      "static": {
-        "maxAge": 31536000
-      },
-      "html": {
-        "maxAge": 0
+    {
+      "source": "/*",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
       }
     }
-  }
+  ]
+}
