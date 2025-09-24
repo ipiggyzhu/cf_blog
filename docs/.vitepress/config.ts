@@ -132,6 +132,7 @@ const teekConfig = defineTeekConfig({
   // 首页尺寸变大
   themeSize: "large",
 
+
   // // 布蒜子统计分析
   // docAnalysis: {
   //   createTime: "2021-10-19",
@@ -215,7 +216,7 @@ const teekConfig = defineTeekConfig({
   articleShare: { enabled: true },
 
   articleAnalyze: {
-    imageViewer: { hideOnClickModal: true }, // 图片预览是否点击遮罩层关闭}
+    imageViewer: { hideOnClickModal: true }, // 图片预览是否点击遮罩层关闭
     showIcon: true, // 作者、日期、分类、标签、字数、阅读时长、浏览量等文章信息的图标是否显示
     // dateFormat: "yyyy-MM-dd hh:mm:ss", // 文章日期格式，首页和文章页解析日期时使用
     dateFormat: "yyyy-MM-dd", // 文章日期格式，首页和文章页解析日期时使用
@@ -252,11 +253,10 @@ const teekConfig = defineTeekConfig({
       return tip;
   },
 
-  // 评论配置 - 已禁用
-  // comment: {
-  //   provider: "twikoo",
-  //   options: CommentData,
-  // },
+  comment: {
+    provider: "twikoo",
+    options: CommentData,
+  },
 
 
   // // 公告
