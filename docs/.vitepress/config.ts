@@ -66,7 +66,7 @@ const teekConfig = defineTeekConfig({
     avatar: "/img/xyy.webp",  //侧边栏个人头像
     shape: "circle-rotate", // 头像风格：square 为方形头像，circle 为圆形头像，circle-rotate 可支持鼠标悬停旋转
     name: "Casual", // 侧边栏个人昵称
-    slogan: "明心静性，爱自己", // 侧边栏个人座右铭
+    slogan: "心向暖阳，静待花开", // 侧边栏个人座右铭
     circleBgImg: "/img/teek-cover-14.webp", // 侧边栏个人头像圆形背景图
     circleBgMask: false, // 头像圆形背景图是否显示遮罩层
     color: "#fff",
@@ -98,7 +98,7 @@ const teekConfig = defineTeekConfig({
 
   // 精选文章卡片
   topArticle: {
-    enabled: false, // 是否启用精选文章卡片
+    enabled: true, // 是否启用精选文章卡片
     limit: 5, // 一页显示的数量
     autoPage: false, // 是否自动翻页
     pageSpeed: 4000, // 翻页间隔时间，单位：毫秒。autoPage 为 true 时生效

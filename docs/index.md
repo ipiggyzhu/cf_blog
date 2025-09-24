@@ -2,7 +2,7 @@
 layout: home
 
 tk:
-  teekHome: false     
+  teekHome: true     
 
 hero:
   name: Teek
