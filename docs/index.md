@@ -2,7 +2,8 @@
 layout: home
 
 tk:
-  teekHome: true     
+  teekHome: true
+  homeCardSort: ["post", "topArticle", "category", "tag"]     
 
 hero:
   name: Teek
