@@ -162,15 +162,15 @@ article: false
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .container h1 {
+  h1 {
     font-size: 36px !important;
   }
   
-  .container p {
+  p {
     font-size: 16px !important;
   }
   
-  .container .buttons {
+  .action-buttons {
     flex-direction: column !important;
     align-items: center !important;
   }
