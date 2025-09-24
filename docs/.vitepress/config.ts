@@ -80,16 +80,33 @@ const teekConfig = defineTeekConfig({
   },
 
 
+  // 文章配置
+  post: {
+    postStyle: "card", // 文章列表风格：card 卡片模式，list 列表模式
+    excerptPosition: "top", // 文章摘要位置
+    showMore: true, // 是否显示更多按钮
+    moreLabel: "阅读全文 >", // 更多按钮文字
+    emptyLabel: "暂无文章", // 文章列表为空时的标签
+    coverImgMode: "default", // 文章封面图模式
+    showCapture: false, // 是否在摘要位置显示文章部分文字
+    splitSeparator: false, // 文章信息是否添加 | 分隔符
+    transition: true, // 是否开启过渡动画
+    transitionName: "tk-slide-fade", // 自定义过渡动画名称
+    listStyleTitleTagPosition: "right", // 列表模式下的标题标签位置
+    cardStyleTitleTagPosition: "left", // 卡片模式下的标题标签位置
+    defaultCoverImg: [], // 默认封面图地址
+  },
+
   // 分类卡片
   category: {
-    enabled: false, // 是否启用分类卡片
+    enabled: true, // 是否启用分类卡片
     limit: 8, // 一页显示的数量
     autoPage: false, // 是否自动翻页
     pageSpeed: 4000, // 翻页间隔时间，单位：毫秒。autoPage 为 true 时生效
   },  
   // 标签卡片
   tag: {
-    enabled: false, // 是否启用标签卡片
+    enabled: true, // 是否启用标签卡片
     limit: 21, // 一页显示的数量
     autoPage: false, // 是否自动翻页
     pageSpeed: 4000, // 翻页间隔时间，单位：毫秒。autoPage 为 true 时生效
@@ -194,9 +211,6 @@ const teekConfig = defineTeekConfig({
     copiedDone: (TkMessage) => TkMessage.success("复制成功！"),
   },
 
-  post: {
-    showCapture: false,  //关闭自动摘要
-  },
 
   articleShare: { enabled: true },
 
