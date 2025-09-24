@@ -43,13 +43,13 @@ article: false
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   text-align: center;
-  padding: 20px;
+  padding: 40px 20px 80px 20px;
   box-sizing: border-box;
   position: relative;
 }
@@ -84,11 +84,14 @@ article: false
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255,255,255,0.2);
   animation: fadeInUp 1s ease-out 0.4s both;
+  max-width: 600px;
+  width: 100%;
 }
 
 .safety-tips h3 {
   margin: 0 0 20px 0;
   font-size: 24px;
+  text-align: center;
 }
 
 .safety-tips ul {
@@ -111,6 +114,7 @@ article: false
   flex-wrap: wrap;
   justify-content: center;
   animation: fadeInUp 1s ease-out 0.6s both;
+  margin: 40px 0;
 }
 
 .btn {
@@ -133,7 +137,7 @@ article: false
 }
 
 .footer-message {
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
@@ -143,6 +147,7 @@ article: false
   display: flex;
   gap: 10px;
   align-items: center;
+  z-index: 10;
 }
 
 @keyframes pulse {
