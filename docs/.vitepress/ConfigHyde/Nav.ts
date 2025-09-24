@@ -18,7 +18,7 @@ export const Nav = [
               <span>运维</span>
             </div>
             `,
-          link: '/categories/运维',
+          link: '/linux/',
         },
         {
           text: `
