@@ -43,15 +43,16 @@ article: false
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   text-align: center;
-  padding: 40px 20px 80px 20px;
+  padding: 20px;
   box-sizing: border-box;
   position: relative;
+  overflow-y: auto;
 }
 
 .warning-icon {
@@ -137,17 +138,15 @@ article: false
 }
 
 .footer-message {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  margin-top: 40px;
   font-size: 14px;
   opacity: 0.7;
   animation: fadeInUp 1s ease-out 0.8s both;
   display: flex;
   gap: 10px;
   align-items: center;
-  z-index: 10;
+  justify-content: center;
 }
 
 @keyframes pulse {

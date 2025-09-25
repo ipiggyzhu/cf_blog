@@ -123,6 +123,11 @@ const teekConfig = defineTeekConfig({
     // dateFormat: "yyyy-MM-dd hh:mm:ss", // 精选文章的日期格式
   },
 
+  // 首页卡片显示配置
+  homeCard: {
+    enabled: true, // 启用首页卡片显示
+  },
+
   page: {
     pageSize: 10, //首页 Post 文章列表的分页配置，设置为合理的数值避免分页计算错误
     hideOnSinglePage: true, // 当只有一页时隐藏分页组件
@@ -317,7 +322,7 @@ const teekConfig = defineTeekConfig({
       md.use(groupIconMdPlugin); // 代码组图标插件
     },    
     demo: {
-      githubUrl: "https://github.com/ipiggyzhu/您的仓库名/blob/main/docs",
+      githubUrl: "https://github.com/ipiggyzhu/blog/main/docs",
     },
   },
   siteAnalytics: [
@@ -484,7 +489,7 @@ export default defineConfig({
     editLink: {
       text: "在 GitHub 上编辑此页",
       // pattern: "https://github.com/Kele-Bingtang/vitepress-theme-teek/edit/master/docs/:path",
-      pattern: "https://github.com/ipiggyzhu/您的仓库名/edit/main/docs/:path",
+      pattern: "https://github.com/ipiggyzhu/blog/edit/main/docs/:path",
     },
   },
 
