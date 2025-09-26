@@ -6,19 +6,19 @@ tk:
   homeCardSort: ["post", "topArticle", "category", "tag"]     
 
 hero:
-  name: Teek
-  text: VitePress 主题
-  tagline: ✨一个轻量、简洁高效、灵活配置，易于扩展的 VitePress 主题
+  name: Casual Blog
+  text: 运维技术分享
+  tagline: 💻 记录技术成长之路，分享运维实战经验
   actions:
     - theme: brand
-      text: 开始
-      link: /guide/quickstart
+      text: 查看文章
+      link: /categories/运维
     - theme: alt
-      text: 配置
-      link: /reference/config
+      text: 关于我
+      link: /about/me
   image:
     src: /img/logo.png
-    alt: Teek
+    alt: Casual
 
 features: []
 ---

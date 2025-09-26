@@ -193,14 +193,49 @@ span {
   object-fit: contain !important;
 }
 
-/* 只隐藏文章卡片，保留左侧个人资料区域 */
-.tk-post-item-card {
-  display: none !important;
+/* 导航栏保持原有样式，不修改 */
+
+/* 其他位置的社交图标对齐 */
+.tk-my__icons,
+.social-icons {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
 }
 
-/* 隐藏右侧文章列表区域 */
-.tk-home-card-list-right {
-  display: none !important;
+.tk-my__icons a,
+.social-icons a {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.tk-my__icons a svg,
+.tk-my__icons a i,
+.social-icons a svg,
+.social-icons a i {
+  width: 20px !important;
+  height: 20px !important;
+  vertical-align: middle !important;
+}
+
+/* 页脚保持原有样式，只微调三个图标的底部对齐 */
+.tk-footer-info a[href*="github"] {
+  position: relative !important;
+  top: 4px !important; /* GitHub图标向下4px，与QQ、微信底部对齐 */
+}
+
+.tk-footer-info a[href*="qq"] {
+  position: relative !important;
+  top: 0px !important; /* QQ图标保持原位作为基准 */
+}
+
+.tk-footer-info a[href*="wechat"] {
+  position: relative !important;
+  top: 2px !important; /* 微信图标向下2px，与GitHub、QQ对齐 */
 }
 
 /* 保留左侧个人资料区域 */
@@ -208,7 +243,60 @@ span {
   display: block !important;
 }
 
+/* 确保右侧文章列表区域显示 */
+.tk-home-card-list-right {
+  display: block !important;
+}
+
 /* 确保整体布局正常 */
 .tk-home-card-list {
   display: flex !important;
+}
+
+/* 允许英语卡片所在的容器溢出 */
+.tk-home-card-list-left {
+  overflow: visible !important;
+}
+
+.tk-home-card-list-right {
+  overflow: visible !important;
+}
+
+/* 英语卡片固定宽度样式，与站点信息卡片右边对齐 */
+.quote-card {
+  width: 280px !important; /* 锁死宽度，与站点信息卡片右边对齐 (250px内容 + 30px padding) */
+  max-width: 280px !important; /* 锁死最大宽度 */
+  min-height: 320px !important; /* 调整为合适的高度，与站点信息卡片对齐 */
+  height: auto !important; /* 允许高度自动调整 */
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important; /* 不允许收缩，保持固定宽度 */
+}
+
+/* 确保卡片容器正常显示 */
+.tk-page-card .quote-card {
+  width: 280px !important;
+  max-width: 280px !important;
+  min-height: 320px !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .quote-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 280px !important; /* 移动端合适高度 */
+    flex-shrink: 1 !important;
+  }
+  
+  .tk-page-card .quote-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 280px !important;
+  }
+  
+  .tk-home-card-list-left,
+  .tk-home-card-list-right {
+    overflow: visible !important; /* 允许卡片正常显示 */
+  }
 }

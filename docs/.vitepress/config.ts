@@ -39,6 +39,11 @@ const CoverImgList = Cover; // 获取壁纸列表
 
  
 const teekConfig = defineTeekConfig({
+  teekTheme: true, // 启用 Teek 主题
+  teekHome: true, // 启用 Teek 首页
+  vpHome: false, // 禁用 VitePress 默认首页风格
+  homeCardListPosition: "right", // 首页卡片栏列表位置
+  
   // // 首页顶部按 F11 开启壁纸模式
   // 首页顶部按 F11 开启壁纸模式
   wallpaper: {
@@ -60,7 +65,7 @@ const teekConfig = defineTeekConfig({
   windowTransition: true,
   
   sidebarTrigger: true,
-  // author: { name: "Teeker", link: "https://github.com/Kele-Bingtang" },
+  // author: { name: "Casual", link: "https://github.com/ipiggyzhu" },
   blogger: {
     // 博主信息，显示在首页侧边栏
     avatar: "/img/xyy.webp",  //侧边栏个人头像
@@ -76,7 +81,7 @@ const teekConfig = defineTeekConfig({
       icon: "😜", // 状态图标
       size: 24, // 图标大小
       title: "有趣", // 鼠标悬停图标的提示语
-    },    
+    }    
   },
 
 
@@ -88,13 +93,16 @@ const teekConfig = defineTeekConfig({
     moreLabel: "阅读全文 >", // 更多按钮文字
     emptyLabel: "暂无文章", // 文章列表为空时的标签
     coverImgMode: "default", // 文章封面图模式
-    showCapture: false, // 是否在摘要位置显示文章部分文字
+    showCapture: true, // 是否在摘要位置显示文章部分文字
     splitSeparator: false, // 文章信息是否添加 | 分隔符
     transition: true, // 是否开启过渡动画
     transitionName: "tk-slide-fade", // 自定义过渡动画名称
     listStyleTitleTagPosition: "right", // 列表模式下的标题标签位置
     cardStyleTitleTagPosition: "left", // 卡片模式下的标题标签位置
     defaultCoverImg: [], // 默认封面图地址
+    limit: 6, // 首页文章卡片显示数量
+    autoPage: true, // 是否自动翻页
+    pageSpeed: 5000, // 翻页间隔时间，单位：毫秒
   },
 
   // 分类卡片
@@ -121,11 +129,6 @@ const teekConfig = defineTeekConfig({
     pageSpeed: 4000, // 翻页间隔时间，单位：毫秒。autoPage 为 true 时生效
     dateFormat: "yyyy-MM-dd", // 精选文章的日期格式
     // dateFormat: "yyyy-MM-dd hh:mm:ss", // 精选文章的日期格式
-  },
-
-  // 首页卡片显示配置
-  homeCard: {
-    enabled: true, // 启用首页卡片显示
   },
 
   page: {

@@ -22,9 +22,9 @@ export const HeadData = [
       src: "https://va.vercel-scripts.com/v1/speed-insights/script.js",
     },
   ],
-  ["meta", { name: "author", content: "Tianke" }],
+  ["meta", { name: "author", content: "Casual" }],
   ['meta', { property: 'og:description', content: '明心静性，爱自己' }],
-  ['meta', { property: 'og:image', content: 'https://onedayxyy.cn/img/xyy.webp' }],
+  ['meta', { property: 'og:image', content: '/img/xyy.webp' }],
 
   [
     "meta",
@@ -69,7 +69,7 @@ export const HeadData = [
   [
     "script",
     {
-      src: "https://umami.onedayxyy.cn/script.js",
+      // src: "https://umami.onedayxyy.cn/script.js", // 原作者的统计服务，已禁用
       "data-website-id": "0d806f5d-cffa-41ec-98bf-862b2273ce4a",
       defer: "defer",
     },

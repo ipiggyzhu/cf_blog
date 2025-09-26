@@ -8,8 +8,7 @@ article: false
 
 <div class="risk-warning-container">
   <div class="warning-icon">⚠️</div>
-  
-  <h1 class="warning-title">风险链接警告 🚨</h1>
+  <h1 class="warning-title">风险链接警告</h1>
   
   <p class="warning-description">
     您即将访问的链接可能存在安全风险！<br>
@@ -56,35 +55,42 @@ article: false
 }
 
 .warning-icon {
-  font-size: 80px;
-  margin-bottom: 30px;
+  font-size: 100px;
+  margin-bottom: 60px; /* 增加底部间距，让标题往下移 */
   animation: pulse 2s ease-in-out infinite;
+  display: block;
+  z-index: 1;
+  position: relative;
 }
 
 .warning-title {
-  font-size: 48px;
-  margin: 0 0 20px 0;
+  font-size: 42px;
+  margin: 0 0 40px 0; /* 增加底部间距 */
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  animation: fadeInUp 1s ease-out;
+  font-weight: bold;
+  letter-spacing: 2px;
+  animation: fadeInUp 1s ease-out 0.3s both;
+  position: relative;
+  z-index: 2;
 }
 
 .warning-description {
   font-size: 20px;
-  margin: 0 0 40px 0;
+  margin: 0 0 50px 0; /* 增加底部间距 */
   opacity: 0.9;
   max-width: 600px;
   line-height: 1.6;
-  animation: fadeInUp 1s ease-out 0.2s both;
+  animation: fadeInUp 1s ease-out 0.4s both; /* 延迟动画 */
 }
 
 .safety-tips {
   background: rgba(255,255,255,0.1);
   padding: 30px;
   border-radius: 20px;
-  margin: 30px 0;
+  margin: 40px 0; /* 增加上下间距 */
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255,255,255,0.2);
-  animation: fadeInUp 1s ease-out 0.4s both;
+  animation: fadeInUp 1s ease-out 0.6s both; /* 进一步延迟动画 */
   max-width: 600px;
   width: 100%;
 }
@@ -114,8 +120,8 @@ article: false
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
-  animation: fadeInUp 1s ease-out 0.6s both;
-  margin: 40px 0;
+  animation: fadeInUp 1s ease-out 0.8s both; /* 进一步延迟动画 */
+  margin: 50px 0; /* 增加上下间距 */
 }
 
 .btn {
@@ -139,10 +145,10 @@ article: false
 
 .footer-message {
   position: relative;
-  margin-top: 40px;
+  margin-top: 50px; /* 增加顶部间距 */
   font-size: 14px;
   opacity: 0.7;
-  animation: fadeInUp 1s ease-out 0.8s both;
+  animation: fadeInUp 1s ease-out 1.0s both; /* 最后显示 */
   display: flex;
   gap: 10px;
   align-items: center;
@@ -170,8 +176,14 @@ article: false
 }
 
 @media (max-width: 768px) {
+  .warning-icon {
+    font-size: 80px;
+    margin-bottom: 15px;
+  }
+  
   .warning-title {
-    font-size: 36px;
+    font-size: 32px;
+    letter-spacing: 1px;
   }
   
   .warning-description {
@@ -181,6 +193,45 @@ article: false
   .action-buttons {
     flex-direction: column;
     align-items: center;
+  }
+  
+  .safety-tips {
+    padding: 20px;
+    margin: 20px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .risk-warning-container {
+    padding: 15px;
+  }
+  
+  .warning-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+  }
+  
+  .warning-title {
+    font-size: 24px;
+    letter-spacing: 0.5px;
+  }
+  
+  .warning-description {
+    font-size: 14px;
+    margin: 0 0 30px 0;
+  }
+  
+  .safety-tips {
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .safety-tips h3 {
+    font-size: 18px;
+  }
+  
+  .safety-tips ul {
+    font-size: 14px;
   }
 }
 </style>

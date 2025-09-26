@@ -1,20 +1,39 @@
 <template>
-  <div class="quote-card">
+  <div class="quote-card" :class="{ 'quote-fade': isChanging }">
     <div class="quote-content">
       <div class="quote-header">
-        <div class="quote-icon">💭</div>
-        <h3 class="quote-title">Daily Quote</h3>
+        <div class="quote-info">
+          <div class="quote-icon">📖</div>
+          <h3 class="quote-title">每日英语</h3>
+        </div>
+        <div class="auto-indicator">
+          <span class="auto-dot"></span>
+          <span class="auto-text">自动切换</span>
+        </div>
       </div>
       
       <div class="quote-main">
         <div class="quote-image-container">
-          <img :src="currentQuote.image" :alt="currentQuote.alt" class="quote-image" />
+          <img 
+            :src="currentImageUrl" 
+            :alt="currentQuote.alt" 
+            class="quote-image" 
+            @error="handleImageError"
+            @load="handleImageLoad"
+          />
           <div class="quote-overlay"></div>
+          <div v-if="isImageLoading" class="image-loading">
+            <div class="loading-spinner"></div>
+            <span>加载中...</span>
+          </div>
         </div>
         
         <div class="quote-text-container">
-          <blockquote class="quote-text">
-            "{{ currentQuote.text }}"
+          <blockquote class="quote-text-en">
+            "{{ currentQuote.english }}"
+          </blockquote>
+          <blockquote class="quote-text-zh">
+            "{{ currentQuote.chinese }}"
           </blockquote>
           <div class="quote-meta">
             <span class="quote-author">{{ currentQuote.author }}</span>
@@ -23,11 +42,8 @@
         </div>
       </div>
       
-      <div class="quote-footer">
-        <button @click="nextQuote" class="refresh-btn">
-          <span class="refresh-icon">🔄</span>
-          <span>Next Quote</span>
-        </button>
+      <div class="quote-progress">
+        <div class="progress-bar" :style="{ width: progressWidth + '%' }"></div>
       </div>
     </div>
   </div>
@@ -36,84 +52,250 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-// 英语格言和电影金句数据
+// 中英文对照的每日英语数据
 const quotes = [
   {
-    text: "The way to get started is to quit talking and begin doing.",
-    author: "Walt Disney",
-    source: "Entrepreneur",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    english: "The way to get started is to quit talking and begin doing.",
+    chinese: "开始行动的方法就是停止空谈，开始实干。",
+    author: "华特·迪士尼",
+    source: "Walt Disney",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&crop=center",
     alt: "Beautiful sunrise over mountains"
   },
   {
-    text: "Life is what happens to you while you're busy making other plans.",
-    author: "John Lennon",
-    source: "Beautiful Boy",
-    image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
+    english: "Life is what happens to you while you're busy making other plans.",
+    chinese: "生活就是在你忙于制定其他计划时，在你身上发生的事。",
+    author: "约翰·列侬",
+    source: "John Lennon",
+    image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop&crop=center",
     alt: "Peaceful nature scene"
   },
   {
-    text: "The future belongs to those who believe in the beauty of their dreams.",
-    author: "Eleanor Roosevelt",
-    source: "Speech",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    english: "The future belongs to those who believe in the beauty of their dreams.",
+    chinese: "未来属于那些相信梦想之美的人。",
+    author: "埃莉诺·罗斯福",
+    source: "Eleanor Roosevelt",
+    image: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=250&fit=crop&crop=center",
     alt: "Dream-like sky"
   },
   {
-    text: "You have been my friend. That in itself is a tremendous thing.",
-    author: "Charlotte",
+    english: "You have been my friend. That in itself is a tremendous thing.",
+    chinese: "你一直是我的朋友，这本身就是一件了不起的事。",
+    author: "夏洛特",
     source: "Charlotte's Web",
-    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=250&fit=crop&crop=center",
     alt: "Friendship theme"
   },
   {
-    text: "After all, tomorrow is another day!",
-    author: "Scarlett O'Hara",
+    english: "After all, tomorrow is another day!",
+    chinese: "毕竟，明天又是新的一天！",
+    author: "郝思嘉",
     source: "Gone with the Wind",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=400&h=250&fit=crop&crop=center",
     alt: "New day sunrise"
   },
   {
-    text: "In the middle of difficulty lies opportunity.",
-    author: "Albert Einstein",
-    source: "Scientist",
-    image: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&h=300&fit=crop",
+    english: "In the middle of difficulty lies opportunity.",
+    chinese: "困难之中蕴含着机遇。",
+    author: "阿尔伯特·爱因斯坦",
+    source: "Albert Einstein",
+    image: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&h=250&fit=crop&crop=center",
     alt: "Opportunity landscape"
   },
   {
-    text: "You're braver than you believe, stronger than you seem, and smarter than you think.",
-    author: "A.A. Milne",
+    english: "You're braver than you believe, stronger than you seem, and smarter than you think.",
+    chinese: "你比你想象的更勇敢，比你看起来更强大，比你认为的更聪明。",
+    author: "A.A.米尔恩",
     source: "Winnie the Pooh",
-    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1502780402662-acc01917949e?w=400&h=250&fit=crop&crop=center",
     alt: "Inspiring forest scene"
   },
   {
-    text: "The greatest glory in living lies not in never falling, but in rising every time we fall.",
-    author: "Nelson Mandela",
-    source: "Autobiography",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    english: "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+    chinese: "生命中最大的荣耀不在于从不跌倒，而在于每次跌倒后都能重新站起。",
+    author: "纳尔逊·曼德拉",
+    source: "Nelson Mandela",
+    image: "https://images.unsplash.com/photo-1464822759844-d150ad6d1dff?w=400&h=250&fit=crop&crop=center",
     alt: "Rising sun motivation"
+  },
+  {
+    english: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+    chinese: "成功不是终点，失败不是致命的：重要的是继续前进的勇气。",
+    author: "温斯顿·丘吉尔",
+    source: "Winston Churchill",
+    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=250&fit=crop&crop=center",
+    alt: "Mountain peak success"
+  },
+  {
+    english: "It does not matter how slowly you go as long as you do not stop.",
+    chinese: "前进缓慢没关系，只要你不停止脚步。",
+    author: "孔子",
+    source: "Confucius",
+    image: "https://images.unsplash.com/photo-1484589065579-248aad0d8b13?w=400&h=250&fit=crop&crop=center",
+    alt: "Steady progress"
   }
 ]
 
 const currentQuoteIndex = ref(0)
 const currentQuote = ref(quotes[0])
+const isChanging = ref(false)
+const progressWidth = ref(0)
+const currentImageUrl = ref('')
+const isImageLoading = ref(true)
+const imageRetryCount = ref(0)
+const maxRetries = 3
+let autoTimer = null
+let progressTimer = null
+
+// 备用图片URLs - 使用CDN和本地备用
+const fallbackImages = [
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&crop=center',
+  'https://picsum.photos/400/250?random=1',
+  'https://picsum.photos/400/250?random=2',
+  'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=250&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=250&fit=crop&crop=center',
+  '/img/teek-cover-14.webp', // 本地备用图片
+  '/img/teek-cover-16.webp',
+  '/img/teek-cover-17.webp'
+]
 
 // 获取随机格言
 const getRandomQuote = () => {
-  const randomIndex = Math.floor(Math.random() * quotes.length)
+  let randomIndex
+  do {
+    randomIndex = Math.floor(Math.random() * quotes.length)
+  } while (randomIndex === currentQuoteIndex.value && quotes.length > 1)
+  
   currentQuoteIndex.value = randomIndex
-  currentQuote.value = quotes[randomIndex]
+  return quotes[randomIndex]
 }
 
-// 下一个格言
-const nextQuote = () => {
-  getRandomQuote()
+// 处理图片加载错误
+const handleImageError = () => {
+  console.warn('图片加载失败:', currentImageUrl.value)
+  
+  // 尝试使用备用图片
+  if (imageRetryCount.value < fallbackImages.length) {
+    console.log(`尝试使用备用图片 ${imageRetryCount.value + 1}/${fallbackImages.length}`)
+    currentImageUrl.value = fallbackImages[imageRetryCount.value]
+    imageRetryCount.value++
+  } else {
+    // 所有备用图片都失败，隐藏图片使用默认背景
+    console.log('所有图片都加载失败，使用默认渐变背景')
+    currentImageUrl.value = '' // 清空src，触发默认背景
+    isImageLoading.value = false
+  }
 }
 
-// 组件挂载时随机选择一个格言
+// 处理图片加载成功
+const handleImageLoad = () => {
+  console.log('图片加载成功:', currentImageUrl.value)
+  isImageLoading.value = false
+  imageRetryCount.value = 0 // 重置重试计数
+}
+
+// 初始化图片URL
+const initializeImage = (quote) => {
+  isImageLoading.value = true
+  imageRetryCount.value = 0
+  
+  // 尝试使用CDN加速的URL
+  const originalUrl = quote.image
+  // 使用jsDelivr CDN加速（如果是GitHub资源）
+  if (originalUrl.includes('github.com')) {
+    currentImageUrl.value = originalUrl.replace('github.com', 'cdn.jsdelivr.net/gh')
+  } else {
+    currentImageUrl.value = originalUrl
+  }
+}
+
+// 切换到下一个格言
+const changeQuote = () => {
+  isChanging.value = true
+  
+  setTimeout(() => {
+    const newQuote = getRandomQuote()
+    currentQuote.value = newQuote
+    initializeImage(newQuote)
+    isChanging.value = false
+    resetProgress()
+  }, 300)
+}
+
+// 重置进度条
+const resetProgress = () => {
+  progressWidth.value = 0
+  if (progressTimer) {
+    clearInterval(progressTimer)
+  }
+  
+  // 8秒进度条动画
+  const duration = 8000
+  const interval = 50
+  const increment = (interval / duration) * 100
+  
+  progressTimer = setInterval(() => {
+    progressWidth.value += increment
+    if (progressWidth.value >= 100) {
+      progressWidth.value = 100
+      clearInterval(progressTimer)
+    }
+  }, interval)
+}
+
+// 启动自动轮播
+const startAutoRotation = () => {
+  if (autoTimer) {
+    clearInterval(autoTimer)
+  }
+  
+  autoTimer = setInterval(() => {
+    changeQuote()
+  }, 8000) // 8秒切换一次
+  
+  resetProgress()
+}
+
+// 停止自动轮播
+const stopAutoRotation = () => {
+  if (autoTimer) {
+    clearInterval(autoTimer)
+  }
+  if (progressTimer) {
+    clearInterval(progressTimer)
+  }
+}
+
+// 页面可见性变化处理
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    stopAutoRotation()
+  } else {
+    startAutoRotation()
+  }
+}
+
+// 组件挂载时初始化
 onMounted(() => {
-  getRandomQuote()
+  // 随机选择初始格言
+  const initialQuote = getRandomQuote()
+  currentQuote.value = initialQuote
+  
+  // 初始化图片
+  initializeImage(initialQuote)
+  
+  // 启动自动轮播
+  startAutoRotation()
+  
+  // 监听页面可见性变化
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+})
+
+// 组件卸载时清理
+import { onUnmounted } from 'vue'
+onUnmounted(() => {
+  stopAutoRotation()
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 
@@ -123,59 +305,116 @@ onMounted(() => {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
   border: 1px solid var(--vp-c-border);
+  position: relative;
+  min-height: 320px; /* 调整为合适的高度，与站点信息卡片对齐 */
+  height: auto; /* 允许高度自动调整 */
+  display: flex;
+  flex-direction: column;
+  width: 280px !important; /* 锁死宽度，与站点信息卡片右边对齐 (250px内容 + 30px padding) */
+  max-width: 280px !important; /* 锁死最大宽度 */
+  box-sizing: border-box; /* 包含边框和内边距在宽度内 */
+  min-width: 0; /* 允许flex项目收缩 */
+  flex-shrink: 1; /* 允许收缩 */
 }
 
 .quote-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+.quote-fade {
+  opacity: 0.7;
+  transform: scale(0.98);
 }
 
 .quote-content {
   padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .quote-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 16px 20px 12px;
+  justify-content: space-between;
+  padding: 18px 24px 14px;
   border-bottom: 1px solid var(--vp-c-border);
+  background: linear-gradient(135deg, var(--vp-c-bg-soft) 0%, var(--vp-c-bg-alt) 100%);
+}
+
+.quote-header .quote-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .quote-icon {
-  font-size: 20px;
+  font-size: 22px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .quote-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--vp-c-text-1);
+  letter-spacing: 0.5px;
+}
+
+.auto-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-brand-1);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.auto-dot {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .quote-main {
   position: relative;
   padding: 0;
+  flex: 1; /* 让主内容区域填充剩余空间 */
 }
 
 .quote-image-container {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 240px; /* 调整图片容器为合适高度 */
   overflow: hidden;
+  flex-shrink: 0; /* 图片容器不收缩 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* 默认渐变背景 */
 }
 
 .quote-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block; /* 移除img元素默认的底部间隙 */
 }
 
 .quote-card:hover .quote-image {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .quote-overlay {
@@ -184,7 +423,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%);
 }
 
 .quote-text-container {
@@ -195,92 +434,215 @@ onMounted(() => {
   padding: 20px;
   color: white;
   z-index: 2;
+  min-height: 120px; /* 确保文字区域有足够高度 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-sizing: border-box; /* 确保内边距包含在宽度内 */
+  max-width: 100%; /* 防止文字容器超出边界 */
 }
 
-.quote-text {
-  margin: 0 0 12px 0;
-  font-size: 16px;
-  line-height: 1.6;
+.quote-text-en {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  line-height: 1.5;
   font-style: italic;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: 500;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   border: none;
   padding: 0;
+  letter-spacing: 0.3px;
+  word-wrap: break-word; /* 长单词换行 */
+  overflow-wrap: break-word; /* 确保文字换行 */
+  max-width: 100%; /* 防止文字超出容器 */
+}
+
+.quote-text-zh {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  font-style: normal;
+  font-weight: 400;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+  border: none;
+  padding: 0;
+  opacity: 0.95;
+  border-left: 3px solid rgba(255, 255, 255, 0.6);
+  padding-left: 10px;
+  margin-left: 4px;
+  word-wrap: break-word; /* 长单词换行 */
+  overflow-wrap: break-word; /* 确保文字换行 */
+  max-width: calc(100% - 14px); /* 减去左边距和内边距 */
 }
 
 .quote-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .quote-author {
   font-weight: 600;
-  font-size: 14px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.3px;
 }
 
 .quote-source {
-  font-size: 12px;
-  opacity: 0.9;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  opacity: 0.85;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  font-style: italic;
 }
 
-.quote-footer {
-  padding: 16px 20px;
-  display: flex;
-  justify-content: center;
+.quote-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
 }
 
-.refresh-btn {
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-brand-2));
+  transition: width 0.1s linear;
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px rgba(var(--vp-c-brand-1), 0.5);
+}
+
+/* 图片加载动画 */
+.image-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--vp-c-brand-1);
+  gap: 10px;
   color: white;
-  border: none;
-  border-radius: 20px;
+  z-index: 3;
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
-.refresh-btn:hover {
-  background: var(--vp-c-brand-2);
-  transform: translateY(-1px);
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.refresh-icon {
-  font-size: 14px;
-  transition: transform 0.3s ease;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.refresh-btn:hover .refresh-icon {
-  transform: rotate(180deg);
+/* 图片加载失败时的默认样式 */
+.quote-image-container:has(.quote-image[src=""]) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.quote-image-container:has(.quote-image[src=""]) .quote-overlay {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%);
 }
 
 /* 深色模式适配 */
 html.dark .quote-card {
   background: var(--vp-c-bg-soft);
   border-color: var(--vp-c-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 html.dark .quote-header {
   border-color: var(--vp-c-border);
+  background: linear-gradient(135deg, var(--vp-c-bg-soft) 0%, var(--vp-c-bg) 100%);
+}
+
+html.dark .quote-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 /* 移动端适配 */
 @media (max-width: 768px) {
-  .quote-image-container {
-    height: 160px;
+  .quote-card {
+    border-radius: 12px;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 280px !important; /* 移动端合适高度 */
+    flex-shrink: 1;
   }
   
-  .quote-text {
-    font-size: 14px;
+  .quote-header {
+    padding: 14px 18px 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .quote-title {
+    font-size: 16px;
+  }
+  
+  .auto-indicator {
+    align-self: flex-end;
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  
+  .quote-image-container {
+    height: 200px; /* 移动端合适的图片高度 */
   }
   
   .quote-text-container {
     padding: 16px;
+    min-height: 100px; /* 移动端确保足够的文字空间 */
+  }
+  
+  .quote-text-en {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  
+  .quote-text-zh {
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  
+  .quote-author {
+    font-size: 13px;
+  }
+  
+  .quote-source {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quote-image-container {
+    height: 170px; /* 小屏设备适当增加高度 */
+  }
+  
+  .quote-text-container {
+    padding: 14px;
+    min-height: 90px; /* 小屏设备确保文字空间 */
+  }
+  
+  .quote-text-en {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  
+  .quote-text-zh {
+    font-size: 11px;
+    line-height: 1.4;
   }
 }
 </style>

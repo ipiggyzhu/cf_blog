@@ -51,7 +51,7 @@ import { useData, useRoute } from 'vitepress'
 
 // 统一配置区
 const config = {
-  authorName: 'Piggy',
+  authorName: 'Casual',
   authorUrl: 'https://github.com/ipiggyzhu',
   siteName: 'Casual Blog',
   siteUrl: 'https://50094988.site/',

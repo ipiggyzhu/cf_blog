@@ -18,7 +18,7 @@ export const Nav = [
               <span>运维</span>
             </div>
             `,
-          link: '/categories/运维',
+          link: '/linux/n29zs',
         },
         {
           text: `
@@ -161,7 +161,7 @@ export const Nav = [
                 `,
               link: '/love/wenan',
             },
-            // { text: "💖情侣空间", link: "https://fxj.onedayxyy.cn/" },
+            // { text: "💖情侣空间", link: "#" }, // 功能暂未开启
           ],
         },
         // 兴趣
@@ -260,7 +260,7 @@ export const Nav = [
               <span>风险链接提示页</span>
             </div>
             `,
-          link: '/risk-link?target=https://onedayxyy.cn/',
+          link: '/risk-link',
         },
       ],
     },  
@@ -304,7 +304,7 @@ export const Nav = [
             `,
           link: '/about/monitor',
         },
-        // { text: "📌我的云盘", link: "https://zdir.onedayxyy.cn/" }, // 暂时删除，等搭建自己的云盘服务
+        // { text: "📌我的云盘", link: "#" }, // 暂时删除，等搭建自己的云盘服务
 
       ],
     },       

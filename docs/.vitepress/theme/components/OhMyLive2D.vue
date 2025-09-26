@@ -11,7 +11,7 @@ onMounted(async () => {
 
       {
         name: "black-cat", //黑猫
-        path: "https://model.hacxy.cn/cat-black/model.json",
+        path: "/live2d/models/black-cat/model.json",
         scale: 0.15,
         position: [0, 20],
         stageStyle: {
@@ -22,7 +22,7 @@ onMounted(async () => {
 
       {
         name: "HK416-1-destroy", // 紫色-好看
-        path: "https://raw.githubusercontent.com/iCharlesZ/vscode-live2d-models/master/model-library/girls-frontline/HK416-1/destroy/model.json",
+        path: "/live2d/models/HK416-1-destroy/model.json",
         scale: 0.09,
         volume: 0,
         position: [20, -40],
@@ -32,22 +32,6 @@ onMounted(async () => {
         },
       },
 
-      {
-        name: "senko", //小狐狸
-        path: "https://model.hacxy.cn/Senko_Normals/senko.model3.json",
-        position: [-10, 20],
-      },
-
-      {
-        name: "HK416", //紫色cos-枪
-        path: "https://model.hacxy.cn/HK416-1-normal/model.json",
-        position: [0, 60],
-        scale: 0.06,
-        stageStyle: {
-          height: 340,
-        },
-        clothesIndex: 0,
-      },      
     //   {
     //     name: "shizuku-pajama", //桌前吃饭
     //     path: "https://model.hacxy.cn/shizuku_pajama/index.json",
@@ -136,15 +120,15 @@ onMounted(async () => {
           icon: "icon-about",
           title: "关于",
           onClick: () => {
-            window.open("https://onedayxyy.cn/");
+            window.open("/about/me");
           },
         },
         {
-          id: "gitee",
-          icon: "icon-gitee",
-          title: "gitee",
+          id: "github",
+          icon: "icon-github",
+          title: "GitHub",
           onClick: () => {
-            window.open("https://cnb.cool/onedayxyy/vitepress-theme-teek-one-public");
+            window.open("https://github.com/ipiggyzhu");
           },
         },
       ],
