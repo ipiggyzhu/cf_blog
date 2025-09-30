@@ -274,7 +274,7 @@ export const Nav = [
         { text: '💖友链', link: '/about/friend-links' },
         { text: '🌐网站导航', link: '/about/websites' },          
         { text: "👂留言区", link: "/about/liuyanqu" },
-        { text: "💡思考", link: "/about/thouht" },
+        { text: "💡思考", link: "/about/thinking" },
         { text: "💡情侣相册", link: "/about/love" },
         {
           text: `

@@ -1,0 +1,1068 @@
+---
+date: 2025-01-27 22:00:00
+title: 旅行
+permalink: /xingqu/travel
+layout: page
+article: false
+sidebar: false
+comment: true
+categories:
+  - 兴趣
+coverImg: https://img.onedayxyy.cn/images/Teek/TeekCover/14.webp
+---
+
+<div class="travel-page">
+
+# 🌍 旅行足迹
+
+> *行万里路，读万卷书，看万种人生*
+
+---
+
+## 🗺️ 我的旅行地图
+
+<div class="travel-map-section">
+  <div class="map-container">
+    <h3>🌎 足迹分布</h3>
+    <div class="map-stats">
+      <div class="stat-card">
+        <div class="stat-icon">🏞️</div>
+        <div class="stat-content">
+          <div class="stat-number">15</div>
+          <div class="stat-label">城市</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏔️</div>
+        <div class="stat-content">
+          <div class="stat-number">8</div>
+          <div class="stat-label">省份</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✈️</div>
+        <div class="stat-content">
+          <div class="stat-number">25</div>
+          <div class="stat-label">次旅行</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📸</div>
+        <div class="stat-content">
+          <div class="stat-number">1000+</div>
+          <div class="stat-label">张照片</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="favorite-destinations">
+    <h3>💖 最爱目的地</h3>
+    <div class="destination-list">
+      <div class="destination-item">
+        <span class="place-icon">🏔️</span>
+        <span class="place-name">西藏拉萨</span>
+        <span class="place-reason">心灵的净土</span>
+      </div>
+      <div class="destination-item">
+        <span class="place-icon">🌊</span>
+        <span class="place-name">海南三亚</span>
+        <span class="place-reason">碧海蓝天</span>
+      </div>
+      <div class="destination-item">
+        <span class="place-icon">🏛️</span>
+        <span class="place-name">北京故宫</span>
+        <span class="place-reason">历史厚重</span>
+      </div>
+      <div class="destination-item">
+        <span class="place-icon">🌸</span>
+        <span class="place-name">日本京都</span>
+        <span class="place-reason">古韵悠长</span>
+      </div>
+      <div class="destination-item">
+        <span class="place-icon">🏞️</span>
+        <span class="place-name">桂林山水</span>
+        <span class="place-reason">如诗如画</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+## 📖 旅行故事
+
+<div class="travel-stories">
+  <div class="story-card featured">
+    <div class="story-header">
+      <div class="story-location">
+        <span class="location-icon">🏔️</span>
+        <h3>西藏之旅：寻找心灵的净土</h3>
+      </div>
+      <div class="story-date">2024年8月</div>
+    </div>
+    <div class="story-content">
+      <div class="story-image">
+        <div class="image-placeholder tibet">
+          <span class="placeholder-text">布达拉宫</span>
+        </div>
+      </div>
+      <div class="story-text">
+        <p>那是一次心灵的朝圣之旅。当飞机降落在贡嘎机场，稀薄的空气提醒着我已经到达了世界屋脊。布达拉宫在夕阳下熠熠生辉，仿佛是天神的宫殿。</p>
+        <p>在大昭寺前，我看到虔诚的朝圣者一步一叩首，他们的信仰如此纯粹，让我深深震撼。纳木错的湖水蓝得令人心醉，仿佛是上天遗落在人间的一颗蓝宝石。</p>
+        <blockquote>
+          "在这里，我找到了内心的宁静，也找到了对生活的敬畏。"
+        </blockquote>
+        <div class="story-tags">
+          <span class="tag">心灵净化</span>
+          <span class="tag">信仰</span>
+          <span class="tag">壮美</span>
+          <span class="tag">难忘</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <div class="story-location">
+        <span class="location-icon">🌊</span>
+        <h3>三亚海滩：拥抱碧海蓝天</h3>
+      </div>
+      <div class="story-date">2024年2月</div>
+    </div>
+    <div class="story-content">
+      <div class="story-image">
+        <div class="image-placeholder sanya">
+          <span class="placeholder-text">椰风海韵</span>
+        </div>
+      </div>
+      <div class="story-text">
+        <p>春节假期，选择在三亚度过。椰风习习，海浪轻抚着沙滩，一切都显得那么悠闲惬意。在亚龙湾，我第一次尝试了浮潜，看到了五彩斑斓的珊瑚和热带鱼。</p>
+        <p>天涯海角的日落格外美丽，橙红色的夕阳慢慢沉入海平面，天空被染成了最美的画布。那一刻，时间仿佛静止了。</p>
+        <div class="story-tags">
+          <span class="tag">度假</span>
+          <span class="tag">海滩</span>
+          <span class="tag">放松</span>
+          <span class="tag">美景</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <div class="story-location">
+        <span class="location-icon">🌸</span>
+        <h3>京都漫步：感受古都韵味</h3>
+      </div>
+      <div class="story-date">2023年4月</div>
+    </div>
+    <div class="story-content">
+      <div class="story-image">
+        <div class="image-placeholder kyoto">
+          <span class="placeholder-text">樱花飞舞</span>
+        </div>
+      </div>
+      <div class="story-text">
+        <p>樱花季的京都，美得如同梦境。清水寺的樱花满树，粉色的花瓣在春风中飞舞。穿着和服的女孩们从身边走过，仿佛时光倒流千年。</p>
+        <p>在竹林小径中漫步，阳光透过竹叶洒下斑驳的光影。抹茶的清香，古刹的钟声，这一切都让人沉醉在古都的优雅韵味中。</p>
+        <div class="story-tags">
+          <span class="tag">文化</span>
+          <span class="tag">樱花</span>
+          <span class="tag">古典</span>
+          <span class="tag">艺术</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+## 🎒 旅行装备
+
+<div class="travel-gear">
+  <div class="gear-category">
+    <h3>📱 必备电子设备</h3>
+    <div class="gear-list">
+      <div class="gear-item">
+        <span class="gear-icon">📷</span>
+        <div class="gear-details">
+          <h4>相机</h4>
+          <p>记录美好瞬间的最佳伙伴</p>
+        </div>
+      </div>
+      <div class="gear-item">
+        <span class="gear-icon">🔋</span>
+        <div class="gear-details">
+          <h4>充电宝</h4>
+          <p>确保设备电量充足</p>
+        </div>
+      </div>
+      <div class="gear-item">
+        <span class="gear-icon">🎧</span>
+        <div class="gear-details">
+          <h4>耳机</h4>
+          <p>旅途中的音乐伴侣</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gear-category">
+    <h3>🧳 实用旅行用品</h3>
+    <div class="gear-list">
+      <div class="gear-item">
+        <span class="gear-icon">🎒</span>
+        <div class="gear-details">
+          <h4>背包</h4>
+          <p>轻便耐用的旅行背包</p>
+        </div>
+      </div>
+      <div class="gear-item">
+        <span class="gear-icon">🧴</span>
+        <div class="gear-details">
+          <h4>洗漱用品</h4>
+          <p>旅行装便携套装</p>
+        </div>
+      </div>
+      <div class="gear-item">
+        <span class="gear-icon">👕</span>
+        <div class="gear-details">
+          <h4>衣物</h4>
+          <p>根据目的地气候选择</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gear-category">
+    <h3>🏥 安全健康用品</h3>
+    <div class="gear-list">
+      <div class="gear-item">
+        <span class="gear-icon">💊</span>
+        <div class="gear-details">
+          <h4>常用药品</h4>
+          <p>感冒药、止痛药等</p>
+        </div>
+      </div>
+      <div class="gear-item">
+        <span class="gear-icon">🧴</span>
+        <div class="gear-details">
+          <h4>防晒霜</h4>
+          <p>保护皮肤免受紫外线伤害</p>
+        </div>
+      </div>
+      <div class="gear-item">
+        <span class="gear-icon">🎭</span>
+        <div class="gear-details">
+          <h4>口罩</h4>
+          <p>必要的防护用品</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+## 🗓️ 旅行计划
+
+<div class="travel-plans">
+  <div class="plan-section current">
+    <h3>🎯 2025年计划</h3>
+    <div class="plan-list">
+      <div class="plan-item">
+        <div class="plan-date">3月</div>
+        <div class="plan-destination">
+          <span class="plan-icon">🌸</span>
+          <div class="plan-details">
+            <h4>日本赏樱</h4>
+            <p>东京、京都、大阪樱花之旅</p>
+          </div>
+        </div>
+        <div class="plan-status planning">计划中</div>
+      </div>
+      
+      <div class="plan-item">
+        <div class="plan-date">7月</div>
+        <div class="plan-destination">
+          <span class="plan-icon">🏔️</span>
+          <div class="plan-details">
+            <h4>新疆天山</h4>
+            <p>天池、喀纳斯湖自然之旅</p>
+          </div>
+        </div>
+        <div class="plan-status planning">计划中</div>
+      </div>
+      
+      <div class="plan-item">
+        <div class="plan-date">10月</div>
+        <div class="plan-destination">
+          <span class="plan-icon">🍂</span>
+          <div class="plan-details">
+            <h4>北京香山</h4>
+            <p>秋叶满山红胜火</p>
+          </div>
+        </div>
+        <div class="plan-status planned">已计划</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="plan-section future">
+    <h3>🌟 梦想清单</h3>
+    <div class="dream-list">
+      <div class="dream-item">
+        <span class="dream-icon">🗼</span>
+        <span class="dream-name">法国巴黎</span>
+        <span class="dream-reason">浪漫之都的艺术气息</span>
+      </div>
+      <div class="dream-item">
+        <span class="dream-icon">🏛️</span>
+        <span class="dream-name">希腊圣托里尼</span>
+        <span class="dream-reason">爱琴海的蓝白童话</span>
+      </div>
+      <div class="dream-item">
+        <span class="dream-icon">🌋</span>
+        <span class="dream-name">冰岛</span>
+        <span class="dream-reason">极光下的冰火奇境</span>
+      </div>
+      <div class="dream-item">
+        <span class="dream-icon">🏝️</span>
+        <span class="dream-name">马尔代夫</span>
+        <span class="dream-reason">印度洋上的珍珠</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+<div class="stats-insights-container">
+  <div class="left-section">
+    <h2>📊 旅行统计</h2>
+    <div class="travel-stats">
+      <div class="stat-item">
+        <div class="stat-number">5</div>
+        <div class="stat-label">年旅行经验</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">15</div>
+        <div class="stat-label">足迹城市</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">🌟</div>
+        <div class="stat-label">精彩回忆</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">未来可能</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-section">
+    <h2>💡 旅行感悟</h2>
+    <div class="travel-insights">
+      <div class="insight-card">
+        <div class="insight-icon">🌍</div>
+        <h3>世界很大，要去看看</h3>
+        <p>每一次旅行都是一次成长。不同的风景、不同的文化、不同的人群，让我们的视野更加开阔，心胸更加宽广。世界很大，而我们很小，但正是这种对比，让我们更加珍惜每一次相遇和体验。</p>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">👥</div>
+        <h3>旅行不在乎目的地，在乎路上的心情</h3>
+        <p>最美的风景往往不在目的地，而在路上。与朋友一起的欢声笑语，陌生人的善意帮助，意外发现的小众景点，这些都是旅行中最珍贵的回忆。</p>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">📚</div>
+        <h3>行万里路如读万卷书</h3>
+        <p>每到一个地方，都如同翻开了一本新书。历史的厚重、文化的深度、自然的神奇，都在旅行中得到最直观的体验。这种体验是任何书本都无法给予的。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+> 🌍 **世界是一本书,不旅行的人只读了一页**  
+> *愿每一次出发都能带回不一样的收获*
+
+<style scoped>
+.travel-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  line-height: 1.7;
+}
+
+.travel-page h1 {
+  text-align: center;
+  color: #667eea;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  padding: 0.2rem 0;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.travel-page > blockquote {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  border-left: none;
+  padding: 0;
+  margin: 2rem 0;
+  font-size: 1.1rem;
+}
+
+.travel-page h2 {
+  color: var(--vp-c-brand);
+  border-bottom: 3px solid var(--vp-c-brand);
+  padding-bottom: 0.8rem;
+  margin-top: 3rem;
+  position: relative;
+}
+
+.travel-page h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--vp-c-brand), transparent);
+}
+
+/* 旅行地图区域 */
+.travel-map-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 30px 0;
+}
+
+.map-container {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.map-container h3 {
+  color: var(--vp-c-brand);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.map-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--vp-c-brand);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* 最爱目的地 */
+.favorite-destinations {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.favorite-destinations h3 {
+  color: var(--vp-c-brand);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.destination-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.destination-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.destination-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.place-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+}
+
+.place-name {
+  font-weight: 600;
+  color: var(--vp-c-brand);
+  min-width: 100px;
+}
+
+.place-reason {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 旅行故事 */
+.travel-stories {
+  margin: 30px 0;
+}
+
+.story-card {
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.story-card.featured {
+  border: 2px solid var(--vp-c-brand);
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.story-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.story-location {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.location-icon {
+  font-size: 1.2rem;
+}
+
+.story-location h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.story-date {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.story-content {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 25px;
+  padding: 25px;
+}
+
+.story-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-placeholder {
+  width: 180px;
+  height: 120px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.image-placeholder.tibet {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+}
+
+.image-placeholder.sanya {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.image-placeholder.kyoto {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.story-text p {
+  color: #666;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+.story-text blockquote {
+  font-style: italic;
+  color: var(--vp-c-brand);
+  border-left: 4px solid var(--vp-c-brand);
+  padding: 10px 15px;
+  margin: 15px 0;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 5px;
+}
+
+.story-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.story-tags .tag {
+  background: linear-gradient(135deg, var(--vp-c-brand), #764ba2);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* 旅行装备 */
+.travel-gear {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin: 30px 0;
+}
+
+.gear-category {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.gear-category h3 {
+  color: var(--vp-c-brand);
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid var(--vp-c-brand);
+  padding-bottom: 10px;
+}
+
+.gear-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.gear-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.gear-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.gear-icon {
+  font-size: 1.5rem;
+  min-width: 24px;
+}
+
+.gear-details h4 {
+  margin: 0 0 5px 0;
+  color: var(--vp-c-brand);
+  font-size: 1rem;
+}
+
+.gear-details p {
+  margin: 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* 旅行计划 */
+.travel-plans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 30px 0;
+}
+
+.plan-section {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.plan-section h3 {
+  color: var(--vp-c-brand);
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid var(--vp-c-brand);
+  padding-bottom: 10px;
+}
+
+.plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.plan-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.plan-item:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.plan-date {
+  font-weight: 600;
+  color: var(--vp-c-brand);
+  min-width: 40px;
+  text-align: center;
+}
+
+.plan-destination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.plan-icon {
+  font-size: 1.2rem;
+}
+
+.plan-details h4 {
+  margin: 0 0 3px 0;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.plan-details p {
+  margin: 0;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.plan-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.plan-status.planning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.plan-status.planned {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* 梦想清单 */
+.dream-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dream-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.dream-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.dream-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+}
+
+.dream-name {
+  font-weight: 600;
+  color: var(--vp-c-brand);
+  min-width: 120px;
+}
+
+.dream-reason {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 统计和感悟容器 */
+.stats-insights-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin: 30px 0;
+}
+
+.left-section,
+.right-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.left-section h2,
+.right-section h2 {
+  color: var(--vp-c-brand);
+  border-bottom: 3px solid var(--vp-c-brand);
+  padding-bottom: 0.8rem;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.left-section h2::after,
+.right-section h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--vp-c-brand), transparent);
+}
+
+/* 旅行感悟 */
+.travel-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.insight-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.insight-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.insight-card h3 {
+  color: var(--vp-c-brand);
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.insight-card p {
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* 统计数据 */
+.travel-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.travel-stats .stat-item {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  padding: 25px 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);
+}
+
+.travel-stats .stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.travel-stats .stat-label {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* 分隔线 */
+.travel-page hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--vp-c-brand), transparent);
+  margin: 3rem 0;
+}
+
+/* 最后的引用块 */
+.travel-page > blockquote:last-child {
+  text-align: center;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 15px;
+  border-left: none;
+  margin-top: 3rem;
+}
+
+.travel-page > blockquote:last-child strong {
+  color: white;
+  font-size: 1.3rem;
+}
+
+/* 深色模式适配 */
+.dark .map-container,
+.dark .favorite-destinations,
+.dark .story-card,
+.dark .gear-category,
+.dark .plan-section,
+.dark .insight-card {
+  background: var(--vp-c-bg-soft);
+  border-color: var(--vp-c-divider);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .travel-page {
+    padding: 15px;
+  }
+  
+  .travel-page h1 {
+    font-size: 2rem;
+  }
+  
+  .travel-map-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .map-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .story-content {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .story-image {
+    justify-content: flex-start;
+  }
+  
+  .image-placeholder {
+    width: 150px;
+    height: 100px;
+  }
+  
+  .travel-gear {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .travel-plans {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .stats-insights-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .travel-insights {
+    gap: 15px;
+  }
+  
+  .travel-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+</style>
+
+</div>
