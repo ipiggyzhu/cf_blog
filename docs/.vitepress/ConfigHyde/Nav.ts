@@ -108,7 +108,7 @@ export const Nav = [
                   <span>相册</span>
                 </div>
                 `,
-              link: '/yule/photo',
+              link: '/yule/photo/gallery',
             },
             {
               text: `
@@ -117,7 +117,7 @@ export const Nav = [
                   <span>电影</span>
                 </div>
                 `,
-              link: '/yule/movie',
+              link: '/yule/movie/collection',
             },
             {
               text: `
@@ -126,7 +126,7 @@ export const Nav = [
                   <span>音乐</span>
                 </div>
                 `,
-              link: '/yule/music',
+              link: '/yule/music/collection',
             },
           ],
         },
@@ -141,7 +141,7 @@ export const Nav = [
                   <span>精神小屋</span>
                 </div>
                 `,
-              link: '/love/inner',
+              link: '/xiaowu/inner/spiritual-cottage',
             },
             {
               text: `
@@ -150,7 +150,7 @@ export const Nav = [
                   <span>时间管理</span>
                 </div>
                 `,
-              link: '/love/time-plan',
+              link: '/xiaowu/time/time-management',
             },
             {
               text: `
@@ -159,7 +159,7 @@ export const Nav = [
                   <span>情感文案</span>
                 </div>
                 `,
-              link: '/love/wenan',
+              link: '/xiaowu/wenan/emotional-copywriting',
             },
             // { text: "💖情侣空间", link: "#" }, // 功能暂未开启
           ],
@@ -175,7 +175,7 @@ export const Nav = [
                   <span>旅行</span>
                 </div>
                 `,
-              link: '/xingqu/travel',
+              link: '/xingqu/travel/wenzhou-trip',
             },
             {
               text: `
@@ -184,7 +184,7 @@ export const Nav = [
                   <span>读书</span>
                 </div>
                 `,
-              link: '/xingqu/reading',
+              link: '/xingqu/reading/book-notes',
             },
           ],
         },  

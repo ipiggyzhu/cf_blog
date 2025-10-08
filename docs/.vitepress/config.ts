@@ -100,9 +100,6 @@ const teekConfig = defineTeekConfig({
     listStyleTitleTagPosition: "right", // 列表模式下的标题标签位置
     cardStyleTitleTagPosition: "left", // 卡片模式下的标题标签位置
     defaultCoverImg: [], // 默认封面图地址
-    limit: 6, // 首页文章卡片显示数量
-    autoPage: true, // 是否自动翻页
-    pageSpeed: 5000, // 翻页间隔时间，单位：毫秒
   },
 
   // 分类卡片
@@ -178,7 +175,7 @@ const teekConfig = defineTeekConfig({
   // 风险链接提示页
   riskLink: {
     enabled: true, //是否启用风险链接提示功能
-    whitelist: ["https://50094988.site/", "https://img.50094988.site/", /https:\/\/github.com/, /https:\/\/giee.com/], // 白名单，匹配到的链接不提示风险
+    whitelist: ["https://blog.itpiggy.top/", "https://image.itpiggy.top/", /https:\/\/github.com/, /https:\/\/giee.com/], // 白名单，匹配到的链接不提示风险
     blacklist: [], // 黑名单，匹配到的链接提示风险
   },
 
@@ -284,14 +281,14 @@ const teekConfig = defineTeekConfig({
 
   vitePlugins: {
     permalink: true,
-    sidebar: true,
+    sidebar: true, // 启用自动侧边栏
 
 
     sidebarOption: {
       // initItems: false, //这条命令注释后，才会让文档和目录的样式保持一致
       collapsed: true, //打开侧边栏自动收缩功能
       ignoreList: [/^_.*$/],
-      resolveRule: "rewrites",
+      resolveRule: "rewrites", // 根据 permalink（rewrites）而不是文件路径生成侧边栏
       checkRewritesPrefix: true,    
       ignoreIndexMd: true,
     },
@@ -388,7 +385,7 @@ export default defineConfig({
     },
   },
   sitemap: {
-    hostname: "https://50094988.site",
+    hostname: "https://blog.itpiggy.top",
     // transformItems: items => {
     //   const permalinkItemBak: typeof items = [];
     //   // 使用永久链接生成 sitemap
@@ -533,10 +530,14 @@ export default defineConfig({
                   { folderName: "25.黑客", prefix: "/hacker/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
                   { folderName: "30.专题", prefix: "/zhuanti/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
                   { folderName: "35.工具", prefix: "/tools/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
-                  { folderName: "40.生活", prefix: "/life/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
-                  { folderName: "45.精神小屋", prefix: "/love/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
-                  { folderName: "50.娱乐", prefix: "/yule/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
-                  { folderName: "55.兴趣", prefix: "/xingqu/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
+                  { folderName: "50.小屋/10.精神小屋", prefix: "/xiaowu/inner/$uuid5", removeLevel: 99}, // 精神小屋
+                  { folderName: "50.小屋/20.时间管理", prefix: "/xiaowu/time/$uuid5", removeLevel: 99}, // 时间管理
+                  { folderName: "50.小屋/30.情感文案", prefix: "/xiaowu/wenan/$uuid5", removeLevel: 99}, // 情感文案
+                  { folderName: "45.娱乐/10.电影", prefix: "/yule/movie/$uuid5", removeLevel: 99}, // 电影
+                  { folderName: "45.娱乐/20.音乐", prefix: "/yule/music/$uuid5", removeLevel: 99}, // 音乐
+                  { folderName: "45.娱乐/30.相册", prefix: "/yule/photo/$uuid5", removeLevel: 99}, // 相册
+                  { folderName: "55.兴趣/10.读书", prefix: "/xingqu/reading/$uuid5", removeLevel: 99}, // 读书
+                  { folderName: "55.兴趣/15.旅行", prefix: "/xingqu/travel/$uuid5", removeLevel: 99}, // 旅行
                   { folderName: "60.关于", prefix: "/about/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
                   { folderName: "65.Teek", prefix: "/teek/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
                   // { folderName: "40.专题/10.博客搭建/45.静态站点构建器", prefix: "/zhuanti/$uuid5", removeLevel: 99}, // 清空前缀并且添加前缀使用随机数
