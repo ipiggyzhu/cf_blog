@@ -7,12 +7,20 @@ pages_build_output_dir = "docs/.vitepress/dist"
 # [build]
 # command = "pnpm run docs:build"
 
+# R2 存储桶绑定配置
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "cf-blog"
+preview_bucket_name = "cf-blog"
+
 # 生产环境配置
 [env.production]
 name = "blog"
 
-# 环境变量（如果需要）
+# 环境变量配置
 [vars]
+# R2 公开访问域名（需要在 Cloudflare R2 设置中配置自定义域名）
+R2_PUBLIC_DOMAIN = "https://image.itpiggy.top"
 
 # 路由规则会由 public/_redirects 文件处理
 

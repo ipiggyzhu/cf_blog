@@ -12,11 +12,16 @@ export const WALLPAPER_SERVICE_CONFIG = {
 
 // 备用图片列表（当本地服务不可用时使用）
 const fallbackImages = [
-  "https://image.itpiggy.top/cf-blog/WallPaper/1.png",
-  "https://image.itpiggy.top/cf-blog/WallPaper/2.png",
-  "https://image.itpiggy.top/cf-blog/WallPaper/3.png",
-  "https://image.itpiggy.top/cf-blog/WallPaper/4.png",
-  "https://image.itpiggy.top/cf-blog/WallPaper/5.png",
+  "https://img.xxdevops.cn/blog/wallpaper/bg01.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg02.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg03.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg04.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg05.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg06.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg07.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg08.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg09.webp",
+  "https://img.xxdevops.cn/blog/wallpaper/bg10.webp",
 ];
 // 动态获取图片列表的函数
 async function fetchDynamicWallpapers(): Promise<string[]> {
@@ -34,22 +39,29 @@ async function fetchDynamicWallpapers(): Promise<string[]> {
     }
     
     const data = await response.json();
+    
+    // 检查 API 是否成功返回数据
+    if (!data.success) {
+      console.warn('API 返回失败:', data.error);
+      return fallbackImages;
+    }
+    
     const images = data.images || [];
     
-    // 将相对路径转换为完整的 R2 URL
-    const wallpapers = images.map((imagePath: string) => {
-      // 如果 API 返回的是完整 URL，直接使用；否则拼接 R2 域名
-      if (imagePath.startsWith('http')) {
-        return imagePath;
-      }
-      return `https://image.itpiggy.top${imagePath}`;
+    // API 现在返回完整的 URL（包含域名），直接使用
+    // 格式：https://image.itpiggy.top/cf-blog/WallPaper/1.png
+    const wallpapers = images.filter((imagePath: string) => {
+      // 确保是有效的 URL
+      return imagePath && (imagePath.startsWith('http://') || imagePath.startsWith('https://'));
     });
     
+    console.log(`✅ 成功获取 ${wallpapers.length} 张壁纸，域名: ${data.domain || '未知'}`);
+    
     // 如果获取到图片，返回动态图片列表，否则返回备用图片
-    return wallpapers.length > 0 ? wallpapers : wallpapers;
+    return wallpapers.length > 0 ? wallpapers : fallbackImages;
     
   } catch (error) {
-    console.warn('无法获取动态壁纸，使用备用图片:', error);
+    console.warn('❌ 无法获取动态壁纸，使用备用图片:', error);
     return fallbackImages;
   }
 }

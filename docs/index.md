@@ -55,11 +55,14 @@ features: []
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useData } from "vitepress";
+import { useData, inBrowser } from "vitepress";
 import DynamicWallpaperManager from "./.vitepress/theme/components/DynamicWallpaperManager.vue";
 
 const { frontmatter } = useData();
 onMounted(() => {
+  // 仅在浏览器环境执行 DOM 操作
+  if (!inBrowser) return;
+  
   const heroTextDom = document.querySelector<HTMLElement>(".VPHero .text");
   const textDom = document.querySelector<HTMLElement>("#hero-text");
 

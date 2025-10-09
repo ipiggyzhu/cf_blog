@@ -5,11 +5,18 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vitepress'
+import { inBrowser } from 'vitepress'
 import { fetchDynamicWallpapers, WALLPAPER_SERVICE_CONFIG } from '../../ConfigHyde/Wallaper'
 
 // 路由检测 - 只在首页启用动态壁纸
 const route = useRoute()
 let isHomePage = false
+
+// SSR 检测 - 仅在浏览器环境运行
+if (!inBrowser) {
+  // 在服务端渲染时，直接退出，不执行任何操作
+  console.log('🖼️ 服务端渲染环境，动态壁纸系统不启动')
+}
 
 // 检查是否为首页
 function checkIsHomePage(): boolean {
@@ -712,6 +719,12 @@ async function fetchImageLibrary() {
 }
 
 onMounted(async () => {
+  // 仅在浏览器环境运行
+  if (!inBrowser) {
+    console.log('⏹️ 服务端环境，动态壁纸系统不启动')
+    return
+  }
+
   // 检查是否为首页
   isHomePage = checkIsHomePage()
   console.log('🖼️ 动态壁纸管理器启动 - 当前页面:', route.path, '是否首页:', isHomePage)

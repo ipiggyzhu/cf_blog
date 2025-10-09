@@ -325,6 +325,10 @@ const teekConfig = defineTeekConfig({
       githubUrl: "https://github.com/ipiggyzhu/blog/main/docs",
     },
   },
+  // 网站分析统计配置
+  // 注意：ERR_BLOCKED_BY_CLIENT 错误是正常现象
+  // 这是由于用户浏览器的广告拦截器阻止了分析脚本加载
+  // 不影响网站正常功能，只是统计数据可能不完整
   siteAnalytics: [
     {
       provider: "baidu",
