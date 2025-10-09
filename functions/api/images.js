@@ -6,12 +6,13 @@
 export async function onRequestGet() {
   try {
     // 您的壁纸列表（通过 image.itpiggy.top Worker 访问）
+    // 注意：R2 对象路径不包含存储桶名称
     const images = [
-      'https://image.itpiggy.top/cf-blog/WallPaper/1.png',
-      'https://image.itpiggy.top/cf-blog/WallPaper/2.png',
-      'https://image.itpiggy.top/cf-blog/WallPaper/3.png',
-      'https://image.itpiggy.top/cf-blog/WallPaper/4.png',
-      'https://image.itpiggy.top/cf-blog/WallPaper/5.png',
+      'https://image.itpiggy.top/WallPaper/1.png',
+      'https://image.itpiggy.top/WallPaper/2.png',
+      'https://image.itpiggy.top/WallPaper/3.png',
+      'https://image.itpiggy.top/WallPaper/4.png',
+      'https://image.itpiggy.top/WallPaper/5.png',
     ];
 
     // 返回 JSON 响应
