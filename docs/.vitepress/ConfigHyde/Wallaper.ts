@@ -10,18 +10,13 @@ export const WALLPAPER_SERVICE_CONFIG = {
   }
 }
 
-// 备用图片列表（当本地服务不可用时使用）
+// 备用图片列表（使用您自己的壁纸）
 const fallbackImages = [
-  "https://img.xxdevops.cn/blog/wallpaper/bg01.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg02.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg03.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg04.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg05.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg06.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg07.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg08.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg09.webp",
-  "https://img.xxdevops.cn/blog/wallpaper/bg10.webp",
+  "https://image.itpiggy.top/WallPaper/1.png",
+  "https://image.itpiggy.top/WallPaper/2.png",
+  "https://image.itpiggy.top/WallPaper/3.png",
+  "https://image.itpiggy.top/WallPaper/4.png",
+  "https://image.itpiggy.top/WallPaper/5.png",
 ];
 // 动态获取图片列表的函数
 async function fetchDynamicWallpapers(): Promise<string[]> {
