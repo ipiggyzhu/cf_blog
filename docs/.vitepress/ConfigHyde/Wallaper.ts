@@ -2,8 +2,8 @@
 
 // 壁纸服务配置 - 统一配置服务地址，一处修改全局生效
 export const WALLPAPER_SERVICE_CONFIG = {
-  baseUrl: 'https://imgapi.onedayxyy.cn',
-  // baseUrl: 'https://imgapi.onedayxyy.cn',
+  baseUrl: 'https://blog.itpiggy.top',
+  // baseUrl: 'https://blog.itpiggy.top',
   apiEndpoint: '/api/images',
   get fullUrl() {
     return `${this.baseUrl}${this.apiEndpoint}`
@@ -12,25 +12,11 @@ export const WALLPAPER_SERVICE_CONFIG = {
 
 // 备用图片列表（当本地服务不可用时使用）
 const fallbackImages = [
-  "https://img.onedayxyy.cn/images/Teek/TeekBg/1.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/2.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/3.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/4.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/5.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/6.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/7.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/8.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/9.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/10.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/11.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/12.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/13.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/14.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/15.webp", 
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/16.webp",
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/17.webp",
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/18.webp",
-  // "https://img.onedayxyy.cn/images/Teek/TeekBg/19.webp",
+  "https://image.itpiggy.top/cf-blog/WallPaper/1.png",
+  "https://image.itpiggy.top/cf-blog/WallPaper/2.png",
+  "https://image.itpiggy.top/cf-blog/WallPaper/3.png",
+  "https://image.itpiggy.top/cf-blog/WallPaper/4.png",
+  "https://image.itpiggy.top/cf-blog/WallPaper/5.png",
 ];
 // 动态获取图片列表的函数
 async function fetchDynamicWallpapers(): Promise<string[]> {
@@ -50,8 +36,14 @@ async function fetchDynamicWallpapers(): Promise<string[]> {
     const data = await response.json();
     const images = data.images || [];
     
-    // 将相对路径转换为完整的服务器URL
-    const wallpapers = images.map((imagePath: string) => `${WALLPAPER_SERVICE_CONFIG.baseUrl}${imagePath}`);
+    // 将相对路径转换为完整的 R2 URL
+    const wallpapers = images.map((imagePath: string) => {
+      // 如果 API 返回的是完整 URL，直接使用；否则拼接 R2 域名
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+      return `https://image.itpiggy.top${imagePath}`;
+    });
     
     // 如果获取到图片，返回动态图片列表，否则返回备用图片
     return wallpapers.length > 0 ? wallpapers : wallpapers;
