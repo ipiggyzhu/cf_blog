@@ -1,13 +1,12 @@
 /**
  * Cloudflare Pages Function - R2 壁纸图片列表 API
- * 直接返回固定的壁纸列表，无需 R2 绑定
+ * 自动列出 R2 存储桶中的所有壁纸图片
  */
 
-export async function onRequestGet() {
+export async function onRequestGet({ env }) {
   try {
-    // 您的壁纸列表（通过 image.itpiggy.top Worker 访问）
-    // 注意：R2 对象路径不包含存储桶名称
-    const images = [
+    // 固定壁纸列表作为备用（如果 R2 绑定失败）
+    const fallbackImages = [
       'https://image.itpiggy.top/WallPaper/1.png',
       'https://image.itpiggy.top/WallPaper/2.png',
       'https://image.itpiggy.top/WallPaper/3.png',
@@ -15,12 +14,66 @@ export async function onRequestGet() {
       'https://image.itpiggy.top/WallPaper/5.png',
     ];
 
-    // 返回 JSON 响应
+    // 检查 R2 绑定是否存在
+    if (!env.R2_BUCKET) {
+      console.warn('⚠️ R2_BUCKET 未绑定，使用固定图片列表');
+      return new Response(JSON.stringify({
+        success: true,
+        count: fallbackImages.length,
+        images: fallbackImages,
+        domain: 'https://image.itpiggy.top',
+        mode: 'fallback',
+        timestamp: new Date().toISOString()
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=300'
+        }
+      });
+    }
+
+    // 自动列出 WallPaper 目录下的所有图片
+    const listed = await env.R2_BUCKET.list({
+      prefix: 'WallPaper/',
+      limit: 100
+    });
+
+    // 过滤出图片文件并构建完整 URL
+    const images = listed.objects
+      .filter(obj => {
+        // 只要图片文件，排除文件夹
+        const fileName = obj.key.split('/').pop();
+        return fileName && /\.(jpg|jpeg|png|webp|gif)$/i.test(fileName);
+      })
+      .map(obj => `https://image.itpiggy.top/${obj.key}`);
+
+    // 如果没有找到图片，使用备用列表
+    if (images.length === 0) {
+      console.warn('⚠️ R2 中没有找到图片，使用备用列表');
+      return new Response(JSON.stringify({
+        success: true,
+        count: fallbackImages.length,
+        images: fallbackImages,
+        domain: 'https://image.itpiggy.top',
+        mode: 'fallback-empty',
+        timestamp: new Date().toISOString()
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=300'
+        }
+      });
+    }
+
+    // 返回动态获取的图片列表
     return new Response(JSON.stringify({
       success: true,
       count: images.length,
       images: images,
       domain: 'https://image.itpiggy.top',
+      mode: 'dynamic',
       timestamp: new Date().toISOString()
     }), {
       headers: {
@@ -31,12 +84,27 @@ export async function onRequestGet() {
     });
 
   } catch (error) {
+    console.error('❌ API 错误:', error);
+    
+    // 出错时返回备用图片
+    const fallbackImages = [
+      'https://image.itpiggy.top/WallPaper/1.png',
+      'https://image.itpiggy.top/WallPaper/2.png',
+      'https://image.itpiggy.top/WallPaper/3.png',
+      'https://image.itpiggy.top/WallPaper/4.png',
+      'https://image.itpiggy.top/WallPaper/5.png',
+    ];
+
     return new Response(JSON.stringify({
-      success: false,
+      success: true,
+      count: fallbackImages.length,
+      images: fallbackImages,
+      domain: 'https://image.itpiggy.top',
+      mode: 'fallback-error',
       error: error.message,
-      images: []
+      timestamp: new Date().toISOString()
     }), {
-      status: 500,
+      status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
