@@ -54,7 +54,7 @@ const config = {
   authorName: 'Casual',
   authorUrl: 'https://github.com/ipiggyzhu',
   siteName: 'Casual Blog',
-  siteUrl: 'https://50094988.site/',
+  siteUrl: 'https://blog.itpiggy.top/',
   licenseName: 'CC BY-NC-SA 4.0',
   licenseUrl: 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh'
 }
