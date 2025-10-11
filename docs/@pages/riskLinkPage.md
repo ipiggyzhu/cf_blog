@@ -1,6 +1,6 @@
 ---
 date: 2025-01-27 21:15:00
-title: 风险链接提示�?
+title: 风险链接提示
 permalink: /risk-link
 layout: false
 article: false
@@ -11,17 +11,17 @@ article: false
   <h1 class="warning-title">风险链接警告</h1>
   
   <p class="warning-description">
-    您即将访问的链接可能存在安全风险�?br>
+    您即将访问的链接可能存在安全风险。<br />
     请谨慎点击，确保链接来源可信 🔒
   </p>
 
   <div class="safety-tips">
-    <h3>🛡�?安全提示</h3>
+    <h3>🛡️ 安全提示</h3>
     <ul>
-      <li>�?确认链接来源可信</li>
-      <li>�?检查网站是否有安全证书</li>
-      <li>�?避免输入敏感信息</li>
-      <li>�?使用杀毒软件保护设�?/li>
+      <li>✔️ 确认链接来源可信</li>
+      <li>✔️ 检查网站是否有安全证书</li>
+      <li>✔️ 避免输入敏感信息</li>
+      <li>✔️ 使用杀毒软件保护设备</li>
     </ul>
   </div>
 
@@ -31,9 +31,9 @@ article: false
   </div>
 
   <div class="footer-message">
-    <span>🛡�?/span>
+    <span>🛡️</span>
     <span>安全第一，谨慎上网！</span>
-    <span>🛡�?/span>
+    <span>🛡️</span>
   </div>
 </div>
 
@@ -90,7 +90,7 @@ article: false
   margin: 40px 0; /* 增加上下间距 */
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255,255,255,0.2);
-  animation: fadeInUp 1s ease-out 0.6s both; /* 进一步延迟动�?*/
+  animation: fadeInUp 1s ease-out 0.6s both; /* 进一步延迟动画 */
   max-width: 600px;
   width: 100%;
 }
@@ -120,7 +120,7 @@ article: false
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
-  animation: fadeInUp 1s ease-out 0.8s both; /* 进一步延迟动�?*/
+  animation: fadeInUp 1s ease-out 0.8s both; /* 进一步延迟动画 */
   margin: 50px 0; /* 增加上下间距 */
 }
 
@@ -148,7 +148,7 @@ article: false
   margin-top: 50px; /* 增加顶部间距 */
   font-size: 14px;
   opacity: 0.7;
-  animation: fadeInUp 1s ease-out 1.0s both; /* 最后显�?*/
+  animation: fadeInUp 1s ease-out 1.0s both; /* 最后显示 */
   display: flex;
   gap: 10px;
   align-items: center;
