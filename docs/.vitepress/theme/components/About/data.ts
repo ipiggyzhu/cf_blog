@@ -42,7 +42,7 @@ export const profile = {
   title: '你好，我是',
   name: 'Casual',
   desc: '心向暖阳，静待花开',
-  avatar: '/img/xyy.webp',//头像
+  avatar: '/img/logo.png', 
   buttons: [
     { text: '联系我', link: 'http://wpa.qq.com/msgrd?v=3&uin=50094988&site=qq&menu=yes', type: 'primary' },
     { text: 'GitHub', link: 'https://github.com/ipiggyzhu', type: 'default' }
