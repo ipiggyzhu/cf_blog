@@ -645,28 +645,13 @@ function startServiceMonitoring() {
 
 // 获取备用图片列表
 function getFallbackImages(): string[] {
-  // 从 Wallaper.ts 导入的备用图片
+  // 使用您自己的 R2 壁纸
   const fallbackImages = [
-    "https://img.xxdevops.cn/blog/wallpaper/bg01.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg02.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg03.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg04.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg05.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg06.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg07.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg08.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg09.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg10.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg11.webp", 
-    "https://img.xxdevops.cn/blog/wallpaper/bg12.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg13.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg14.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg15.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg16.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg17.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg18.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg19.webp",
-    "https://img.xxdevops.cn/blog/wallpaper/bg20.webp"
+    "https://image.itpiggy.top/WallPaper/1.webp",
+    "https://image.itpiggy.top/WallPaper/2.webp",
+    "https://image.itpiggy.top/WallPaper/3.webp",
+    "https://image.itpiggy.top/WallPaper/4.webp",
+    "https://image.itpiggy.top/WallPaper/5.webp",
   ]
   return fallbackImages
 }

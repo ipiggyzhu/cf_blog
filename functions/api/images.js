@@ -7,11 +7,11 @@ export async function onRequestGet({ env }) {
   try {
     // 固定壁纸列表作为备用（如果 R2 绑定失败）
     const fallbackImages = [
-      'https://image.itpiggy.top/WallPaper/1.png',
-      'https://image.itpiggy.top/WallPaper/2.png',
-      'https://image.itpiggy.top/WallPaper/3.png',
-      'https://image.itpiggy.top/WallPaper/4.png',
-      'https://image.itpiggy.top/WallPaper/5.png',
+      'https://image.itpiggy.top/WallPaper/1.webp',
+      'https://image.itpiggy.top/WallPaper/2.webp',
+      'https://image.itpiggy.top/WallPaper/3.webp',
+      'https://image.itpiggy.top/WallPaper/4.webp',
+      'https://image.itpiggy.top/WallPaper/5.webp',
     ];
 
     // 检查 R2 绑定是否存在
@@ -88,11 +88,11 @@ export async function onRequestGet({ env }) {
     
     // 出错时返回备用图片
     const fallbackImages = [
-      'https://image.itpiggy.top/WallPaper/1.png',
-      'https://image.itpiggy.top/WallPaper/2.png',
-      'https://image.itpiggy.top/WallPaper/3.png',
-      'https://image.itpiggy.top/WallPaper/4.png',
-      'https://image.itpiggy.top/WallPaper/5.png',
+      'https://image.itpiggy.top/WallPaper/1.webp',
+      'https://image.itpiggy.top/WallPaper/2.webp',
+      'https://image.itpiggy.top/WallPaper/3.webp',
+      'https://image.itpiggy.top/WallPaper/4.webp',
+      'https://image.itpiggy.top/WallPaper/5.webp',
     ];
 
     return new Response(JSON.stringify({

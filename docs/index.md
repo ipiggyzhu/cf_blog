@@ -7,14 +7,14 @@ tk:
 
 hero:
   name: Casual Blog
-  text: 运维技术分享
+  text: 运维技术分�?
   tagline: 💻 记录技术成长之路，分享运维实战经验
   actions:
     - theme: brand
       text: 查看文章
       link: /categories/运维
     - theme: alt
-      text: 关于我
+      text: 关于�?
       link: /about/me
   image:
     src: /img/logo.png
@@ -25,13 +25,13 @@ features: []
 
 <!-- ## 💡 反馈交流
 
-在使用过程中有任何问题和想法，请给我提 [Issue](https://github.com/ipiggyzhu/您的仓库名/issues)。 你也可以在 Issue 查看别人提的问题和解决方案。
+在使用过程中有任何问题和想法，请给我�?[Issue](https://github.com/ipiggyzhu/您的仓库�?issues)�?你也可以�?Issue 查看别人提的问题和解决方案�?
 
-或者加入我们的交流群（添加我的微信并备注 <mark>进群</mark>）：
+或者加入我们的交流群（添加我的微信并备�?<mark>进群</mark>）：
 
-<img src="/img/wechat/wechat.png" alt="添加我微信备注「进群」" style="width: 180px;" />
+<img src="/img/wechat/wechat.png" alt="添加我微信备注「进群�? style="width: 180px;" />
 
-如果图片链接失效，可以在微信右上角 -> 添加朋友，然后搜索 `您的微信号` 来添加我的微信。 -->
+如果图片链接失效，可以在微信右上�?-> 添加朋友，然后搜�?`您的微信号` 来添加我的微信�?-->
 
 <style>
 
@@ -60,7 +60,7 @@ import DynamicWallpaperManager from "./.vitepress/theme/components/DynamicWallpa
 
 const { frontmatter } = useData();
 onMounted(() => {
-  // 仅在浏览器环境执行 DOM 操作
+  // 仅在浏览器环境执�?DOM 操作
   if (!inBrowser) return;
   
   const heroTextDom = document.querySelector<HTMLElement>(".VPHero .text");
@@ -80,5 +80,5 @@ onMounted(() => {
   </svg>
 </span>
 
-<!-- 首页专用动态壁纸组件 -->
+<!-- 首页专用动态壁纸组�?-->
 <DynamicWallpaperManager />

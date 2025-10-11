@@ -12,11 +12,11 @@ export const WALLPAPER_SERVICE_CONFIG = {
 
 // 备用图片列表（使用您自己的壁纸）
 const fallbackImages = [
-  "https://image.itpiggy.top/WallPaper/1.png",
-  "https://image.itpiggy.top/WallPaper/2.png",
-  "https://image.itpiggy.top/WallPaper/3.png",
-  "https://image.itpiggy.top/WallPaper/4.png",
-  "https://image.itpiggy.top/WallPaper/5.png",
+  "https://image.itpiggy.top/WallPaper/1.webp",
+  "https://image.itpiggy.top/WallPaper/2.webp",
+  "https://image.itpiggy.top/WallPaper/3.webp",
+  "https://image.itpiggy.top/WallPaper/4.webp",
+  "https://image.itpiggy.top/WallPaper/5.webp",
 ];
 // 动态获取图片列表的函数
 async function fetchDynamicWallpapers(): Promise<string[]> {

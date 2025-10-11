@@ -41,10 +41,10 @@ interface NoticeContent {
 // 公告内容
 const noticeContent: NoticeContent = {
   title: '📢 重要公告',
-  subtitle: '全网最美博客Teek🎉',
-  content: 'Teek~一款简约、唯美、丝滑且强大的VitePress主题博客(知识库&博客二合一) ，正在持续迭代更新，欢迎交流学习！',
-  operationButtonName: '查看详情',
-  operationButtonPath: 'https://vp.teek.top/',
+  subtitle: 'Casual 的运维技术博客 💻',
+  content: '记录技术成长之路，分享运维实战经验。欢迎交流学习，共同进步！',
+  operationButtonName: '关于本站',
+  operationButtonPath: '/about/site',
 };
 
 // 判断是否为外链

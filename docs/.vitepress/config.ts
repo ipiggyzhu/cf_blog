@@ -30,9 +30,9 @@ import { useTransformByRules, type TransformRule } from "./theme/composables/use
 
 
 const description = [
-  "欢迎来到 vitepress-theme-teek 使用文档",
-  "Teek 是一个基于 VitePress 构建的主题，是在默认主题的基础上进行拓展，支持 VitePress 的所有功能、配置",
-  "Teek 拥有三种典型的知识管理形态：结构化、碎片化、体系化，可以轻松构建一个结构化知识库，适用个人博客、文档站、知识库等场景",
+  "欢迎来到 Casual 的技术博客",
+  "记录技术成长之路，分享运维实战经验",
+  "专注于 Linux、Docker、Kubernetes、云原生等技术领域，打造个人知识库与技术分享平台",
 ].toString();
 const CoverImgList = Cover; // 获取壁纸列表
 // const CoverBgList = Wallpaper; // 获取壁纸列表
@@ -53,7 +53,7 @@ const teekConfig = defineTeekConfig({
   },
 
   loading: false, // 启用 Loading 动画，为 false 则关闭 Loading 动画
-  // loading: "正在加载中...", // 修改 Loading 文案
+  // loading: "🚀 正在加载...", // 修改 Loading 文案
 
 
   themeEnhance: {
@@ -432,62 +432,84 @@ export default defineConfig({
 
 
 
-    // search: {
-    //   provider: "local",
-    // },
-
-    // algolia搜索
+    // 本地搜索 - 支持模糊搜索和忽略大小写
     search: {
-      provider: 'algolia',
+      provider: "local",
       options: {
-        appId: '6AC1N60WH4',
-        apiKey: '90f7d1ece3094d290fe42fcaf6cdfd3c',
-        indexName: '50094988',
         locales: {
           root: {
-            placeholder: '搜索文档',
             translations: {
               button: {
                 buttonText: '搜索文档',
                 buttonAriaLabel: '搜索文档'
               },
               modal: {
-                searchBox: {
-                  resetButtonTitle: '清除查询条件',
-                  resetButtonAriaLabel: '清除查询条件',
-                  cancelButtonText: '取消',
-                  cancelButtonAriaLabel: '取消'
-                },
-                startScreen: {
-                  recentSearchesTitle: '搜索历史',
-                  noRecentSearchesText: '没有搜索历史',
-                  saveRecentSearchButtonTitle: '保存至搜索历史',
-                  removeRecentSearchButtonTitle: '从搜索历史中移除',
-                  favoriteSearchesTitle: '收藏',
-                  removeFavoriteSearchButtonTitle: '从收藏中移除'
-                },
-                errorScreen: {
-                  titleText: '无法获取结果',
-                  helpText: '你可能需要检查你的网络连接'
-                },
+                noResultsText: '无法找到相关结果',
+                resetButtonTitle: '清除查询条件',
                 footer: {
                   selectText: '选择',
                   navigateText: '切换',
-                  closeText: '关闭',
-                  searchByText: '搜索提供者'
-                },
-                noResultsScreen: {
-                  noResultsText: '无法找到相关结果',
-                  suggestedQueryText: '你可以尝试查询',
-                  reportMissingResultsText: '你认为该查询应该有结果？',
-                  reportMissingResultsLinkText: '点击反馈'
-                },
-              },
-            },
-          },
-        },        
+                  closeText: '关闭'
+                }
+              }
+            }
+          }
+        }
       }
     },
+
+    // algolia搜索（已停用，改用本地搜索）
+    // search: {
+    //   provider: 'algolia',
+    //   options: {
+    //     appId: '6AC1N60WH4',
+    //     apiKey: '90f7d1ece3094d290fe42fcaf6cdfd3c',
+    //     indexName: '50094988',
+    //     locales: {
+    //       root: {
+    //         placeholder: '搜索文档',
+    //         translations: {
+    //           button: {
+    //             buttonText: '搜索文档',
+    //             buttonAriaLabel: '搜索文档'
+    //           },
+    //           modal: {
+    //             searchBox: {
+    //               resetButtonTitle: '清除查询条件',
+    //               resetButtonAriaLabel: '清除查询条件',
+    //               cancelButtonText: '取消',
+    //               cancelButtonAriaLabel: '取消'
+    //             },
+    //             startScreen: {
+    //               recentSearchesTitle: '搜索历史',
+    //               noRecentSearchesText: '没有搜索历史',
+    //               saveRecentSearchButtonTitle: '保存至搜索历史',
+    //               removeRecentSearchButtonTitle: '从搜索历史中移除',
+    //               favoriteSearchesTitle: '收藏',
+    //               removeFavoriteSearchButtonTitle: '从收藏中移除'
+    //             },
+    //             errorScreen: {
+    //               titleText: '无法获取结果',
+    //               helpText: '你可能需要检查你的网络连接'
+    //             },
+    //             footer: {
+    //               selectText: '选择',
+    //               navigateText: '切换',
+    //               closeText: '关闭',
+    //               searchByText: '搜索提供者'
+    //             },
+    //             noResultsScreen: {
+    //               noResultsText: '无法找到相关结果',
+    //               suggestedQueryText: '你可以尝试查询',
+    //               reportMissingResultsText: '你认为该查询应该有结果？',
+    //               reportMissingResultsLinkText: '点击反馈'
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },        
+    //   }
+    // },
 
     
     editLink: {
