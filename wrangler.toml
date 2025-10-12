@@ -5,7 +5,8 @@ pages_build_output_dir = "docs/.vitepress/dist"
 
 # 生产环境配置
 [env.production]
-  #  R2 绑定
-  [[r2_buckets]]
-  binding = "R2_BUCKET"
-  bucket_name = "cf-blog"
+
+# 生产环境的 R2 绑定
+[[env.production.r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "cf-blog"
