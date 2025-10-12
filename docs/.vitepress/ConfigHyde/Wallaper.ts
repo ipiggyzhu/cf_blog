@@ -18,6 +18,16 @@ const fallbackImages = [
   "https://image.itpiggy.top/WallPaper/4.webp",
   "https://image.itpiggy.top/WallPaper/5.webp",
 ];
+// 随机打乱数组的函数
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 // 动态获取图片列表的函数
 async function fetchDynamicWallpapers(): Promise<string[]> {
   try {
@@ -38,7 +48,7 @@ async function fetchDynamicWallpapers(): Promise<string[]> {
     // 检查 API 是否成功返回数据
     if (!data.success) {
       console.warn('API 返回失败:', data.error);
-      return fallbackImages;
+      return shuffleArray(fallbackImages);
     }
     
     const images = data.images || [];
@@ -52,12 +62,12 @@ async function fetchDynamicWallpapers(): Promise<string[]> {
     
     console.log(`✅ 成功获取 ${wallpapers.length} 张壁纸，域名: ${data.domain || '未知'}`);
     
-    // 如果获取到图片，返回动态图片列表，否则返回备用图片
-    return wallpapers.length > 0 ? wallpapers : fallbackImages;
+    // 如果获取到图片，随机打乱后返回，否则返回随机打乱的备用图片
+    return wallpapers.length > 0 ? shuffleArray(wallpapers) : shuffleArray(fallbackImages);
     
   } catch (error) {
     console.warn('❌ 无法获取动态壁纸，使用备用图片:', error);
-    return fallbackImages;
+    return shuffleArray(fallbackImages);
   }
 }
 
@@ -72,8 +82,8 @@ function getWallpapers(): Promise<string[]> {
   return wallpaperPromise;
 }
 
-// 导出的Wallpaper数组 - 在服务端渲染时使用备用图片，客户端动态加载
-export const Wallpaper: string[] = fallbackImages;
+// 导出的Wallpaper数组 - 在服务端渲染时使用随机打乱的备用图片，客户端动态加载
+export const Wallpaper: string[] = shuffleArray(fallbackImages);
 
 // 导出动态获取函数供主题使用
 export { getWallpapers, fetchDynamicWallpapers };
