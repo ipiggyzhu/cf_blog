@@ -68,7 +68,7 @@ const teekConfig = defineTeekConfig({
   // author: { name: "Casual", link: "https://github.com/ipiggyzhu" },
   blogger: {
     // 博主信息，显示在首页侧边栏
-    avatar: "/img/xyy.webp",  //侧边栏个人头像
+    avatar: "/img/logo.png",  //侧边栏个人头像
     shape: "circle-rotate", // 头像风格：square 为方形头像，circle 为圆形头像，circle-rotate 可支持鼠标悬停旋转
     name: "Casual", // 侧边栏个人昵称
     slogan: "心向暖阳，静待花开", // 侧边栏个人座右铭
@@ -99,7 +99,7 @@ const teekConfig = defineTeekConfig({
     transitionName: "tk-slide-fade", // 自定义过渡动画名称
     listStyleTitleTagPosition: "right", // 列表模式下的标题标签位置
     cardStyleTitleTagPosition: "left", // 卡片模式下的标题标签位置
-    defaultCoverImg: [], // 默认封面图地址
+    defaultCoverImg: CoverImgList, // 使用你自己的封面图列表
   },
 
   // 分类卡片

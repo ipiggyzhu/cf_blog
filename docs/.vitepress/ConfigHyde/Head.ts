@@ -6,25 +6,21 @@ const description = [
 
 // 导出head.ts
 export const HeadData = [
-  // Vercel Analytics (正式版本，减少被广告拦截器阻止的可能)
-  [
-    "script",
-    {
-      defer: true,
-      src: "https://va.vercel-scripts.com/v1/script.js",
-    },
-  ],
-  // Vercel Speed Insights
-  [
-    "script",
-    {
-      defer: true,
-      src: "https://va.vercel-scripts.com/v1/speed-insights/script.js",
-    },
-  ],
+  // 已移除 Vercel Analytics，因为部署在 Cloudflare Pages
+  // Vercel Analytics 只能在 Vercel 平台使用
+  
+  // Cloudflare Analytics (可选，需要在 Cloudflare Dashboard 中启用)
+  // [
+  //   "script",
+  //   {
+  //     defer: true,
+  //     src: "https://static.cloudflareinsights.com/beacon.min.js",
+  //     "data-cf-beacon": '{"token": "your-token-here"}'
+  //   },
+  // ],
   ["meta", { name: "author", content: "Casual" }],
   ['meta', { property: 'og:description', content: '明心静性，爱自己' }],
-  ['meta', { property: 'og:image', content: '/img/xyy.webp' }],
+  ['meta', { property: 'og:image', content: '/img/logo.png' }],
 
   [
     "meta",

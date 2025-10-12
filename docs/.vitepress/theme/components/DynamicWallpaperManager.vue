@@ -120,12 +120,13 @@ function preloadImage(src: string): Promise<boolean> {
   return new Promise((resolve) => {
     const img = new Image()
 
-    // 设置3秒超时
+    // 设置5秒超时，给网络慢的用户更多时间
     const timeout = setTimeout(() => {
       img.onload = null
       img.onerror = null
+      console.warn('⏰ 图片预加载超时:', src)
       resolve(false)
-    }, 3000)
+    }, 5000)
 
     img.onload = () => {
       clearTimeout(timeout)
@@ -510,7 +511,7 @@ async function displayRandomImage() {
       
       if (fallbackPreloadSuccess) {
         currentDisplayImage = fallbackImg
-        updateBannerBackground(fallbackImg)
+        updateBannerBackgroundWithCSS(fallbackImg)
         return
       } else {
         console.error('备用图片也加载失败')
@@ -645,13 +646,33 @@ function startServiceMonitoring() {
 
 // 获取备用图片列表
 function getFallbackImages(): string[] {
-  // 使用您自己的 R2 壁纸
+  // 使用您自己的 R2 壁纸 - 扩展备用图片数量
   const fallbackImages = [
     "https://image.itpiggy.top/WallPaper/1.webp",
     "https://image.itpiggy.top/WallPaper/2.webp",
     "https://image.itpiggy.top/WallPaper/3.webp",
     "https://image.itpiggy.top/WallPaper/4.webp",
     "https://image.itpiggy.top/WallPaper/5.webp",
+    "https://image.itpiggy.top/WallPaper/6.webp",
+    "https://image.itpiggy.top/WallPaper/7.webp",
+    "https://image.itpiggy.top/WallPaper/8.webp",
+    "https://image.itpiggy.top/WallPaper/9.webp",
+    "https://image.itpiggy.top/WallPaper/10.webp",
+    "https://image.itpiggy.top/WallPaper/11.webp",
+    "https://image.itpiggy.top/WallPaper/12.webp",
+    "https://image.itpiggy.top/WallPaper/13.webp",
+    "https://image.itpiggy.top/WallPaper/14.webp",
+    "https://image.itpiggy.top/WallPaper/15.webp",
+    "https://image.itpiggy.top/WallPaper/16.webp",
+    "https://image.itpiggy.top/WallPaper/17.webp",
+    "https://image.itpiggy.top/WallPaper/18.webp",
+    "https://image.itpiggy.top/WallPaper/19.webp",
+    "https://image.itpiggy.top/WallPaper/20.webp",
+    "https://image.itpiggy.top/WallPaper/21.webp",
+    "https://image.itpiggy.top/WallPaper/22.webp",
+    "https://image.itpiggy.top/WallPaper/23.webp",
+    "https://image.itpiggy.top/WallPaper/24.webp",
+    "https://image.itpiggy.top/WallPaper/25.webp",
   ]
   return fallbackImages
 }
