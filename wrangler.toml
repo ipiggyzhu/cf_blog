@@ -1,18 +1,11 @@
 name = "blog"
 compatibility_date = "2024-01-01"
 
-# Pages 配置
 pages_build_output_dir = "docs/.vitepress/dist"
-
-# R2 绑定配置
-[[r2_buckets]]
-binding = "R2_BUCKET"
-bucket_name = "cf-blog"
 
 # 生产环境配置
 [env.production]
-name = "blog"
-
-# 路由规则会由 public/_redirects 文件处理
-
-
+  #  R2 绑定
+  [[r2_buckets]]
+  binding = "R2_BUCKET"
+  bucket_name = "cf-blog"

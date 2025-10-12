@@ -36,7 +36,7 @@ export async function onRequestGet({ env }) {
     // 自动列出 WallPaper 目录下的所有图片
     const listed = await env.R2_BUCKET.list({
       prefix: 'WallPaper/',
-      limit: 100
+      limit: 1000
     });
 
     // 过滤出图片文件并构建完整 URL
