@@ -22,6 +22,7 @@ import DocFooterCopyright from "./DocFooterCopyright.vue"; //导入文档页脚�
 
 import BackTop from "./BackTop.vue"; //导入回到顶部组件
 import Clock from "./Clock.vue"; // 时钟组件
+import NavWeather from "./NavWeather.vue"; // 导航栏天气组件
 // import OhMyLive2D from "./OhMyLive2D.vue"; //导入看板娘组件
 
 
@@ -147,6 +148,11 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
       <DocFooterCopyright />
     </template>
 
+    <!-- 导航栏社交图标区域 - 天气组件 -->
+    <template #nav-bar-social-after>
+      <NavWeather />
+    </template>
+
     <!-- 右上角时钟组件 -->
     <template #nav-bar-content-after>
       <Clock/>
@@ -169,7 +175,7 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
   // margin-bottom: 15px;
 
   .tk-my__avatar.circle-rotate {
-    margin-top: 90px;
+    margin-top: 0; // 由 flex 布局控制居中
 
 
     .tk-avatar:not(.avatar-sticker) {

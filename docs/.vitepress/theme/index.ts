@@ -52,6 +52,9 @@ import About from "./components/About.vue"; //关于我
 import CoupleAlbum from './components/CoupleAlbum/CoupleAlbum.vue'
 import PhotoCard from './components/CoupleAlbum/PhotoCard.vue'
 
+// 导入天气组件
+import NavWeather from './components/NavWeather.vue'
+
 
 
 // import "./style/sidebar-icon.scss";
@@ -67,7 +70,7 @@ export default {
     app.component('CoupleAlbum', CoupleAlbum) // 注册情侣相册组件
     app.component('PhotoCard', PhotoCard)
     
-    // app.component("NavIcon", NavIcon); //导航栏图标
+    app.component("NavWeather", NavWeather); // 注册导航栏天气组件
 
     // 注册全局组件
     app.component("friend-link", SLink);

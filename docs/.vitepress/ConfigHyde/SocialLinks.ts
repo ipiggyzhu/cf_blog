@@ -1,10 +1,7 @@
 import { gitee, email, WhatsApp, telegram } from "../theme/icon/icons";
 
+// GitHub 图标已被天气组件替换，天气组件通过自定义插槽实现
 export const SocialLinks = [
-  {
-    icon: "github", // 使用GitHub图标
-    link: "https://github.com/ipiggyzhu", // 跳转到您的GitHub
-  },
   // {
   //   icon: { svg: email },
   //   link: "mailto:2675263825@qq.com",
@@ -19,6 +16,6 @@ export const SocialLinks = [
   // },
   // {
   //   icon: "github",
-  //   link: "https://github.com/Kele-Bingtang/vitepress-theme-teek/tree/dev",
+  //   link: "https://github.com/ipiggyzhu",
   // },
 ];

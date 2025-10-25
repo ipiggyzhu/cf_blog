@@ -40,6 +40,10 @@ $icons-margin-top: 10px;
 // 圆形背景
 .is-circle-bg {
   height: $circle-height; // 首页卡片栏博主信息高度
+  display: flex; // 使用 flex 布局
+  flex-direction: column; // 垂直排列
+  justify-content: center; // 垂直居中
+  align-items: center; // 水平居中
 }
 
 .tk-my__icons {
@@ -56,14 +60,6 @@ $icons-margin-top: 10px;
     justify-content: center; // 水平居中
   }
 }
-
-.tk-my__avatar {
-  margin-top: 40px;
-  margin-bottom: 7px;
-}
-// .is-circle-bg {
-//   height: 645px;
-// }
 
 
 
