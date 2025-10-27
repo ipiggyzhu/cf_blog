@@ -75,7 +75,8 @@ onUnmounted(() => {
 #clock {
   order: 99;
   text-align: center;
-  margin-left: 15px;
+  margin-left: 3px !important;
+  margin-right: 3px !important;
   display: flex;
   align-items: center;
 

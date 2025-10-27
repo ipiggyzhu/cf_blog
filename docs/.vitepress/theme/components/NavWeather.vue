@@ -1,9 +1,11 @@
 <template>
-  <div class="nav-weather VPSocialLink" :title="weatherTooltip">
-    <div class="weather-content">
+  <div class="weather-wrapper">
+    <div class="divider divider-left"></div>
+    <a class="VPSocialLink no-icon weather-link" :title="weatherTooltip" href="javascript:void(0)">
       <span class="weather-emoji" v-if="weatherData">{{ weatherIcon }}</span>
       <span class="weather-loading" v-else>🌡️</span>
-    </div>
+    </a>
+    <div class="divider divider-right"></div>
   </div>
 </template>
 
@@ -17,6 +19,7 @@ interface WeatherData {
 }
 
 const weatherData = ref<WeatherData | null>(null)
+const cityName = ref<string>('')
 
 // 彩云天气的天气代码映射到emoji图标
 const weatherIconMap: Record<string, string> = {
@@ -78,37 +81,127 @@ const temperature = computed(() => {
 
 const weatherTooltip = computed(() => {
   if (!weatherData.value) return '加载天气中...'
-  return `${weatherData.value.description} ${temperature.value}°C`
+  const city = cityName.value ? `${cityName.value} · ` : ''
+  return `${city}${weatherData.value.description} ${temperature.value}°C`
 })
+
+// ---- 位置与缓存 ----
+const GEO_CACHE_KEY = 'nav-weather:geo'
+const WEATHER_CACHE_PREFIX = 'nav-weather:realtime:'
+
+const withTimeout = async <T>(promise: Promise<T>, ms = 8000): Promise<T> => {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), ms)
+  try {
+    // @ts-ignore
+    const result = await promise
+    return result as T
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+const getEnvToken = (): string => {
+  // @ts-ignore
+  return (import.meta.env && import.meta.env.VITE_CAIYUN_TOKEN) || (window as any).__CAIYUN_TOKEN__ || ''
+}
+
+const getVisitorLocation = async (): Promise<{ latitude: number; longitude: number; city?: string } | null> => {
+  if (typeof window === 'undefined') return null
+
+  try {
+    const cacheRaw = localStorage.getItem(GEO_CACHE_KEY)
+    if (cacheRaw) {
+      const cache = JSON.parse(cacheRaw)
+      if (Date.now() - cache.time < 10 * 60 * 1000) {
+        return cache.value
+      }
+    }
+  } catch {}
+
+  const geoByBrowser = await new Promise<{ latitude: number; longitude: number } | null>(resolve => {
+    if (!('geolocation' in navigator)) return resolve(null)
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      () => resolve(null),
+      { enableHighAccuracy: false, timeout: 3000 }
+    )
+  })
+  if (geoByBrowser) {
+    try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: geoByBrowser })) } catch {}
+    return geoByBrowser
+  }
+
+  const providers = [
+    async () => {
+      const r = await withTimeout(fetch('https://ipapi.co/json/'))
+      const j = await r.json()
+      return { latitude: j.latitude, longitude: j.longitude, city: j.city }
+    },
+    async () => {
+      const r = await withTimeout(fetch('https://ipwho.is/'))
+      const j = await r.json()
+      return { latitude: j.latitude, longitude: j.longitude, city: j.city }
+    }
+  ]
+  for (const fn of providers) {
+    try {
+      const loc = await fn()
+      if (loc && loc.latitude && loc.longitude) {
+        try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
+        return loc
+      }
+    } catch {}
+  }
+  return null
+}
 
 // 获取天气数据
 const fetchWeather = async () => {
   try {
-    // 彩云天气API配置
-    const API_KEY = 'HsqDIplY13zWWUVM' // 请替换为您的彩云天气API Key
-    
-    // 通过 IP 自动获取访问者的位置
-    const ipResponse = await fetch('https://ipapi.co/json/')
-    const ipData = await ipResponse.json()
-    const longitude = ipData.longitude
-    const latitude = ipData.latitude
-    
-    const url = `https://api.caiyunapp.com/v2.6/${API_KEY}/${longitude},${latitude}/realtime`
-    
-    const response = await fetch(url)
-    const data = await response.json()
-    
+    if (typeof window === 'undefined') return
+    const token = getEnvToken()
+    if (!token) {
+      console.warn('[NavWeather] 未设置 VITE_CAIYUN_TOKEN 或 window.__CAIYUN_TOKEN__')
+      throw new Error('missing token')
+    }
+
+    const loc = await getVisitorLocation()
+    if (!loc) throw new Error('geo failed')
+
+    const lat = loc.latitude
+    const lon = loc.longitude
+    cityName.value = loc.city || ''
+
+    const cacheKey = `${WEATHER_CACHE_PREFIX}${lat.toFixed(2)},${lon.toFixed(2)}`
+    try {
+      const cached = localStorage.getItem(cacheKey)
+      if (cached) {
+        const cc = JSON.parse(cached)
+        if (Date.now() - cc.time < 10 * 60 * 1000) {
+          weatherData.value = cc.value
+          return
+        }
+      }
+    } catch {}
+
+    const url = `https://api.caiyunapp.com/v2.6/${token}/${lon},${lat}/realtime`
+    const resp = await withTimeout(fetch(url))
+    const data = await resp.json()
     if (data.status === 'ok') {
       const realtime = data.result.realtime
-      weatherData.value = {
+      const value: WeatherData = {
         temperature: realtime.temperature,
         skycon: realtime.skycon,
         description: weatherDescMap[realtime.skycon] || '未知'
       }
+      weatherData.value = value
+      try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), value })) } catch {}
+    } else {
+      throw new Error('caiyun status not ok')
     }
   } catch (error) {
     console.error('获取天气数据失败:', error)
-    // 失败时显示默认数据
     weatherData.value = {
       temperature: 0,
       skycon: 'CLOUDY',
@@ -125,52 +218,70 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.nav-weather {
-  display: flex;
+.weather-wrapper {
+  display: inline-flex;
   align-items: center;
+  height: 100%;
+  margin-left: 8px;
+  /* 不做负外边距偏移，避免与后续图标重叠 */
+}
+
+.divider {
+  display: block !important;
+  width: 1px;
+  height: 24px;
+  background-color: var(--vp-c-divider);
+  flex-shrink: 0;
+}
+
+.divider-left {
+  margin-right: 3px;
+}
+
+.divider-right {
+  margin-left: 3px;
+}
+
+/* 完全模仿VPSocialLink的样式 */
+.weather-link {
+  display: flex;
   justify-content: center;
-  width: 36px;
+  align-items: center;
+  width: 24px;
   height: 36px;
   color: var(--vp-c-text-2);
-  transition: color 0.5s;
-  cursor: default;
+  transition: color 0.25s;
+  flex-shrink: 0;
 }
 
-.nav-weather:hover {
+.weather-link:hover {
   color: var(--vp-c-text-1);
+  transition: color 0.25s;
 }
 
-.weather-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.weather-emoji {
-  font-size: 20px;
-  line-height: 1;
+.weather-emoji,
+.weather-loading {
+  font-size: 18px;
+  line-height: 18px;
   display: block;
 }
 
 .weather-loading {
-  font-size: 20px;
-  line-height: 1;
-  display: block;
   opacity: 0.5;
 }
 
-/* 响应式：移动端适配 */
+/* 移动端适配 */
 @media (max-width: 768px) {
-  .nav-weather {
-    width: 32px;
+  .weather-link {
+    width: 20px;
     height: 32px;
+    margin: 0 2px;
   }
   
   .weather-emoji,
   .weather-loading {
-    font-size: 18px;
+    font-size: 16px;
+    line-height: 16px;
   }
 }
 </style>

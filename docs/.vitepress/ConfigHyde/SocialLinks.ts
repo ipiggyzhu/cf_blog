@@ -1,6 +1,6 @@
 import { gitee, email, WhatsApp, telegram } from "../theme/icon/icons";
 
-// GitHub 图标已被天气组件替换，天气组件通过自定义插槽实现
+// GitHub图标已被天气组件替换，通过nav-bar-social-after插槽实现
 export const SocialLinks = [
   // {
   //   icon: { svg: email },

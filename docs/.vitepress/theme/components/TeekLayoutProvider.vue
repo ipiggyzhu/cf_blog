@@ -148,13 +148,11 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
       <DocFooterCopyright />
     </template>
 
-    <!-- 导航栏社交图标区域 - 天气组件 -->
-    <template #nav-bar-social-after>
-      <NavWeather />
-    </template>
-
-    <!-- 右上角时钟组件 -->
+    <!-- 右上角天气和时钟组件 -->
     <template #nav-bar-content-after>
+      <div class="nav-extra-content">
+        <NavWeather />
+      </div>
       <Clock/>
     </template>
 
@@ -182,5 +180,36 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
       border: 5px solid var(--vp-c-bg-elv);
     }    
   }
+}
+
+.nav-extra-content {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* 右上角分组容器，统一控制天气与时钟之间的间距 */
+/* 控制书本icon（tk-theme-enhance）与时钟的顺序和间距 */
+.tk-theme-enhance.flx-align-center { 
+  order: 98 !important; 
+  margin-left: 3px !important;
+  margin-right: 3px !important;
+}
+
+#clock { 
+  order: 99; 
+  margin-left: 3px !important; 
+  margin-right: 3px !important; 
+}
+
+/* 时钟左右间距统一为3px */
+#clock {
+  margin-left: 3px !important;
+  margin-right: 3px !important;
+}
+
+/* 隐藏时钟后面tk-theme-enhance的左侧竖线（与天气组件右侧竖线重复） */
+.tk-theme-enhance.flx-align-center::before {
+  display: none !important;
 }
 </style>
