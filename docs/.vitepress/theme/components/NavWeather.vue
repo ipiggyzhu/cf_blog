@@ -291,6 +291,7 @@ onMounted(() => {
 }
 
 .divider-left {
+  margin-left: 8px;
   margin-right: 8px;
 }
 

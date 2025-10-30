@@ -45,5 +45,5 @@
 
 /* 使切换主题组件与其右侧内容（我们的自定义竖线）保持 8px 间隙 */
 .VPNavBar .appearance {
-  margin-right: 8px !important;
+  margin-right: 0 !important; /* 由天气左侧自定义竖线控制与其的 8px 距离 */
 }
