@@ -135,7 +135,7 @@ const getVisitorLocation = async (): Promise<{ latitude: number; longitude: numb
     navigator.geolocation.getCurrentPosition(
       pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
       () => resolve(null),
-      { enableHighAccuracy: false, timeout: 3000 }
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
     )
   })
   if (geoByBrowser) {
@@ -153,6 +153,11 @@ const getVisitorLocation = async (): Promise<{ latitude: number; longitude: numb
       const r = await withTimeout(fetch('https://ipwho.is/'))
       const j = await r.json()
       return { latitude: j.latitude, longitude: j.longitude, city: j.city }
+    },
+    async () => {
+      const r = await withTimeout(fetch('https://ip-api.com/json/'))
+      const j = await r.json()
+      return { latitude: j.lat, longitude: j.lon, city: j.city }
     }
   ]
   for (const fn of providers) {
