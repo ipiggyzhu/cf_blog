@@ -42,3 +42,8 @@
   height: 0 !important;
   margin: 0 !important;
 }
+
+/* 使切换主题组件与其右侧内容（我们的自定义竖线）保持 8px 间隙 */
+.VPNavBar .appearance {
+  margin-right: 8px !important;
+}
