@@ -235,11 +235,12 @@ onMounted(() => {
 }
 
 .divider-left {
-  margin-right: 3px;
+  margin-right: 8px;
 }
 
 .divider-right {
-  margin-left: 3px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 /* 完全模仿VPSocialLink的样式 */

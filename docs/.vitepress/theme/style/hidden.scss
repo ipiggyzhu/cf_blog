@@ -29,11 +29,13 @@
 }
 
 // nav导航栏深色模式切换两边隐藏线
-.menu + .appearance[data-v-df4b8734]::before,
-.translations + .appearance[data-v-df4b8734]::before {
-  background-color: #ffffff00;
-}
-
-.appearance + .social-links[data-v-df4b8734]::before {
-  background-color: #ffffff00;
+/* 生产环境下 data-v-* 会变，使用更稳健的选择器隐藏 VitePress 导航分隔线 */
+.VPNavBar .appearance::before,
+.VPNavBar .appearance::after,
+.VPNavBar .social-links::before,
+.VPNavBar .social-links::after,
+.VPNavBar .extra::before,
+.VPNavBar .extra::after {
+  background-color: transparent !important;
+  width: 0 !important;
 }
