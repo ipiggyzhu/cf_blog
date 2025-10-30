@@ -109,6 +109,17 @@ const getEnvToken = (): string => {
 const getVisitorLocation = async (): Promise<{ latitude: number; longitude: number; city?: string } | null> => {
   if (typeof window === 'undefined') return null
 
+  // 0. 优先使用 Cloudflare Pages Functions（更快更稳）
+  try {
+    const r = await withTimeout(fetch('/api/geo'), 1500)
+    const j = await r.json()
+    if (j && j.ok && j.latitude && j.longitude) {
+      const value = { latitude: Number(j.latitude), longitude: Number(j.longitude), city: j.city || '' }
+      try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value })) } catch {}
+      return value
+    }
+  } catch {}
+
   try {
     const cacheRaw = localStorage.getItem(GEO_CACHE_KEY)
     if (cacheRaw) {

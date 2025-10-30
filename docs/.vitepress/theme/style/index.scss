@@ -3,7 +3,7 @@
 
 
 @use "./var.scss" as *; ///自定义变量
-// @use "./hidden.scss" as *; //隐藏横条
+@use "./hidden.scss" as *; // 隐藏/覆盖 VitePress 导航分隔线等
 @use "./hyde-banner-desc-gradient.scss" as *; // 首页打字机渐变文字颜色
 @use "./vp-code.scss" as *; //代码块
 // @use "./vp-code-group.scss" as *; //代码组
