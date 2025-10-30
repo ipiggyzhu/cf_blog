@@ -197,28 +197,73 @@ const fetchWeather = async () => {
     } catch {}
 
     const url = `https://api.caiyunapp.com/v2.6/${token}/${lon},${lat}/realtime`
-    const resp = await withTimeout(fetch(url))
-    const data = await resp.json()
-    if (data.status === 'ok') {
-      const realtime = data.result.realtime
-      const value: WeatherData = {
-        temperature: realtime.temperature,
-        skycon: realtime.skycon,
-        description: weatherDescMap[realtime.skycon] || '未知'
-      }
-      weatherData.value = value
-      try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), value })) } catch {}
-    } else {
-      throw new Error('caiyun status not ok')
+  const resp = await withTimeout(fetch(url))
+  const data = await resp.json()
+  if (data.status === 'ok') {
+    const realtime = data.result.realtime
+    const value: WeatherData = {
+      temperature: realtime.temperature,
+      skycon: realtime.skycon,
+      description: weatherDescMap[realtime.skycon] || '未知'
     }
+    weatherData.value = value
+    try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), value })) } catch {}
+  } else {
+    // 彩云未返回 ok，尝试 Open-Meteo 兜底，避免 0℃
+    await fetchOpenMeteo(lat, lon, cacheKey)
+  }
   } catch (error) {
     console.error('获取天气数据失败:', error)
-    weatherData.value = {
-      temperature: 0,
-      skycon: 'CLOUDY',
-      description: '天气'
+  try {
+    const loc = await getVisitorLocation()
+    if (loc) {
+      const cacheKey = `${WEATHER_CACHE_PREFIX}${loc.latitude.toFixed(2)},${loc.longitude.toFixed(2)}`
+      await fetchOpenMeteo(loc.latitude, loc.longitude, cacheKey)
+      return
     }
+  } catch {}
+  weatherData.value = { temperature: 0, skycon: 'CLOUDY', description: '天气' }
   }
+}
+
+// Open-Meteo 兜底：无需 token，保证温度不为 0
+const fetchOpenMeteo = async (lat: number, lon: number, cacheKey: string) => {
+  try {
+    const api = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`
+    const r = await withTimeout(fetch(api), 5000)
+    const j = await r.json()
+    const cur = j.current
+    if (!cur) throw new Error('no current')
+
+    const sky = wmoToSkycon(Number(cur.weather_code))
+    const value: WeatherData = {
+      temperature: Number(cur.temperature_2m),
+      skycon: sky,
+      description: weatherDescMap[sky] || '天气'
+    }
+    weatherData.value = value
+    try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), value })) } catch {}
+  } catch (e) {
+    console.warn('open-meteo fallback failed', e)
+  }
+}
+
+const wmoToSkycon = (code: number): string => {
+  if (code === 0) return 'CLEAR_DAY'
+  if ([1,2,3].includes(code)) return 'PARTLY_CLOUDY_DAY'
+  if ([45,48].includes(code)) return 'FOG'
+  if ([51,53,55,61,63,65,80,81,82].includes(code)) {
+    if ([61,80,51].includes(code)) return 'LIGHT_RAIN'
+    if ([63,81,53,55].includes(code)) return 'MODERATE_RAIN'
+    return 'HEAVY_RAIN'
+  }
+  if ([71,73,75,85,86].includes(code)) {
+    if (code === 71) return 'LIGHT_SNOW'
+    if ([73,85].includes(code)) return 'MODERATE_SNOW'
+    return 'HEAVY_SNOW'
+  }
+  if ([95,96,99].includes(code)) return 'STORM_RAIN'
+  return 'CLOUDY'
 }
 
 onMounted(() => {
