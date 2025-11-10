@@ -24,6 +24,7 @@ import BackTop from "./BackTop.vue"; //导入回到顶部组件
 import Clock from "./Clock.vue"; // 时钟组件
 import NavWeather from "./NavWeather.vue"; // 导航栏天气组件
 // import OhMyLive2D from "./OhMyLive2D.vue"; //导入看板娘组件
+import DynamicWallpaperManager from "./DynamicWallpaperManager.vue"; //导入动态壁纸管理器
 
 
 // @ts-ignore
@@ -89,6 +90,8 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
 <template>
   <Teek.Layout>
     <template #layout-top>
+      <!-- 动态壁纸管理器 -->
+      <DynamicWallpaperManager />
       <!-- 全局问候组件 -->
       <!-- <GlobalGreet /> -->
       <!-- 看板娘组件 -->
@@ -99,7 +102,7 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
       <TitleChange />
       <!-- 返回顶部组件 -->
       <!--<BackToTop /> -->
-      
+
       <!-- 路由切换遮罩动画组件 -->
       <RouteSwitchingLoading />
     </template>
