@@ -12,6 +12,7 @@
   "devDependencies": {
     "nprogress-v2": "^1.1.10",
     "sass": "^1.89.1",
+    "terser": "^5.36.0",
     "vitepress": "^1.6.3",
     "vitepress-theme-teek": "^1.4.6"
   },
