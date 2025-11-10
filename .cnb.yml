@@ -21,7 +21,7 @@ main:
             npm install -g pnpm && node -v && npm -v && yarn -v && pnpm -v
         - name: 📦️ 安装依赖
           script: |
-            pnpm install
+            pnpm install --no-frozen-lockfile
         - name: ⚗️ 编译项目
           script: |
             pnpm docs:build
