@@ -525,11 +525,62 @@ export default defineConfig({
       // port: 5173, // 指定开发服务器端口
       // strictPort: true, // 若端口已被占用则会直接退出
       // open: true, // 运行后自动打开网页
+      warmup: {
+        clientFiles: [
+          './docs/.vitepress/theme/index.ts',
+          './docs/.vitepress/theme/components/*.vue'
+        ]
+      }
     },
-    
-    // 构建
+
+    // 构建优化
     build: {
       chunkSizeWarningLimit: 1500, // 限制警告的块大小
+      // 启用 CSS 代码分割
+      cssCodeSplit: true,
+      // 启用构建报告
+      reportCompressedSize: false,
+      // 分块策略
+      rollupOptions: {
+        output: {
+          // 手动分块，优化缓存
+          manualChunks: {
+            'vue-vendor': ['vue'],
+            'vitepress': ['vitepress'],
+            'theme': ['vitepress-theme-teek'],
+            'echarts': ['echarts'],
+            'live2d': ['oh-my-live2d'],
+          },
+          // 用于从入口点创建的块的输出格式
+          entryFileNames: 'assets/[name].[hash].js',
+          // 用于代码分割创建的块的输出格式
+          chunkFileNames: 'assets/[name].[hash].js',
+          // 用于静态资源的输出格式
+          assetFileNames: 'assets/[name].[hash].[ext]'
+        }
+      },
+      // 提高构建性能
+      sourcemap: false,
+      // 启用 minify
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        }
+      }
+    },
+
+    // 优化依赖预构建
+    optimizeDeps: {
+      include: [
+        'vue',
+        'vitepress',
+        'vitepress-theme-teek',
+        'echarts',
+        'oh-my-live2d'
+      ],
+      exclude: ['@vueuse/core']
     },    
 
     plugins: [

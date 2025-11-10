@@ -22,6 +22,19 @@ export const HeadData = [
   ['meta', { property: 'og:description', content: '明心静性，爱自己' }],
   ['meta', { property: 'og:image', content: '/img/logo.png' }],
 
+  // PWA 配置
+  ["link", { rel: "manifest", href: "/manifest.json" }],
+  ["meta", { name: "theme-color", content: "#5086a1" }],
+  ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
+  ["meta", { name: "apple-mobile-web-app-status-bar-style", content: "default" }],
+  ["meta", { name: "apple-mobile-web-app-title", content: "Casual Blog" }],
+  ["link", { rel: "apple-touch-icon", href: "/img/logo.png" }],
+
+  // 预连接优化
+  ["link", { rel: "preconnect", href: "https://at.alicdn.com" }],
+  ["link", { rel: "preconnect", href: "https://image.itpiggy.top" }],
+  ["link", { rel: "dns-prefetch", href: "https://busuanzi.ibruce.info" }],
+
   [
     "meta",
     {

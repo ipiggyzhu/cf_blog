@@ -55,7 +55,8 @@ import PhotoCard from './components/CoupleAlbum/PhotoCard.vue'
 // 导入天气组件
 import NavWeather from './components/NavWeather.vue'
 
-
+// 导入Service Worker
+import { useServiceWorker } from './composables/useServiceWorker'
 
 // import "./style/sidebar-icon.scss";
 
@@ -75,7 +76,7 @@ export default {
     // 注册全局组件
     app.component("friend-link", SLink);
 
-    // 非SSR环境下配置路由进度条
+    // 非SSR环境下配置路由进度条和Service Worker
     // @ts-expect-error
     if (!import.meta.env.SSR) {
       NProgress.configure({ showSpinner: false });
@@ -85,6 +86,9 @@ export default {
           NProgress.done();
         }, 100);
       };
+
+      // 注册 Service Worker
+      useServiceWorker();
     }
       // 不蒜子环境下配置路由进度条
     // if (inBrowser) {

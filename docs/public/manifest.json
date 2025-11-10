@@ -1,0 +1,66 @@
+{
+  "name": "Casual's Personal Tech Blog",
+  "short_name": "Casual Blog",
+  "description": "记录技术成长之路，分享运维实战经验，专注于Linux、Docker、Kubernetes、云原生等技术领域",
+  "theme_color": "#5086a1",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/logo.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "categories": [
+    "technology",
+    "education",
+    "developer"
+  ],
+  "screenshots": [
+    {
+      "src": "/img/screenshot.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Linux运维",
+      "short_name": "Linux",
+      "url": "/linux/",
+      "icons": [{ "src": "/img/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "编程技术",
+      "short_name": "编程",
+      "url": "/code/",
+      "icons": [{ "src": "/img/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "前端开发",
+      "short_name": "前端",
+      "url": "/qianduan/",
+      "icons": [{ "src": "/img/logo.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
