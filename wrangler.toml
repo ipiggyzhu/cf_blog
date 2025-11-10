@@ -3,13 +3,7 @@ compatibility_date = "2024-01-01"
 
 pages_build_output_dir = "docs/.vitepress/dist"
 
-[build]
-command = "pnpm install --no-frozen-lockfile && pnpm docs:build"
-
-# 生产环境配置
-[env.production]
-
-# 生产环境的 R2 绑定
-[[env.production.r2_buckets]]
+# R2 绑定配置 - 用于 Cloudflare Pages Functions
+[[r2_buckets]]
 binding = "R2_BUCKET"
 bucket_name = "cf-blog"

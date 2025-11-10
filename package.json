@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "我的个人博客",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "node node_modules/vitepress/bin/vitepress.js build docs",
