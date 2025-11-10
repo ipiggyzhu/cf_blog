@@ -540,25 +540,6 @@ export default defineConfig({
       cssCodeSplit: true,
       // 启用构建报告
       reportCompressedSize: false,
-      // 分块策略
-      rollupOptions: {
-        output: {
-          // 手动分块，优化缓存
-          manualChunks: {
-            'vue-vendor': ['vue'],
-            'vitepress': ['vitepress'],
-            'theme': ['vitepress-theme-teek'],
-            'echarts': ['echarts'],
-            'live2d': ['oh-my-live2d'],
-          },
-          // 用于从入口点创建的块的输出格式
-          entryFileNames: 'assets/[name].[hash].js',
-          // 用于代码分割创建的块的输出格式
-          chunkFileNames: 'assets/[name].[hash].js',
-          // 用于静态资源的输出格式
-          assetFileNames: 'assets/[name].[hash].[ext]'
-        }
-      },
       // 提高构建性能
       sourcemap: false,
       // 启用 minify
