@@ -32,7 +32,7 @@ import DynamicWallpaperManager from "./DynamicWallpaperManager.vue"; //导入动
 
 import NoticeCard from "./NoticeCard.vue";
 import QuoteCard from "./QuoteCard.vue";
-import RouteSwitchingLoading from "./RouteSwitchingLoading.vue"; // 过渡动画组件
+// import RouteSwitchingLoading from "./RouteSwitchingLoading.vue"; // 过渡动画组件 - 已禁用
 
 
 
@@ -103,8 +103,8 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
       <!-- 返回顶部组件 -->
       <!--<BackToTop /> -->
 
-      <!-- 路由切换遮罩动画组件 -->
-      <RouteSwitchingLoading />
+      <!-- 路由切换遮罩动画组件 - 已禁用，提升加载速度 -->
+      <!-- <RouteSwitchingLoading /> -->
     </template>
 
     <template #teek-theme-enhance-bottom>
