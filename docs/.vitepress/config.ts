@@ -533,23 +533,15 @@ export default defineConfig({
       }
     },
 
-    // 构建优化
+    // 构建优化 - 专注于速度
     build: {
-      chunkSizeWarningLimit: 1500, // 限制警告的块大小
-      // 启用 CSS 代码分割
-      cssCodeSplit: true,
-      // 启用构建报告
-      reportCompressedSize: false,
-      // 提高构建性能
-      sourcemap: false,
-      // 启用 minify
-      minify: 'terser',
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true
-        }
-      }
+      chunkSizeWarningLimit: 2000, // 提高警告阈值，减少警告
+      cssCodeSplit: true, // CSS 代码分割
+      reportCompressedSize: false, // 禁用压缩大小报告，加快构建
+      sourcemap: false, // 禁用 sourcemap，加快构建
+      minify: 'esbuild', // 使用 esbuild 替代 terser，速度更快
+      target: 'es2015', // 降低目标版本，减少转换
+      // 移除 rollupOptions.manualChunks 避免与 VitePress 冲突
     },
 
     // 优化依赖预构建

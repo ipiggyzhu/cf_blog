@@ -52,14 +52,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-// 中英文对照的每日英语数据
+// 中英文对照的每日英语数据 - 使用 R2 存储的图片，确保国内访问稳定
 const quotes = [
   {
     english: "The way to get started is to quit talking and begin doing.",
     chinese: "开始行动的方法就是停止空谈，开始实干。",
     author: "华特·迪士尼",
     source: "Walt Disney",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/1.webp",
     alt: "Beautiful sunrise over mountains"
   },
   {
@@ -67,7 +67,7 @@ const quotes = [
     chinese: "生活就是在你忙于制定其他计划时，在你身上发生的事。",
     author: "约翰·列侬",
     source: "John Lennon",
-    image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/2.webp",
     alt: "Peaceful nature scene"
   },
   {
@@ -75,7 +75,7 @@ const quotes = [
     chinese: "未来属于那些相信梦想之美的人。",
     author: "埃莉诺·罗斯福",
     source: "Eleanor Roosevelt",
-    image: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/3.webp",
     alt: "Dream-like sky"
   },
   {
@@ -83,7 +83,7 @@ const quotes = [
     chinese: "你一直是我的朋友，这本身就是一件了不起的事。",
     author: "夏洛特",
     source: "Charlotte's Web",
-    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/4.webp",
     alt: "Friendship theme"
   },
   {
@@ -91,7 +91,7 @@ const quotes = [
     chinese: "毕竟，明天又是新的一天！",
     author: "郝思嘉",
     source: "Gone with the Wind",
-    image: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/5.webp",
     alt: "New day sunrise"
   },
   {
@@ -99,7 +99,7 @@ const quotes = [
     chinese: "困难之中蕴含着机遇。",
     author: "阿尔伯特·爱因斯坦",
     source: "Albert Einstein",
-    image: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/6.webp",
     alt: "Opportunity landscape"
   },
   {
@@ -107,7 +107,7 @@ const quotes = [
     chinese: "你比你想象的更勇敢，比你看起来更强大，比你认为的更聪明。",
     author: "A.A.米尔恩",
     source: "Winnie the Pooh",
-    image: "https://images.unsplash.com/photo-1502780402662-acc01917949e?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/7.webp",
     alt: "Inspiring forest scene"
   },
   {
@@ -115,7 +115,7 @@ const quotes = [
     chinese: "生命中最大的荣耀不在于从不跌倒，而在于每次跌倒后都能重新站起。",
     author: "纳尔逊·曼德拉",
     source: "Nelson Mandela",
-    image: "https://images.unsplash.com/photo-1464822759844-d150ad6d1dff?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/8.webp",
     alt: "Rising sun motivation"
   },
   {
@@ -123,7 +123,7 @@ const quotes = [
     chinese: "成功不是终点，失败不是致命的：重要的是继续前进的勇气。",
     author: "温斯顿·丘吉尔",
     source: "Winston Churchill",
-    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/9.webp",
     alt: "Mountain peak success"
   },
   {
@@ -131,7 +131,7 @@ const quotes = [
     chinese: "前进缓慢没关系，只要你不停止脚步。",
     author: "孔子",
     source: "Confucius",
-    image: "https://images.unsplash.com/photo-1484589065579-248aad0d8b13?w=400&h=250&fit=crop&crop=center",
+    image: "https://image.itpiggy.top/Cover/10.webp",
     alt: "Steady progress"
   }
 ]
@@ -147,16 +147,14 @@ const maxRetries = 3
 let autoTimer = null
 let progressTimer = null
 
-// 备用图片URLs - 使用CDN和本地备用
+// 备用图片URLs - 使用 R2 存储的图片作为备用，确保稳定性
 const fallbackImages = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&crop=center',
-  'https://picsum.photos/400/250?random=1',
-  'https://picsum.photos/400/250?random=2',
-  'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=250&fit=crop&crop=center',
-  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=250&fit=crop&crop=center',
-  '/img/teek-cover-14.webp', // 本地备用图片
-  '/img/teek-cover-16.webp',
-  '/img/teek-cover-17.webp'
+  'https://image.itpiggy.top/Cover/1.webp',
+  'https://image.itpiggy.top/Cover/2.webp',
+  'https://image.itpiggy.top/Cover/3.webp',
+  'https://image.itpiggy.top/Cover/4.webp',
+  'https://image.itpiggy.top/Cover/5.webp',
+  '/img/logo.png', // 本地备用图片
 ]
 
 // 获取随机格言

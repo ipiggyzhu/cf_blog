@@ -61,15 +61,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip external analytics and tracking requests
+  // Skip external resources - 跳过所有外部域名的请求，避免拦截导致加载失败
   if (
-    url.hostname.includes('google-analytics.com') ||
-    url.hostname.includes('googletagmanager.com') ||
-    url.hostname.includes('baidu.com') ||
-    url.hostname.includes('busuanzi.ibruce.info') ||
-    url.hostname.includes('vercel.com') ||
-    url.hostname.includes('myhkw.cn')
+    url.hostname !== self.location.hostname &&
+    !url.hostname.includes('blog.itpiggy.top') &&
+    !url.hostname.includes('image.itpiggy.top')
   ) {
+    // 跳过所有外部域名：Google Fonts, Cloudflare Insights, Analytics等
     return;
   }
 
