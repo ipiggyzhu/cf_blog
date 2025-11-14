@@ -548,12 +548,10 @@ export default defineConfig({
     optimizeDeps: {
       include: [
         'vue',
-        'vitepress',
-        'vitepress-theme-teek',
         'echarts',
         'oh-my-live2d'
       ],
-      exclude: ['@vueuse/core']
+      exclude: ['@vueuse/core', 'vitepress', 'vitepress-theme-teek']
     },    
 
     plugins: [
