@@ -1,0 +1,223 @@
+/* 移动端响应式样式 */
+
+/* 小屏幕设备 (手机) */
+@media (max-width: 768px) {
+  /* 导航栏适配 */
+  .VPNav {
+    padding: 0 16px;
+  }
+
+  .VPNavBar .container {
+    padding: 0 12px;
+  }
+
+  /* 首页 Banner 适配 */
+  .VPHero {
+    padding: 48px 24px;
+  }
+
+  .VPHero .name,
+  .VPHero .text {
+    font-size: 32px !important;
+    line-height: 1.2;
+  }
+
+  .VPHero .tagline {
+    font-size: 16px;
+    padding: 0 12px;
+  }
+
+  .VPHero .actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .VPHero .action {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 首页卡片布局 */
+  .tk-home-card-list {
+    flex-direction: column !important;
+    padding: 0 16px;
+  }
+
+  .tk-home-card-list-left,
+  .tk-home-card-list-right {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* 博主信息卡片 */
+  .tk-blogger {
+    margin-bottom: 16px;
+  }
+
+  /* 文章列表 */
+  .tk-post-list {
+    padding: 0;
+  }
+
+  .tk-post-item {
+    margin-bottom: 16px;
+    padding: 16px;
+  }
+
+  /* 文章封面图 */
+  .tk-post-item .cover-img {
+    height: 180px;
+  }
+
+  /* 侧边栏 */
+  .VPSidebar {
+    padding: 16px;
+  }
+
+  /* 文档内容 */
+  .VPDoc {
+    padding: 24px 16px;
+  }
+
+  .VPDoc h1 {
+    font-size: 28px;
+    margin-top: 24px;
+  }
+
+  .VPDoc h2 {
+    font-size: 24px;
+    margin-top: 32px;
+  }
+
+  .VPDoc h3 {
+    font-size: 20px;
+  }
+
+  /* 代码块 */
+  .vp-code-group,
+  div[class*='language-'] {
+    margin: 16px -16px;
+    border-radius: 0;
+  }
+
+  /* 表格横向滚动 */
+  .vp-doc table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* 图片适配 */
+  .vp-doc img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 目录 */
+  .VPDocAside {
+    display: none;
+  }
+
+  /* 分页 */
+  .tk-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* 评论区 */
+  #twikoo {
+    padding: 0 16px;
+  }
+
+  /* 页脚 */
+  .VPFooter {
+    padding: 24px 16px;
+  }
+
+  /* 回到顶部按钮 */
+  .tk-back-top {
+    right: 16px;
+    bottom: 80px;
+  }
+
+  /* 滚动到评论按钮 */
+  .tk-to-comment {
+    right: 16px;
+    bottom: 140px;
+  }
+}
+
+/* 超小屏幕设备 */
+@media (max-width: 480px) {
+  .VPHero .name,
+  .VPHero .text {
+    font-size: 28px !important;
+  }
+
+  .VPHero .tagline {
+    font-size: 14px;
+  }
+
+  .VPDoc h1 {
+    font-size: 24px;
+  }
+
+  .VPDoc h2 {
+    font-size: 20px;
+  }
+
+  .VPDoc h3 {
+    font-size: 18px;
+  }
+
+  /* 文章卡片 */
+  .tk-post-item {
+    padding: 12px;
+  }
+
+  .tk-post-item .cover-img {
+    height: 150px;
+  }
+}
+
+/* 平板设备 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .tk-home-card-list {
+    padding: 0 24px;
+  }
+
+  .VPDoc {
+    padding: 32px 24px;
+  }
+
+  /* 侧边栏和内容区域调整 */
+  .tk-home-card-list-left {
+    width: 35%;
+  }
+
+  .tk-home-card-list-right {
+    width: 65%;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 增大可点击区域 */
+  a,
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 移除 hover 效果 */
+  .tk-post-item:hover {
+    transform: none;
+  }
+
+  .VPFeatures .items .item:hover {
+    transform: none;
+  }
+}
