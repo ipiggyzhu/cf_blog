@@ -123,7 +123,12 @@ const getVisitorLocation = async (): Promise<{ latitude: number; longitude: numb
       const cache = JSON.parse(cacheRaw)
       // 缓存时间从 10 分钟改为 5 分钟
       if (Date.now() - cache.time < 5 * 60 * 1000) {
+        console.log('[NavWeather] 📦 使用缓存的位置信息:', cache.value)
+        console.log(`[NavWeather] 📍 经纬度: ${cache.value.latitude.toFixed(6)}, ${cache.value.longitude.toFixed(6)}`)
+        console.log('[NavWeather] 💡 如需重新定位，请点击天气图标')
         return cache.value
+      } else {
+        console.log('[NavWeather] 🔄 缓存已过期，重新获取位置')
       }
     }
   } catch {}
@@ -153,12 +158,13 @@ const getVisitorLocation = async (): Promise<{ latitude: number; longitude: numb
     )
   })
   if (geoByBrowser) {
-    console.log('[NavWeather] 浏览器定位成功:', geoByBrowser)
+    console.log('[NavWeather] ✅ 浏览器定位成功（精准）:', geoByBrowser)
+    console.log(`[NavWeather] 📍 经纬度: ${geoByBrowser.latitude.toFixed(6)}, ${geoByBrowser.longitude.toFixed(6)}`)
     // 使用高德地图逆地理编码获取城市名称（国内更准确）
     try {
       const cityName = await getCityNameFromCoords(geoByBrowser.latitude, geoByBrowser.longitude)
       const value = { ...geoByBrowser, city: cityName }
-      console.log('[NavWeather] 逆地理编码成功:', value)
+      console.log('[NavWeather] 🏙️ 逆地理编码成功:', value)
       try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value })) } catch {}
       return value
     } catch (e) {
@@ -202,16 +208,18 @@ const getVisitorLocation = async (): Promise<{ latitude: number; longitude: numb
     }
   ]
 
-  for (const fn of cnProviders) {
+  for (let i = 0; i < cnProviders.length; i++) {
     try {
-      const loc = await fn()
+      const loc = await cnProviders[i]()
       if (loc && loc.latitude && loc.longitude) {
-        console.log('[NavWeather] 国内IP定位成功:', loc)
+        console.log(`[NavWeather] ⚠️ 使用IP定位（精度低）- 服务${i + 1}:`, loc)
+        console.log(`[NavWeather] 📍 经纬度: ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}`)
+        console.log('[NavWeather] 💡 提示：IP定位可能不准确，建议授权浏览器定位')
         try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
         return loc
       }
     } catch (e) {
-      console.warn('[NavWeather] 国内IP定位尝试失败，继续下一个服务')
+      console.warn(`[NavWeather] IP定位服务${i + 1}失败，尝试下一个...`)
     }
   }
 
@@ -229,14 +237,18 @@ const getVisitorLocation = async (): Promise<{ latitude: number; longitude: numb
     }
   ]
   
-  for (const fn of intlProviders) {
+  for (let i = 0; i < intlProviders.length; i++) {
     try {
-      const loc = await fn()
+      const loc = await intlProviders[i]()
       if (loc && loc.latitude && loc.longitude) {
+        console.log(`[NavWeather] ⚠️ 使用国际IP定位 - 服务${i + 1}:`, loc)
+        console.log(`[NavWeather] 📍 经纬度: ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}`)
         try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
         return loc
       }
-    } catch {}
+    } catch (e) {
+      console.warn(`[NavWeather] 国际IP定位服务${i + 1}失败`)
+    }
   }
 
   // 5. 最后尝试 Cloudflare Pages Functions
@@ -292,7 +304,9 @@ const fetchWeather = async () => {
         const cc = JSON.parse(cached)
         if (Date.now() - cc.time < 10 * 60 * 1000) {
           weatherData.value = cc.value
-          console.log('[NavWeather] 使用缓存的天气数据')
+          console.log('[NavWeather] 📦 使用缓存的天气数据')
+          console.log(`[NavWeather] 🏙️ 城市: ${cityName.value || '未知'}`)
+          console.log(`[NavWeather] 🌡️ 温度: ${cc.value.temperature}°C`)
           return
         }
       }
