@@ -33,3 +33,8 @@ yarn.lock
 *.sw?
 
 /**/.vitepress/cache/*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
