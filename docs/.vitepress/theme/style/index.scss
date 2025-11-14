@@ -20,5 +20,6 @@
 
 @use "./blockquote-one.scss" as *; // 自定义块
 @use "./blogger-fix.scss" as *; // 修复博主信息卡片背景图层级问题
+@use "./mobile.scss" as *; // 移动端响应式样式
 
 @import './sidebarIcon.css';

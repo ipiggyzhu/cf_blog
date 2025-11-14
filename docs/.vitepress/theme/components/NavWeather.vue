@@ -1,7 +1,7 @@
 <template>
   <div class="weather-wrapper">
     <div class="divider divider-left"></div>
-    <a class="VPSocialLink no-icon weather-link" :title="weatherTooltip" href="javascript:void(0)">
+    <a class="VPSocialLink no-icon weather-link" :title="weatherTooltip" href="javascript:void(0)" @click="handleWeatherClick">
       <span class="weather-emoji" v-if="weatherData">{{ weatherIcon }}</span>
       <span class="weather-loading" v-else>🌡️</span>
     </a>
@@ -109,7 +109,115 @@ const getEnvToken = (): string => {
 const getVisitorLocation = async (): Promise<{ latitude: number; longitude: number; city?: string } | null> => {
   if (typeof window === 'undefined') return null
 
-  // 0. 优先使用 Cloudflare Pages Functions（更快更稳）
+  // 1. 检查缓存（缩短缓存时间到 5 分钟，提高准确性）
+  try {
+    const cacheRaw = localStorage.getItem(GEO_CACHE_KEY)
+    if (cacheRaw) {
+      const cache = JSON.parse(cacheRaw)
+      // 缓存时间从 10 分钟改为 5 分钟
+      if (Date.now() - cache.time < 5 * 60 * 1000) {
+        return cache.value
+      }
+    }
+  } catch {}
+
+  // 2. 优先使用浏览器地理位置 API（最准确）
+  const geoByBrowser = await new Promise<{ latitude: number; longitude: number } | null>(resolve => {
+    if (!('geolocation' in navigator)) return resolve(null)
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      () => resolve(null),
+      // 提高超时时间到 15 秒，给用户更多时间授权
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+    )
+  })
+  if (geoByBrowser) {
+    // 使用高德地图逆地理编码获取城市名称（国内更准确）
+    try {
+      const cityName = await getCityNameFromCoords(geoByBrowser.latitude, geoByBrowser.longitude)
+      const value = { ...geoByBrowser, city: cityName }
+      try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value })) } catch {}
+      return value
+    } catch {
+      try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: geoByBrowser })) } catch {}
+      return geoByBrowser
+    }
+  }
+
+  // 3. 使用国内 IP 定位服务（对国内用户更准确）
+  const cnProviders = [
+    // 高德 IP 定位（国内最准）
+    async () => {
+      const r = await withTimeout(fetch('https://restapi.amap.com/v3/ip?key=REDACTED_AMAP_KEY'))
+      const j = await r.json()
+      if (j.status === '1' && j.rectangle) {
+        // 高德返回矩形范围，取中心点
+        const coords = j.rectangle.split(';')
+        const [lon1, lat1] = coords[0].split(',').map(Number)
+        const [lon2, lat2] = coords[1].split(',').map(Number)
+        return { 
+          latitude: (lat1 + lat2) / 2, 
+          longitude: (lon1 + lon2) / 2, 
+          city: j.city || j.province 
+        }
+      }
+      throw new Error('amap failed')
+    },
+    // 腾讯位置服务
+    async () => {
+      const r = await withTimeout(fetch('https://apis.map.qq.com/ws/location/v1/ip?key=UBNBZ-PHZW3-JJJ3Z-7R5LE-BQGVF-YVFBV&output=jsonp'))
+      const text = await r.text()
+      // 处理 JSONP 响应
+      const jsonMatch = text.match(/\((.+)\)/)
+      if (jsonMatch) {
+        const j = JSON.parse(jsonMatch[1])
+        if (j.status === 0 && j.result) {
+          return { 
+            latitude: j.result.location.lat, 
+            longitude: j.result.location.lng, 
+            city: j.result.ad_info.city 
+          }
+        }
+      }
+      throw new Error('tencent failed')
+    }
+  ]
+
+  for (const fn of cnProviders) {
+    try {
+      const loc = await fn()
+      if (loc && loc.latitude && loc.longitude) {
+        try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
+        return loc
+      }
+    } catch {}
+  }
+
+  // 4. 回退到国际 IP 定位服务
+  const intlProviders = [
+    async () => {
+      const r = await withTimeout(fetch('https://ipapi.co/json/'))
+      const j = await r.json()
+      return { latitude: j.latitude, longitude: j.longitude, city: j.city }
+    },
+    async () => {
+      const r = await withTimeout(fetch('https://ip-api.com/json/?lang=zh-CN'))
+      const j = await r.json()
+      return { latitude: j.lat, longitude: j.lon, city: j.city }
+    }
+  ]
+  
+  for (const fn of intlProviders) {
+    try {
+      const loc = await fn()
+      if (loc && loc.latitude && loc.longitude) {
+        try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
+        return loc
+      }
+    } catch {}
+  }
+
+  // 5. 最后尝试 Cloudflare Pages Functions
   try {
     const r = await withTimeout(fetch('/api/geo'), 1500)
     const j = await r.json()
@@ -120,56 +228,21 @@ const getVisitorLocation = async (): Promise<{ latitude: number; longitude: numb
     }
   } catch {}
 
+  return null
+}
+
+// 根据经纬度获取城市名称（使用高德地图逆地理编码）
+const getCityNameFromCoords = async (lat: number, lon: number): Promise<string> => {
   try {
-    const cacheRaw = localStorage.getItem(GEO_CACHE_KEY)
-    if (cacheRaw) {
-      const cache = JSON.parse(cacheRaw)
-      if (Date.now() - cache.time < 10 * 60 * 1000) {
-        return cache.value
-      }
+    const r = await withTimeout(
+      fetch(`https://restapi.amap.com/v3/geocode/regeo?key=REDACTED_AMAP_KEY&location=${lon},${lat}`)
+    )
+    const j = await r.json()
+    if (j.status === '1' && j.regeocode) {
+      return j.regeocode.addressComponent.city || j.regeocode.addressComponent.province || ''
     }
   } catch {}
-
-  const geoByBrowser = await new Promise<{ latitude: number; longitude: number } | null>(resolve => {
-    if (!('geolocation' in navigator)) return resolve(null)
-    navigator.geolocation.getCurrentPosition(
-      pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      () => resolve(null),
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
-    )
-  })
-  if (geoByBrowser) {
-    try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: geoByBrowser })) } catch {}
-    return geoByBrowser
-  }
-
-  const providers = [
-    async () => {
-      const r = await withTimeout(fetch('https://ipapi.co/json/'))
-      const j = await r.json()
-      return { latitude: j.latitude, longitude: j.longitude, city: j.city }
-    },
-    async () => {
-      const r = await withTimeout(fetch('https://ipwho.is/'))
-      const j = await r.json()
-      return { latitude: j.latitude, longitude: j.longitude, city: j.city }
-    },
-    async () => {
-      const r = await withTimeout(fetch('https://ip-api.com/json/'))
-      const j = await r.json()
-      return { latitude: j.lat, longitude: j.lon, city: j.city }
-    }
-  ]
-  for (const fn of providers) {
-    try {
-      const loc = await fn()
-      if (loc && loc.latitude && loc.longitude) {
-        try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
-        return loc
-      }
-    } catch {}
-  }
-  return null
+  return ''
 }
 
 // 获取天气数据
@@ -273,9 +346,21 @@ const wmoToSkycon = (code: number): string => {
 
 onMounted(() => {
   fetchWeather()
-  // 每30分钟更新一次天气
-  setInterval(fetchWeather, 30 * 60 * 1000)
+  // 每 15 分钟更新一次天气（更频繁的更新）
+  setInterval(fetchWeather, 15 * 60 * 1000)
 })
+
+// 添加手动刷新功能（点击天气图标刷新）
+const handleWeatherClick = () => {
+  // 清除缓存，强制重新获取
+  try {
+    localStorage.removeItem(GEO_CACHE_KEY)
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(WEATHER_CACHE_PREFIX))
+    keys.forEach(k => localStorage.removeItem(k))
+  } catch {}
+  weatherData.value = null
+  fetchWeather()
+}
 </script>
 
 <style scoped>
