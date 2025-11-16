@@ -289,6 +289,10 @@ function initBannerBackground(imageSrc: string): boolean {
 
     console.log('🔄 双图层系统 - 立即显示背景并验证图片:', imageSrc)
     img.src = imageSrc
+    
+    // 保存初始图片到缓存
+    saveLastImage(imageSrc)
+    
     return true
   }
 
@@ -331,6 +335,13 @@ async function updateBannerBackgroundWithCSS(imageSrc: string): Promise<boolean>
     recordLayerState(oldActiveLayer, currentDisplayImage || '当前图片')
 
     // 1. 在非活动图层预加载新图片
+    // 状态检查：确保banner元素仍然存在
+    if (!document.querySelector('.tk-banner')) {
+      console.warn('⚠️ Banner元素在切换过程中消失，中止切换')
+      isTransitioning = false
+      return false
+    }
+
     if (targetLayer === 'A') {
       bannerEl.style.setProperty('--layer-a-bg-image', `url("${imageSrc}")`)
       bannerEl.style.setProperty('--layer-a-opacity', '0')
@@ -344,10 +355,19 @@ async function updateBannerBackgroundWithCSS(imageSrc: string): Promise<boolean>
     // 2. 新图层淡入（此时两个图层都显示，无白屏）
     await new Promise<void>(resolve => {
       setTimeout(() => {
+        // 状态检查：验证banner元素仍然存在
+        const currentBannerEl = document.querySelector('.tk-banner') as HTMLElement
+        if (!currentBannerEl) {
+          console.warn('⚠️ Banner元素在淡入阶段消失，中止切换')
+          isTransitioning = false
+          resolve()
+          return
+        }
+
         if (targetLayer === 'A') {
-          bannerEl.style.setProperty('--layer-a-opacity', '1')
+          currentBannerEl.style.setProperty('--layer-a-opacity', '1')
         } else {
-          bannerEl.style.setProperty('--layer-b-opacity', '1')
+          currentBannerEl.style.setProperty('--layer-b-opacity', '1')
         }
         console.log('🔄 新图层开始淡入:', targetLayer, '透明度设为1')
         resolve()
@@ -358,28 +378,46 @@ async function updateBannerBackgroundWithCSS(imageSrc: string): Promise<boolean>
     await new Promise<void>(resolve => {
       // 等待新图层过渡动画完全结束再隐藏旧图层
       setTimeout(() => {
+        // 状态检查：验证banner元素仍然存在
+        const currentBannerEl = document.querySelector('.tk-banner') as HTMLElement
+        if (!currentBannerEl) {
+          console.warn('⚠️ Banner元素在旧图层隐藏阶段消失，中止切换')
+          isTransitioning = false
+          resolve()
+          return
+        }
+
         console.log('🔄 新图层已完全可见，开始隐藏旧图层:', oldActiveLayer)
 
         // 现在开始隐藏旧图层
         if (oldActiveLayer === 'A') {
-          bannerEl.style.setProperty('--layer-a-opacity', '0')
+          currentBannerEl.style.setProperty('--layer-a-opacity', '0')
         } else {
-          bannerEl.style.setProperty('--layer-b-opacity', '0')
+          currentBannerEl.style.setProperty('--layer-b-opacity', '0')
         }
 
         // 等待旧图层完全隐藏后再清理类
         setTimeout(() => {
+          // 状态检查：验证banner元素仍然存在
+          const finalBannerEl = document.querySelector('.tk-banner') as HTMLElement
+          if (!finalBannerEl) {
+            console.warn('⚠️ Banner元素在清理阶段消失，中止切换')
+            isTransitioning = false
+            resolve()
+            return
+          }
+
           // 移除旧图层的显示类
           if (oldActiveLayer === 'A') {
-            bannerEl.classList.remove('has-layer-a')
+            finalBannerEl.classList.remove('has-layer-a')
           } else {
-            bannerEl.classList.remove('has-layer-b')
+            finalBannerEl.classList.remove('has-layer-b')
           }
 
           // 4. 切换完成，更新状态
           currentActiveLayer = targetLayer
-          bannerEl.classList.remove('dual-layer') // 关闭双图层模式
-          bannerEl.classList.add('background-loaded') // 确保移除预设背景
+          finalBannerEl.classList.remove('dual-layer') // 关闭双图层模式
+          finalBannerEl.classList.add('background-loaded') // 确保移除预设背景
 
           // 记录新的图层状态
           recordLayerState(targetLayer, imageSrc)
@@ -391,8 +429,8 @@ async function updateBannerBackgroundWithCSS(imageSrc: string): Promise<boolean>
           saveLastImage(imageSrc)
 
           resolve()
-        }, 2050) // 缩短等待时间（2s + 50ms 缓冲）
-      }, 1800) // 缩短新图层等待时间（1.8s）
+        }, 2100) // 优化等待时间（2.1s确保新图层完全可见）
+      }, 1000) // 优化新图层等待时间（1s后旧图层开始淡出，确保1.1秒重叠）
     })
 
     // 处理队列中可能的待处理请求
@@ -402,7 +440,20 @@ async function updateBannerBackgroundWithCSS(imageSrc: string): Promise<boolean>
 
   } catch (error) {
     console.error('❌ 双图层切换过程中发生错误:', error)
+    // 确保切换过程中的异常不会导致状态锁死
     isTransitioning = false
+    
+    // 尝试恢复到安全状态
+    try {
+      const recoveryBannerEl = document.querySelector('.tk-banner') as HTMLElement
+      if (recoveryBannerEl) {
+        recoveryBannerEl.classList.remove('dual-layer')
+        console.log('🔧 已尝试恢复到安全状态')
+      }
+    } catch (recoveryError) {
+      console.error('❌ 状态恢复失败:', recoveryError)
+    }
+    
     return false
   }
 }
@@ -473,6 +524,8 @@ async function displayRandomImage() {
     console.warn('图库为空，使用备用图片')
     currentImages = getFallbackImages()
     isUsingFallback = true
+    // 保存备用图库到缓存
+    saveImagesToCache(currentImages)
   }
   
   let availableImages = currentImages
@@ -501,6 +554,9 @@ async function displayRandomImage() {
       console.warn('🔌 动态图片加载失败，服务可能已停止，切换到备用图片')
       currentImages = getFallbackImages()
       isUsingFallback = true
+      
+      // 保存备用图库到缓存
+      saveImagesToCache(currentImages)
       
       // 启动服务监控
       startServiceMonitoring()
@@ -708,6 +764,8 @@ async function fetchImageLibrary() {
         console.log('⚠️ 图集服务不可用，切换到备用图片')
         currentImages = fallbackImages
         isUsingFallback = true
+        // 保存备用图库到缓存
+        saveImagesToCache(fallbackImages)
         // 启动服务监控
         startServiceMonitoring()
       }
@@ -718,6 +776,8 @@ async function fetchImageLibrary() {
     if (!isUsingFallback) {
       currentImages = getFallbackImages()
       isUsingFallback = true
+      // 保存备用图库到缓存
+      saveImagesToCache(currentImages)
       // 启动服务监控
       startServiceMonitoring()
     }
@@ -775,6 +835,9 @@ onMounted(async () => {
   } else {
     // 没有任何缓存，使用备用图片立即显示
     currentImages = getFallbackImages()
+    
+    // 保存备用图库到缓存
+    saveImagesToCache(currentImages)
 
     ensureBannerContentStability()
 
