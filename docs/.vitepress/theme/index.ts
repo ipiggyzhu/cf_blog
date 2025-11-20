@@ -111,6 +111,15 @@ export default {
 
       // 注册 Service Worker
       useServiceWorker();
+
+      // 确保字体加载完成后再渲染
+      if (document.fonts) {
+        document.fonts.ready.then(() => {
+          console.log('[Fonts] All fonts loaded');
+        }).catch((err) => {
+          console.warn('[Fonts] Font loading failed:', err);
+        });
+      }
     }
       // 不蒜子环境下配置路由进度条
     // if (inBrowser) {
