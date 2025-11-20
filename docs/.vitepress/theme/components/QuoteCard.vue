@@ -6,10 +6,6 @@
           <div class="quote-icon">📖</div>
           <h3 class="quote-title">每日英语</h3>
         </div>
-        <div class="auto-indicator">
-          <span class="auto-dot"></span>
-          <span class="auto-text">自动切换</span>
-        </div>
       </div>
       
       <div class="quote-main">
@@ -42,9 +38,7 @@
         </div>
       </div>
       
-      <div class="quote-progress">
-        <div class="progress-bar" :style="{ width: progressWidth + '%' }"></div>
-      </div>
+
     </div>
   </div>
 </template>
@@ -139,13 +133,10 @@ const quotes = [
 const currentQuoteIndex = ref(0)
 const currentQuote = ref(quotes[0])
 const isChanging = ref(false)
-const progressWidth = ref(0)
 const currentImageUrl = ref('')
 const isImageLoading = ref(true)
 const imageRetryCount = ref(0)
 const maxRetries = 3
-let autoTimer = null
-let progressTimer = null
 
 // 备用图片URLs - 使用 R2 存储的图片作为备用，确保稳定性
 const fallbackImages = [
@@ -207,93 +198,16 @@ const initializeImage = (quote) => {
   }
 }
 
-// 切换到下一个格言
-const changeQuote = () => {
-  isChanging.value = true
-  
-  setTimeout(() => {
-    const newQuote = getRandomQuote()
-    currentQuote.value = newQuote
-    initializeImage(newQuote)
-    isChanging.value = false
-    resetProgress()
-  }, 300)
-}
-
-// 重置进度条
-const resetProgress = () => {
-  progressWidth.value = 0
-  if (progressTimer) {
-    clearInterval(progressTimer)
-  }
-  
-  // 8秒进度条动画
-  const duration = 8000
-  const interval = 50
-  const increment = (interval / duration) * 100
-  
-  progressTimer = setInterval(() => {
-    progressWidth.value += increment
-    if (progressWidth.value >= 100) {
-      progressWidth.value = 100
-      clearInterval(progressTimer)
-    }
-  }, interval)
-}
-
-// 启动自动轮播
-const startAutoRotation = () => {
-  if (autoTimer) {
-    clearInterval(autoTimer)
-  }
-  
-  autoTimer = setInterval(() => {
-    changeQuote()
-  }, 8000) // 8秒切换一次
-  
-  resetProgress()
-}
-
-// 停止自动轮播
-const stopAutoRotation = () => {
-  if (autoTimer) {
-    clearInterval(autoTimer)
-  }
-  if (progressTimer) {
-    clearInterval(progressTimer)
-  }
-}
-
-// 页面可见性变化处理
-const handleVisibilityChange = () => {
-  if (document.hidden) {
-    stopAutoRotation()
-  } else {
-    startAutoRotation()
-  }
-}
+// 移除了自动切换功能，现在只显示随机的一条格言
 
 // 组件挂载时初始化
 onMounted(() => {
-  // 随机选择初始格言
+  // 随机选择一条格言显示
   const initialQuote = getRandomQuote()
   currentQuote.value = initialQuote
   
   // 初始化图片
   initializeImage(initialQuote)
-  
-  // 启动自动轮播
-  startAutoRotation()
-  
-  // 监听页面可见性变化
-  document.addEventListener('visibilitychange', handleVisibilityChange)
-})
-
-// 组件卸载时清理
-import { onUnmounted } from 'vue'
-onUnmounted(() => {
-  stopAutoRotation()
-  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 
@@ -362,31 +276,7 @@ onUnmounted(() => {
   letter-spacing: 0.5px;
 }
 
-.auto-indicator {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--vp-c-text-2);
-  background: var(--vp-c-brand-1);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 500;
-}
 
-.auto-dot {
-  width: 6px;
-  height: 6px;
-  background: currentColor;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
 
 .quote-main {
   position: relative;
@@ -493,23 +383,7 @@ onUnmounted(() => {
   font-style: italic;
 }
 
-.quote-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-}
 
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-brand-2));
-  transition: width 0.1s linear;
-  border-radius: 0 2px 2px 0;
-  box-shadow: 0 0 8px rgba(var(--vp-c-brand-1), 0.5);
-}
 
 /* 图片加载动画 */
 .image-loading {
@@ -578,19 +452,10 @@ html.dark .quote-card:hover {
   
   .quote-header {
     padding: 14px 18px 10px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
   }
   
   .quote-title {
     font-size: 16px;
-  }
-  
-  .auto-indicator {
-    align-self: flex-end;
-    font-size: 11px;
-    padding: 3px 8px;
   }
   
   .quote-image-container {
