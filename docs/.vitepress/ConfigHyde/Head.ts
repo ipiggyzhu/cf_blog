@@ -30,10 +30,11 @@ export const HeadData = [
   ["meta", { name: "apple-mobile-web-app-title", content: "Casual Blog" }],
   ["link", { rel: "apple-touch-icon", href: "/img/logo.png" }],
 
-  // 预连接优化
-  ["link", { rel: "preconnect", href: "https://at.alicdn.com" }],
-  ["link", { rel: "preconnect", href: "https://image.itpiggy.top" }],
+  // 预连接优化 - 添加 crossorigin 以提高加载性能
+  ["link", { rel: "preconnect", href: "https://at.alicdn.com", crossorigin: "" }],
+  ["link", { rel: "preconnect", href: "https://image.itpiggy.top", crossorigin: "" }],
   ["link", { rel: "dns-prefetch", href: "https://busuanzi.ibruce.info" }],
+  ["link", { rel: "dns-prefetch", href: "https://bszi.eryajf.net" }],
 
   [
     "meta",
@@ -57,21 +58,23 @@ export const HeadData = [
     { name: "msvalidate.01", content: "48CABE70F538B8D117567176ABF325AF" },
   ], // Bing 收录验证
   ["link", { rel: "icon", href: "/img/logo.png", type: "image/png" }],
-  // 阿里在线矢量库
+  // 阿里在线矢量库 - 添加错误处理
   [
     "link",
     {
       rel: "stylesheet",
-      href: "//at.alicdn.com/t/font_2989306_w303erbip9.css",
+      href: "https://at.alicdn.com/t/font_2989306_w303erbip9.css",
+      crossorigin: "anonymous",
     },
   ],
   [
-    // 阿里图标库symbol 引用
+    // 阿里图标库symbol 引用 - 异步加载
     "script",
     {
       src: "https://at.alicdn.com/t/c/font_4899452_xj7acblxpxj.js",
-      media: "print",
-      onload: "this.media='all'",
+      async: true,
+      crossorigin: "anonymous",
+      onerror: "console.warn('Icon font failed to load')",
     },
   ],
   // umami统计
@@ -113,6 +116,14 @@ export const HeadData = [
   //   },
   // ],
 
-  // 阿里图标库symbol 引用
-  ["script",{src: "https://at.alicdn.com/t/c/font_4686603_33kna2v5qcm.js",defer: "defer",},],  
+  // 阿里图标库symbol 引用 - 异步加载并添加错误处理
+  [
+    "script",
+    {
+      src: "https://at.alicdn.com/t/c/font_4686603_33kna2v5qcm.js",
+      async: true,
+      crossorigin: "anonymous",
+      onerror: "console.warn('Icon font 2 failed to load')",
+    },
+  ],  
 ];
