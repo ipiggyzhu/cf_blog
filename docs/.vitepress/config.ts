@@ -542,14 +542,7 @@ export default defineConfig({
       sourcemap: false, // 禁用 sourcemap，加快构建并减小体积
       minify: 'esbuild', // 使用 esbuild 替代 terser，速度更快
       target: 'es2015', // 确保兼容性
-      // 优化代码分割 - 只分割非外部模块
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            'echarts-vendor': ['echarts'],
-          }
-        }
-      }
+      // 移除 manualChunks 避免与 VitePress 的外部模块配置冲突
     },
 
     // SSR 优化 - 确保主题和插件正确打包
