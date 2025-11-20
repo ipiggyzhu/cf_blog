@@ -542,11 +542,10 @@ export default defineConfig({
       sourcemap: false, // 禁用 sourcemap，加快构建并减小体积
       minify: 'esbuild', // 使用 esbuild 替代 terser，速度更快
       target: 'es2015', // 确保兼容性
-      // 优化代码分割
+      // 优化代码分割 - 只分割非外部模块
       rollupOptions: {
         output: {
           manualChunks: {
-            'vue-vendor': ['vue'],
             'echarts-vendor': ['echarts'],
           }
         }
