@@ -547,15 +547,14 @@ export default defineConfig({
 
     // SSR 优化 - 确保主题和插件正确打包
     ssr: {
-      noExternal: ['vitepress-theme-teek', 'oh-my-live2d', 'canvas-confetti']
+      noExternal: ['vitepress-theme-teek', 'canvas-confetti']
     },
 
     // 优化依赖预构建
     optimizeDeps: {
       include: [
         'vue',
-        'echarts',
-        'oh-my-live2d'
+        'echarts'
       ],
       exclude: ['@vueuse/core', 'vitepress', 'vitepress-theme-teek']
     },    
