@@ -20,9 +20,6 @@ importers:
       echarts:
         specifier: ^6.0.0
         version: 6.0.0
-      oh-my-live2d:
-        specifier: ^0.19.3
-        version: 0.19.3
       vitepress-markdown-timeline:
         specifier: ^1.2.2
         version: 1.2.2
@@ -1014,9 +1011,6 @@ packages:
 
   nprogress-v2@1.1.10:
     resolution: {integrity: sha512-MypWLNIPIM07SS0bAc/oac0vhVFz9vAHm7d1sj//Pnf3J03LQ3CuWrlDteIu6exq0fIvkDJ6tUDRWLaifsIt5w==}
-
-  oh-my-live2d@0.19.3:
-    resolution: {integrity: sha512-EWva8OUmcExIFIhqGkeiVPQt44RvYYFg+nmpkrZgQVQ+xofVFq4SDYAg5NcdK40HxyV4vORBJEg4OHIHP96MrA==}
 
   oniguruma-to-es@3.1.1:
     resolution: {integrity: sha512-bUH8SDvPkH3ho3dvwJwfonjlQ4R80vjyvrU8YpxuROddv55vAEJrTuCuCVUhhsHbtlD9tGGbaNApGQckXhS8iQ==}
@@ -2144,8 +2138,6 @@ snapshots:
     optional: true
 
   nprogress-v2@1.1.10: {}
-
-  oh-my-live2d@0.19.3: {}
 
   oniguruma-to-es@3.1.1:
     dependencies:
