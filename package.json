@@ -25,7 +25,6 @@
     "@vercel/speed-insights": "^1.2.0",
     "canvas-confetti": "^1.9.3",
     "echarts": "^6.0.0",
-    "oh-my-live2d": "^0.19.3",
     "vitepress-markdown-timeline": "^1.2.2",
     "vitepress-plugin-auto-frontmatter": "^1.0.11",
     "vitepress-plugin-group-icons": "^1.6.0",
