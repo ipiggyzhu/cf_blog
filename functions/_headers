@@ -1,0 +1,62 @@
+# Cloudflare Pages 静态资源缓存配置
+
+# CSS 和 JavaScript 文件 - 长期缓存（1 年）
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# 图片文件 - 长期缓存（1 年）
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.gif
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+# 字体文件 - 长期缓存（1 年）
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.ttf
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.eot
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML 文件 - 短期缓存（5 分钟）
+/*.html
+  Cache-Control: public, max-age=300, must-revalidate
+
+# 根路径 HTML
+/
+  Cache-Control: public, max-age=300, must-revalidate
+
+# API 响应 - 不缓存或短期缓存
+/api/*
+  Cache-Control: public, max-age=60, must-revalidate
+
+/geo
+  Cache-Control: no-store, no-cache, must-revalidate
+
+# 安全头
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin

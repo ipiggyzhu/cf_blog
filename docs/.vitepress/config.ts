@@ -366,6 +366,7 @@ export default defineConfig({
   }),
 
   extends: teekConfig,
+  base: '/', // 确保 base 路径正确
   title: "Casual", //左上角网站名称
   description: description,
   cleanUrls: true,  //设置为true就是让链接后不默认添加.html
@@ -533,15 +534,28 @@ export default defineConfig({
       }
     },
 
-    // 构建优化 - 专注于速度
+    // 构建优化 - 专注于速度和兼容性
     build: {
-      chunkSizeWarningLimit: 2000, // 提高警告阈值，减少警告
+      chunkSizeWarningLimit: 1000, // 减小 chunk 大小警告阈值
       cssCodeSplit: true, // CSS 代码分割
       reportCompressedSize: false, // 禁用压缩大小报告，加快构建
-      sourcemap: false, // 禁用 sourcemap，加快构建
+      sourcemap: false, // 禁用 sourcemap，加快构建并减小体积
       minify: 'esbuild', // 使用 esbuild 替代 terser，速度更快
-      target: 'es2015', // 降低目标版本，减少转换
-      // 移除 rollupOptions.manualChunks 避免与 VitePress 冲突
+      target: 'es2015', // 确保兼容性
+      // 优化代码分割
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vue-vendor': ['vue'],
+            'echarts-vendor': ['echarts'],
+          }
+        }
+      }
+    },
+
+    // SSR 优化 - 确保主题和插件正确打包
+    ssr: {
+      noExternal: ['vitepress-theme-teek', 'oh-my-live2d', 'canvas-confetti']
     },
 
     // 优化依赖预构建

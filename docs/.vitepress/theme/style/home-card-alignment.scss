@@ -1,0 +1,62 @@
+/* 修复首页博主信息卡片和文章卡片的垂直对齐问题 */
+
+/* 强制左右两侧容器顶部对齐 */
+.tk-home-card-list {
+  display: flex !important;
+  align-items: flex-start !important;
+  
+  /* 移除可能的间隙 */
+  gap: 0 !important;
+  column-gap: 16px !important; /* 保持左右间距 */
+  row-gap: 0 !important;
+}
+
+/* 左侧容器 - 博主信息区域 */
+.tk-home-card-list-left {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  
+  /* 移除所有可能导致偏移的边距 */
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  /* 确保从顶部开始 */
+  align-self: flex-start !important;
+}
+
+/* 右侧容器 - 文章列表区域 */
+.tk-home-card-list-right {
+  display: flex !important;
+  flex-direction: column !important;
+  
+  /* 移除所有可能导致偏移的边距 */
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  /* 确保从顶部开始 */
+  align-self: flex-start !important;
+}
+
+/* 博主信息卡片本身 */
+.tk-my {
+  margin-top: 0 !important;
+  margin-bottom: 16px !important;
+}
+
+/* 文章卡片 */
+.tk-post-item-card {
+  margin-top: 0 !important;
+}
+
+/* 确保第一个文章卡片没有顶部边距 */
+.tk-home-card-list-right > :first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* 确保博主信息卡片是左侧第一个元素时没有顶部边距 */
+.tk-home-card-list-left > .tk-my:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

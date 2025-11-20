@@ -58,11 +58,30 @@ import NavWeather from './components/NavWeather.vue'
 // 导入Service Worker
 import { useServiceWorker } from './composables/useServiceWorker'
 
+// 导入错误处理器
+import { errorHandler } from './utils/errorHandler'
+
 // import "./style/sidebar-icon.scss";
 
 export default {
   extends: Teek,
   async enhanceApp({ app, router }) {
+    // 配置 Vue 错误处理
+    app.config.errorHandler = (err, instance, info) => {
+      console.error('[Vue Error]', err, info);
+      errorHandler.captureError(
+        err instanceof Error ? err : new Error(String(err)),
+        'vue',
+        { info, component: instance?.$options.name }
+      );
+      // 不阻止应用继续运行
+    };
+
+    app.config.warnHandler = (msg, instance, trace) => {
+      if (import.meta.env.DEV) {
+        console.warn('[Vue Warning]', msg, trace);
+      }
+    };
     // 注册组件
     // app.component("MNavLinks", MNavLinks); // 注册导航组件
     app.component("confetti", confetti); // 注册五彩纸屑组件
@@ -76,9 +95,12 @@ export default {
     // 注册全局组件
     app.component("friend-link", SLink);
 
-    // 非SSR环境下配置路由进度条和Service Worker
+    // 非SSR环境下配置路由进度条、错误处理和Service Worker
     // @ts-expect-error
     if (!import.meta.env.SSR) {
+      // 初始化错误处理器
+      errorHandler.init();
+
       NProgress.configure({ showSpinner: false });
       router.onBeforeRouteChange = () => NProgress.start();
       router.onAfterRouteChange = () => {
