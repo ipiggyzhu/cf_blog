@@ -18,10 +18,6 @@
             @load="handleImageLoad"
           />
           <div class="quote-overlay"></div>
-          <div v-if="isImageLoading" class="image-loading">
-            <div class="loading-spinner"></div>
-            <span>加载中...</span>
-          </div>
         </div>
         
         <div class="quote-text-container">
