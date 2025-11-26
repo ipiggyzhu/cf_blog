@@ -1,0 +1,87 @@
+/* ============================================
+   玻璃态效果 - 侧边栏样式
+   Glassmorphism Effect - Sidebar Styles
+   ============================================ */
+
+@use './variables' as *;
+@use './mixins' as *;
+
+/* ========== 主侧边栏 ========== */
+.VPSidebar {
+  @include glass-effect(var(--glass-blur-sidebar), var(--glass-bg-sidebar), var(--glass-opacity-sidebar));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  border-radius: 12px;
+  border-right: var(--glass-border);
+  
+  /* 确保侧边栏在正确的层级 */
+  position: relative;
+  z-index: 50;
+}
+
+/* ========== 侧边栏容器 ========== */
+.aside {
+  @include glass-effect(var(--glass-blur-sidebar), var(--glass-bg-sidebar), var(--glass-opacity-sidebar));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  border-radius: 12px;
+  padding: 16px;
+  
+  /* 确保侧边栏在正确的层级 */
+  position: relative;
+  z-index: 50;
+}
+
+/* ========== 文档侧边栏 ========== */
+.VPDocAside {
+  @include glass-effect(var(--glass-blur-sidebar), var(--glass-bg-sidebar), var(--glass-opacity-sidebar));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  border-radius: 12px;
+  padding: 16px;
+  
+  /* 确保侧边栏在正确的层级 */
+  position: relative;
+  z-index: 50;
+}
+
+/* ========== 侧边栏导航项 ========== */
+.VPSidebar .group,
+.VPSidebar .item {
+  /* 侧边栏项目 hover 效果 */
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    transition: var(--glass-transition);
+    
+    .dark & {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+/* ========== 侧边栏激活状态 ========== */
+.VPSidebar .item.active {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  border-left: 3px solid var(--glass-border-color-hover);
+  
+  .dark & {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* ========== 移动端侧边栏优化 ========== */
+@media (max-width: 768px) {
+  .VPSidebar,
+  .aside,
+  .VPDocAside {
+    /* 移动端侧边栏使用更强的背景以提升可读性 */
+    background: var(--glass-bg-sidebar);
+    backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate));
+  }
+}

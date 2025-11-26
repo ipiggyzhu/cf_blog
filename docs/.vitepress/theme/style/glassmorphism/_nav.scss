@@ -1,0 +1,52 @@
+/* ============================================
+   玻璃态效果 - 导航栏样式
+   Glassmorphism Effect - Navigation Styles
+   ============================================ */
+
+@use './variables' as *;
+@use './mixins' as *;
+
+/* ========== 主导航栏 ========== */
+.VPNav {
+  @include glass-effect(var(--glass-blur-nav), var(--glass-bg-nav), var(--glass-opacity-nav));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  /* 确保导航栏在正确的层级 */
+  position: relative;
+  z-index: 100;
+  
+  /* 添加微妙的底部边框 */
+  border-bottom: var(--glass-border);
+}
+
+/* ========== 导航栏容器 ========== */
+.VPNavBar {
+  @include glass-performance;
+  
+  /* 确保内容在玻璃效果之上 */
+  position: relative;
+  z-index: 2;
+}
+
+/* ========== 本地导航 ========== */
+.VPLocalNav {
+  @include glass-effect(var(--glass-blur-nav), var(--glass-bg-nav), var(--glass-opacity-nav));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  /* 确保本地导航在正确的层级 */
+  position: relative;
+  z-index: 99;
+  
+  /* 添加微妙的底部边框 */
+  border-bottom: var(--glass-border);
+}
+
+/* ========== 导航栏滚动状态优化 ========== */
+.VPNav.has-sidebar,
+.VPNav.scrolled {
+  /* 滚动时保持玻璃效果稳定 */
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
+}

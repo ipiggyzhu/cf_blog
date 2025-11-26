@@ -1,0 +1,117 @@
+/* ============================================
+   强制全局玻璃效果
+   使用最高优先级确保效果可见
+   ============================================ */
+
+/* 导航栏 - 所有可能的选择器 */
+nav,
+header,
+.nav,
+.navbar,
+[class*="nav"],
+[class*="Nav"],
+.tk-nav,
+.VPNav,
+.VPNavBar,
+.VPLocalNav {
+  background: var(--glass-bg-nav) !important;
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate)) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* 侧边栏 - 所有可能的选择器 */
+aside,
+.aside,
+.sidebar,
+[class*="sidebar"],
+[class*="Sidebar"],
+.tk-sidebar,
+.tk-aside,
+.VPSidebar,
+.VPDocAside {
+  background: var(--glass-bg-sidebar) !important;
+  backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate)) !important;
+  border: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 12px !important;
+}
+
+/* 主内容区 - 所有可能的选择器 */
+main,
+article,
+.content,
+.main-content,
+[class*="content"],
+[class*="Content"],
+.tk-doc,
+.tk-content,
+.VPDoc,
+.vp-doc,
+.container {
+  background: var(--glass-bg-content) !important;
+  backdrop-filter: blur(var(--glass-blur-content)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-content)) saturate(var(--glass-saturate)) !important;
+  border: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 12px !important;
+}
+
+/* 卡片 - 所有可能的选择器 */
+.card,
+[class*="card"],
+[class*="Card"],
+.tk-my,
+.info-card,
+.welcome-card,
+.announcement-card,
+.quote-card,
+.wechat-card,
+.oss-card,
+.about-card,
+.skill-card,
+.timeline-item,
+.custom-block {
+  background: var(--glass-bg-card) !important;
+  backdrop-filter: blur(var(--glass-blur-card)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-card)) saturate(var(--glass-saturate)) !important;
+  border: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 12px !important;
+  
+  &:hover {
+    box-shadow: var(--glass-shadow-hover) !important;
+    transform: translateY(-2px);
+    transition: var(--glass-transition);
+  }
+}
+
+/* 确保文字可读 */
+nav,
+header,
+aside,
+main,
+article,
+.card,
+[class*="card"] {
+  color: inherit !important;
+  
+  h1, h2, h3, h4, h5, h6 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* 暗色模式特殊处理 */
+html.dark {
+  nav,
+  header,
+  aside,
+  main,
+  article,
+  .card,
+  [class*="card"],
+  [class*="content"] {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+}

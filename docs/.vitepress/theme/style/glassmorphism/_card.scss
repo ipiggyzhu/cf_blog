@@ -1,0 +1,160 @@
+/* ============================================
+   玻璃态效果 - 卡片组件样式
+   Glassmorphism Effect - Card Component Styles
+   ============================================ */
+
+@use './variables' as *;
+@use './mixins' as *;
+
+/* ========== 博主信息卡片 ========== */
+.tk-my {
+  @include glass-card;
+  @include glass-gradient-border;
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  /* 确保卡片在正确的层级 */
+  position: relative;
+  z-index: 10;
+  
+  /* 过渡动画 */
+  transition: var(--glass-transition);
+  
+  &:hover {
+    @include glass-hover;
+  }
+}
+
+/* ========== 关于页面卡片 ========== */
+.about-card,
+.about-hero,
+.about-info {
+  @include glass-card;
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  margin-bottom: 24px;
+  padding: 24px;
+  
+  &:hover {
+    @include glass-hover;
+  }
+}
+
+/* ========== 开源项目卡片 ========== */
+.oss-card {
+  @include glass-card;
+  @include glass-gradient-border;
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  padding: 20px;
+  margin-bottom: 16px;
+  
+  &:hover {
+    @include glass-hover;
+  }
+}
+
+/* ========== 技能卡片 ========== */
+.skill-card,
+.skills-section {
+  @include glass-card;
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  padding: 24px;
+  margin-bottom: 20px;
+  
+  &:hover {
+    @include glass-hover;
+  }
+}
+
+/* ========== 自定义块 ========== */
+.custom-block {
+  @include glass-effect(var(--glass-blur-card), var(--glass-bg-card), var(--glass-opacity-card));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  border-radius: 8px;
+  border-left: 4px solid var(--glass-border-color);
+  
+  &.tip {
+    border-left-color: rgba(66, 184, 131, 0.8);
+  }
+  
+  &.warning {
+    border-left-color: rgba(255, 197, 61, 0.8);
+  }
+  
+  &.danger {
+    border-left-color: rgba(244, 63, 94, 0.8);
+  }
+  
+  &.info {
+    border-left-color: rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* ========== 代码组 ========== */
+.vp-code-group {
+  @include glass-effect(var(--glass-blur-card), var(--glass-bg-card), var(--glass-opacity-card));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  border-radius: 8px;
+  overflow: hidden;
+  
+  /* 代码组标签 */
+  .tabs {
+    background: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    
+    .dark & {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+/* ========== 信息卡片 ========== */
+.information-card,
+.notice-card,
+.quote-card {
+  @include glass-card;
+  @include glass-gradient-border;
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  padding: 20px;
+  margin: 16px 0;
+  
+  &:hover {
+    @include glass-hover;
+  }
+}
+
+/* ========== 时间线卡片 ========== */
+.timeline-item {
+  @include glass-effect(var(--glass-blur-card), var(--glass-bg-card), var(--glass-opacity-card));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-left: 3px solid var(--glass-border-color);
+  
+  &:hover {
+    border-left-color: var(--glass-border-color-hover);
+    box-shadow: var(--glass-shadow-hover);
+  }
+}
+
+/* ========== 通用卡片类 ========== */
+.glass-card {
+  @include glass-card;
+  @include glass-performance;
+  @include glass-reduced-motion;
+}
