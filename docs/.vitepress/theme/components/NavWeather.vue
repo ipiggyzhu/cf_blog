@@ -1,449 +1,331 @@
 <template>
-  <div class="weather-wrapper">
+  <div
+    class="weather-wrapper"
+    @mouseenter="showTooltip = true"
+    @mouseleave="hideTooltipWithDelay"
+  >
     <div class="divider divider-left"></div>
-    <button 
-      class="VPSocialLink no-icon weather-link" 
-      :title="weatherTooltip" 
-      @click.prevent="handleWeatherClick" 
+    <button
+      ref="weatherButton"
+      class="VPSocialLink no-icon weather-link"
+      :title="tooltipText"
+      @click.prevent="handleWeatherClick"
       type="button"
-      :class="{ 'weather-loading-state': !weatherData }"
     >
-      <span class="weather-emoji" v-if="weatherData">{{ weatherIcon }}</span>
-      <span class="weather-loading" v-else>🌡️</span>
+      <WeatherIcon
+        :icon="weatherIcon"
+        :is-loading="geolocation.state.isLoading || weatherAPI.state.isLoading"
+        :has-error="geolocation.state.isError || weatherAPI.state.isError"
+      />
     </button>
     <div class="divider divider-right"></div>
+
+    <!-- 悬浮提示框 - 简化版，直接显示简单信息 -->
+    <div
+      v-if="showTooltip"
+      class="simple-tooltip"
+      @mouseenter="clearHideTimeout"
+      @mouseleave="hideTooltipWithDelay"
+    >
+      <div class="tooltip-content">
+        <!-- 加载状态 -->
+        <div class="weather-info" v-if="isLoading">
+          <span class="loading">获取位置和天气中...</span>
+        </div>
+        <!-- 正常状态 -->
+        <div class="weather-info" v-else-if="hasLocation && hasWeather">
+          <span v-if="geolocation.state.location?.city" class="city">{{ geolocation.state.location.city }} · </span>
+          <span class="description">{{ weatherAPI.state.weather?.description }}</span>
+          <span class="temperature">{{ Math.round(weatherAPI.state.weather?.temperature || 0) }}°C</span>
+        </div>
+        <!-- 错误状态 -->
+        <div class="weather-info" v-else-if="hasError">
+          <span class="error">点击重新获取位置</span>
+        </div>
+        <!-- 无数据状态 -->
+        <div class="weather-info" v-else>
+          <span class="loading">准备获取位置...</span>
+        </div>
+
+        <!-- 精准定位提示 -->
+        <div class="hint" v-if="!geolocation.isPreciseLocation && !hasError && hasLocation && hasWeather && !isLoading">
+          点击允许浏览器定位获得更精准位置
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import WeatherIcon from './nav-weather/WeatherIcon.vue'
+import { useGeolocation } from '../composables/useGeolocation'
+import { useWeatherAPI } from '../composables/useWeatherAPI'
+import { UPDATE_INTERVALS } from '../utils/constants'
 
-interface WeatherData {
-  temperature: number
-  skycon: string
-  description: string
-}
+// 状态
+const showTooltip = ref(false)
+let refreshInterval: number | null = null
+let tooltipTimeout: number | null = null
+const weatherButton = ref<HTMLElement | null>(null)
 
-const weatherData = ref<WeatherData | null>(null)
-const cityName = ref<string>('')
+// 组合式函数
+console.log('[NavWeather] 🚀 初始化组合式函数...')
+const geolocation = useGeolocation()
+const weatherAPI = useWeatherAPI()
+console.log('[NavWeather] ✅ 组合式函数初始化完成:', {
+  geolocation: !!geolocation,
+  weatherAPI: !!weatherAPI
+})
 
-// 彩云天气的天气代码映射到emoji图标
-const weatherIconMap: Record<string, string> = {
-  'CLEAR_DAY': '☀️',
-  'CLEAR_NIGHT': '🌙',
-  'PARTLY_CLOUDY_DAY': '⛅',
-  'PARTLY_CLOUDY_NIGHT': '☁️',
-  'CLOUDY': '☁️',
-  'LIGHT_HAZE': '😶‍🌫️',
-  'MODERATE_HAZE': '😶‍🌫️',
-  'HEAVY_HAZE': '😶‍🌫️',
-  'LIGHT_RAIN': '🌦️',
-  'MODERATE_RAIN': '🌧️',
-  'HEAVY_RAIN': '⛈️',
-  'STORM_RAIN': '⛈️',
-  'FOG': '🌫️',
-  'LIGHT_SNOW': '🌨️',
-  'MODERATE_SNOW': '❄️',
-  'HEAVY_SNOW': '❄️',
-  'STORM_SNOW': '❄️',
-  'DUST': '💨',
-  'SAND': '💨',
-  'WIND': '💨'
-}
-
-// 天气描述
-const weatherDescMap: Record<string, string> = {
-  'CLEAR_DAY': '晴天',
-  'CLEAR_NIGHT': '晴夜',
-  'PARTLY_CLOUDY_DAY': '多云',
-  'PARTLY_CLOUDY_NIGHT': '多云',
-  'CLOUDY': '阴天',
-  'LIGHT_HAZE': '轻度雾霾',
-  'MODERATE_HAZE': '中度雾霾',
-  'HEAVY_HAZE': '重度雾霾',
-  'LIGHT_RAIN': '小雨',
-  'MODERATE_RAIN': '中雨',
-  'HEAVY_RAIN': '大雨',
-  'STORM_RAIN': '暴雨',
-  'FOG': '雾',
-  'LIGHT_SNOW': '小雪',
-  'MODERATE_SNOW': '中雪',
-  'HEAVY_SNOW': '大雪',
-  'STORM_SNOW': '暴雪',
-  'DUST': '浮尘',
-  'SAND': '沙尘',
-  'WIND': '大风'
-}
-
+// 计算属性
 const weatherIcon = computed(() => {
-  if (!weatherData.value) return '🌡️'
-  return weatherIconMap[weatherData.value.skycon] || '🌡️'
+  return weatherAPI.weatherIcon.value
 })
 
-const temperature = computed(() => {
-  if (!weatherData.value) return '--'
-  return Math.round(weatherData.value.temperature)
-})
-
-const weatherTooltip = computed(() => {
-  if (!weatherData.value) return '加载天气中...'
-  const city = cityName.value ? `${cityName.value} · ` : ''
-  const clickTip = '\n点击刷新天气'
-  return `${city}${weatherData.value.description} ${temperature.value}°C${clickTip}`
-})
-
-// ---- 位置与缓存 ----
-const GEO_CACHE_KEY = 'nav-weather:geo'
-const WEATHER_CACHE_PREFIX = 'nav-weather:realtime:'
-
-const withTimeout = async <T>(promise: Promise<T>, ms = 8000): Promise<T> => {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), ms)
-  try {
-    // @ts-ignore
-    const result = await promise
-    return result as T
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-const getEnvToken = (): string => {
-  // @ts-ignore
-  return (import.meta.env && import.meta.env.VITE_CAIYUN_TOKEN) || (window as any).__CAIYUN_TOKEN__ || ''
-}
-
-const getVisitorLocation = async (): Promise<{ latitude: number; longitude: number; city?: string } | null> => {
-  if (typeof window === 'undefined') return null
-
-  // 1. 检查缓存（缩短缓存时间到 5 分钟，提高准确性）
-  try {
-    const cacheRaw = localStorage.getItem(GEO_CACHE_KEY)
-    if (cacheRaw) {
-      const cache = JSON.parse(cacheRaw)
-      // 缓存时间从 10 分钟改为 5 分钟
-      if (Date.now() - cache.time < 5 * 60 * 1000) {
-        console.log('[NavWeather] 📦 使用缓存的位置信息:', cache.value)
-        console.log(`[NavWeather] 📍 经纬度: ${cache.value.latitude.toFixed(6)}, ${cache.value.longitude.toFixed(6)}`)
-        console.log('[NavWeather] 💡 如需重新定位，请点击天气图标')
-        return cache.value
-      } else {
-        console.log('[NavWeather] 🔄 缓存已过期，重新获取位置')
-      }
-    }
-  } catch {}
-
-  // 2. 优先使用浏览器地理位置 API（最准确）
-  const geoByBrowser = await new Promise<{ latitude: number; longitude: number } | null>(resolve => {
-    if (!('geolocation' in navigator)) {
-      console.warn('[NavWeather] 浏览器不支持地理位置 API')
-      return resolve(null)
-    }
-    
-    console.log('[NavWeather] 正在请求浏览器定位权限...')
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        console.log('[NavWeather] 浏览器定位授权成功')
-        resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude })
-      },
-      (error) => {
-        console.warn('[NavWeather] 浏览器定位失败:', error.message)
-        if (error.code === 1) {
-          console.warn('[NavWeather] 用户拒绝了定位权限，将使用 IP 定位（精度较低）')
-        }
-        resolve(null)
-      },
-      // 提高超时时间到 20 秒，启用高精度模式
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
-    )
+// 调试计算属性
+const hasLocation = computed(() => {
+  const result = !!geolocation.state.location
+  console.log('[NavWeather] 🔍 hasLocation计算:', {
+    location: geolocation.state.location,
+    result
   })
-  if (geoByBrowser) {
-    console.log('[NavWeather] ✅ 浏览器定位成功（精准）:', geoByBrowser)
-    console.log(`[NavWeather] 📍 经纬度: ${geoByBrowser.latitude.toFixed(6)}, ${geoByBrowser.longitude.toFixed(6)}`)
-    // 使用高德地图逆地理编码获取城市名称（国内更准确）
-    try {
-      const cityName = await getCityNameFromCoords(geoByBrowser.latitude, geoByBrowser.longitude)
-      const value = { ...geoByBrowser, city: cityName }
-      console.log('[NavWeather] 🏙️ 逆地理编码成功:', value)
-      try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value })) } catch {}
-      return value
-    } catch (e) {
-      console.warn('[NavWeather] 逆地理编码失败:', e)
-      try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: geoByBrowser })) } catch {}
-      return geoByBrowser
-    }
-  }
-
-  // 3. 使用国内 IP 定位服务（对国内用户更准确）
-  const cnProviders = [
-    // 高德 IP 定位（国内最稳定）
-    async () => {
-      const r = await withTimeout(fetch('https://restapi.amap.com/v3/ip?key=REDACTED_AMAP_KEY'), 5000)
-      const j = await r.json()
-      if (j.status === '1' && j.rectangle) {
-        // 高德返回矩形范围，取中心点
-        const coords = j.rectangle.split(';')
-        const [lon1, lat1] = coords[0].split(',').map(Number)
-        const [lon2, lat2] = coords[1].split(',').map(Number)
-        return { 
-          latitude: (lat1 + lat2) / 2, 
-          longitude: (lon1 + lon2) / 2, 
-          city: j.city || j.province 
-        }
-      }
-      throw new Error('amap failed')
-    },
-    // 百度地图 IP 定位
-    async () => {
-      const r = await withTimeout(fetch('https://api.map.baidu.com/location/ip?ak=REDACTED_BAIDU_KEY&coor=bd09ll'), 5000)
-      const j = await r.json()
-      if (j.status === 0 && j.content && j.content.point) {
-        return { 
-          latitude: j.content.point.y, 
-          longitude: j.content.point.x, 
-          city: j.content.address_detail?.city || j.content.address 
-        }
-      }
-      throw new Error('baidu failed')
-    }
-  ]
-
-  for (let i = 0; i < cnProviders.length; i++) {
-    try {
-      const loc = await cnProviders[i]()
-      if (loc && loc.latitude && loc.longitude) {
-        console.log(`[NavWeather] ⚠️ 使用IP定位（精度低）- 服务${i + 1}:`, loc)
-        console.log(`[NavWeather] 📍 经纬度: ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}`)
-        console.log('[NavWeather] 💡 提示：IP定位可能不准确，建议授权浏览器定位')
-        try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
-        return loc
-      }
-    } catch (e) {
-      console.warn(`[NavWeather] IP定位服务${i + 1}失败，尝试下一个...`)
-    }
-  }
-
-  // 4. 回退到国际 IP 定位服务
-  const intlProviders = [
-    async () => {
-      const r = await withTimeout(fetch('https://ipapi.co/json/'))
-      const j = await r.json()
-      return { latitude: j.latitude, longitude: j.longitude, city: j.city }
-    },
-    async () => {
-      const r = await withTimeout(fetch('https://ip-api.com/json/?lang=zh-CN'))
-      const j = await r.json()
-      return { latitude: j.lat, longitude: j.lon, city: j.city }
-    }
-  ]
-  
-  for (let i = 0; i < intlProviders.length; i++) {
-    try {
-      const loc = await intlProviders[i]()
-      if (loc && loc.latitude && loc.longitude) {
-        console.log(`[NavWeather] ⚠️ 使用国际IP定位 - 服务${i + 1}:`, loc)
-        console.log(`[NavWeather] 📍 经纬度: ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}`)
-        try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value: loc })) } catch {}
-        return loc
-      }
-    } catch (e) {
-      console.warn(`[NavWeather] 国际IP定位服务${i + 1}失败`)
-    }
-  }
-
-  // 5. 最后尝试 Cloudflare Pages Functions
-  try {
-    const r = await withTimeout(fetch('/api/geo'), 1500)
-    const j = await r.json()
-    if (j && j.ok && j.latitude && j.longitude) {
-      const value = { latitude: Number(j.latitude), longitude: Number(j.longitude), city: j.city || '' }
-      try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({ time: Date.now(), value })) } catch {}
-      return value
-    }
-  } catch {}
-
-  return null
-}
-
-// 根据经纬度获取城市名称（使用高德地图逆地理编码）
-const getCityNameFromCoords = async (lat: number, lon: number): Promise<string> => {
-  try {
-    const r = await withTimeout(
-      fetch(`https://restapi.amap.com/v3/geocode/regeo?key=REDACTED_AMAP_KEY&location=${lon},${lat}`)
-    )
-    const j = await r.json()
-    if (j.status === '1' && j.regeocode) {
-      return j.regeocode.addressComponent.city || j.regeocode.addressComponent.province || ''
-    }
-  } catch {}
-  return ''
-}
-
-// 获取天气数据
-const fetchWeather = async () => {
-  try {
-    if (typeof window === 'undefined') return
-
-    const loc = await getVisitorLocation()
-    if (!loc) {
-      console.warn('[NavWeather] 无法获取位置信息')
-      weatherData.value = { temperature: 0, skycon: 'CLOUDY', description: '天气' }
-      return
-    }
-
-    const lat = loc.latitude
-    const lon = loc.longitude
-    cityName.value = loc.city || ''
-
-    const cacheKey = `${WEATHER_CACHE_PREFIX}${lat.toFixed(2)},${lon.toFixed(2)}`
-    
-    // 检查缓存
-    try {
-      const cached = localStorage.getItem(cacheKey)
-      if (cached) {
-        const cc = JSON.parse(cached)
-        if (Date.now() - cc.time < 10 * 60 * 1000) {
-          weatherData.value = cc.value
-          console.log('[NavWeather] 📦 使用缓存的天气数据')
-          console.log(`[NavWeather] 🏙️ 城市: ${cityName.value || '未知'}`)
-          console.log(`[NavWeather] 🌡️ 温度: ${cc.value.temperature}°C`)
-          return
-        }
-      }
-    } catch {}
-
-    // 优先尝试彩云天气（如果有 token）
-    const token = getEnvToken()
-    if (token) {
-      try {
-        const url = `https://api.caiyunapp.com/v2.6/${token}/${lon},${lat}/realtime`
-        const resp = await withTimeout(fetch(url), 5000)
-        const data = await resp.json()
-        if (data.status === 'ok') {
-          const realtime = data.result.realtime
-          const value: WeatherData = {
-            temperature: realtime.temperature,
-            skycon: realtime.skycon,
-            description: weatherDescMap[realtime.skycon] || '未知'
-          }
-          weatherData.value = value
-          try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), value })) } catch {}
-          console.log('[NavWeather] 彩云天气获取成功')
-          return
-        }
-      } catch (e) {
-        console.warn('[NavWeather] 彩云天气获取失败，使用 Open-Meteo 兜底:', e)
-      }
-    }
-
-    // 使用免费的 Open-Meteo API（无需 token）
-    await fetchOpenMeteo(lat, lon, cacheKey)
-  } catch (error) {
-    console.error('[NavWeather] 获取天气数据失败:', error)
-    weatherData.value = { temperature: 0, skycon: 'CLOUDY', description: '天气' }
-  }
-}
-
-// Open-Meteo 兜底：无需 token，保证温度不为 0
-const fetchOpenMeteo = async (lat: number, lon: number, cacheKey: string) => {
-  try {
-    const api = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`
-    const r = await withTimeout(fetch(api), 5000)
-    const j = await r.json()
-    const cur = j.current
-    if (!cur) throw new Error('no current')
-
-    const sky = wmoToSkycon(Number(cur.weather_code))
-    const value: WeatherData = {
-      temperature: Number(cur.temperature_2m),
-      skycon: sky,
-      description: weatherDescMap[sky] || '天气'
-    }
-    weatherData.value = value
-    try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), value })) } catch {}
-  } catch (e) {
-    console.warn('open-meteo fallback failed', e)
-  }
-}
-
-const wmoToSkycon = (code: number): string => {
-  if (code === 0) return 'CLEAR_DAY'
-  if ([1,2,3].includes(code)) return 'PARTLY_CLOUDY_DAY'
-  if ([45,48].includes(code)) return 'FOG'
-  if ([51,53,55,61,63,65,80,81,82].includes(code)) {
-    if ([61,80,51].includes(code)) return 'LIGHT_RAIN'
-    if ([63,81,53,55].includes(code)) return 'MODERATE_RAIN'
-    return 'HEAVY_RAIN'
-  }
-  if ([71,73,75,85,86].includes(code)) {
-    if (code === 71) return 'LIGHT_SNOW'
-    if ([73,85].includes(code)) return 'MODERATE_SNOW'
-    return 'HEAVY_SNOW'
-  }
-  if ([95,96,99].includes(code)) return 'STORM_RAIN'
-  return 'CLOUDY'
-}
-
-onMounted(() => {
-  // 检查是否已有定位权限
-  if ('permissions' in navigator) {
-    // @ts-ignore
-    navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-      if (result.state === 'prompt') {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.log('🌤️  天气组件提示')
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.log('💡 当前使用 IP 定位（精度较低，误差可达几十公里）')
-        console.log('✨ 点击天气图标并允许浏览器定位，可获得精准位置')
-        console.log('📍 浏览器定位精度：< 100 米')
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      } else if (result.state === 'denied') {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.log('⚠️  天气组件警告')
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-        console.warn('❌ 浏览器定位权限被拒绝')
-        console.warn('📍 当前使用 IP 定位（精度低，可能不准确）')
-        console.log('💡 如需精准定位，请按以下步骤操作：')
-        console.log('   1. 点击地址栏左侧的 🔒 图标')
-        console.log('   2. 找到"位置"权限，选择"允许"')
-        console.log('   3. 刷新页面或点击天气图标')
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      } else if (result.state === 'granted') {
-        console.log('[NavWeather] ✅ 浏览器定位权限已授权，将使用精准定位')
-      }
-    })
-  }
-  
-  fetchWeather()
-  // 每 15 分钟更新一次天气（更频繁的更新）
-  setInterval(fetchWeather, 15 * 60 * 1000)
+  return result
 })
 
-// 添加手动刷新功能（点击天气图标刷新）
-const handleWeatherClick = async (e: Event) => {
-  e.preventDefault()
-  e.stopPropagation()
-  
-  // 清除缓存，强制重新获取
-  try {
-    localStorage.removeItem(GEO_CACHE_KEY)
-    const keys = Object.keys(localStorage).filter(k => k.startsWith(WEATHER_CACHE_PREFIX))
-    keys.forEach(k => localStorage.removeItem(k))
-  } catch {}
-  
-  weatherData.value = null
-  cityName.value = ''
-  
-  console.log('[NavWeather] 手动刷新天气...')
-  console.log('[NavWeather] 💡 提示：如果定位不准确，请允许浏览器获取您的位置信息')
-  
-  // 主动请求浏览器定位权限
-  if ('geolocation' in navigator) {
-    console.log('[NavWeather] 正在请求浏览器定位权限，请点击"允许"以获得精准定位...')
+const hasWeather = computed(() => {
+  const result = !!weatherAPI.state.weather
+  console.log('[NavWeather] 🔍 hasWeather计算:', {
+    weather: weatherAPI.state.weather,
+    result
+  })
+  return result
+})
+
+const isLoading = computed(() => {
+  const result = geolocation.state.isLoading || weatherAPI.state.isLoading
+  console.log('[NavWeather] 🔍 isLoading计算:', {
+    geoLoading: geolocation.state.isLoading,
+    weatherLoading: weatherAPI.state.isLoading,
+    result
+  })
+  return result
+})
+
+const hasError = computed(() => {
+  const result = geolocation.state.isError || weatherAPI.state.isError
+  console.log('[NavWeather] 🔍 hasError计算:', {
+    geoError: geolocation.state.isError,
+    weatherError: weatherAPI.state.isError,
+    result
+  })
+  return result
+})
+
+const tooltipText = computed(() => {
+  if (geolocation.state.isError || weatherAPI.state.isError) {
+    return '点击重新获取位置'
   }
-  
-  await fetchWeather()
+  return weatherAPI.getTooltipText(
+    geolocation.state.location!,
+    weatherAPI.state.weather
+  )
+})
+
+const errorText = computed(() => {
+  if (geolocation.state.error) return geolocation.state.error
+  if (weatherAPI.state.error) return weatherAPI.state.error
+  return '未知错误'
+})
+
+/**
+ * 清除隐藏定时器
+ */
+const clearHideTimeout = () => {
+  if (tooltipTimeout) {
+    clearTimeout(tooltipTimeout)
+    tooltipTimeout = null
+  }
 }
+
+/**
+ * 隐藏提示框（带延迟）
+ */
+const hideTooltipWithDelay = () => {
+  if (tooltipTimeout) {
+    clearTimeout(tooltipTimeout)
+  }
+
+  tooltipTimeout = setTimeout(() => {
+    showTooltip.value = false
+    tooltipTimeout = null
+  }, 200) // 200ms 延迟，避免鼠标快速移动时闪烁
+}
+
+/**
+ * 初始化流程
+ */
+const initializeWeather = async () => {
+  console.log('[NavWeather] 🔧 初始化天气组件...')
+
+  // 1. 获取位置
+  const location = await geolocation.getCurrentLocation()
+
+  if (!location) {
+    console.warn('[NavWeather] ⚠️ 无法获取位置信息')
+    return
+  }
+
+  // 2. 根据位置获取天气
+  await weatherAPI.fetchWeather(location)
+}
+
+/**
+ * 刷新天气（点击触发）
+ */
+const handleWeatherClick = async () => {
+  console.log('[NavWeather] 🔄 手动刷新天气...')
+
+  // 显示加载状态
+  geolocation.state.isLoading = true
+  weatherAPI.state.isLoading = true
+
+  try {
+    // 1. 刷新位置
+    await geolocation.refreshLocation()
+
+    // 2. 如果有新位置，刷新天气
+    if (geolocation.state.location) {
+      await weatherAPI.refreshWeather(geolocation.state.location)
+    }
+
+    // 3. 显示成功提示
+    setTimeout(() => {
+      console.log('[NavWeather] ✅ 刷新完成')
+    }, 300)
+
+  } catch (error) {
+    console.error('[NavWeather] ❌ 刷新失败:', error)
+  } finally {
+    geolocation.state.isLoading = false
+    weatherAPI.state.isLoading = false
+  }
+}
+
+/**
+ * 显示权限提示
+ */
+const showPermissionHints = () => {
+  if (!geolocation.isSupported.value) return
+
+  // 延迟执行，避免控制台信息混乱
+  setTimeout(() => {
+    const permissionState = geolocation.state.permissionState
+
+    if (permissionState === 'prompt') {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('🌤️  天气组件提示')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('💡 当前使用 IP 定位（精度较低，误差可达几十公里）')
+      console.log('✨ 点击天气图标并允许浏览器定位，可获得精准位置')
+      console.log('📍 浏览器定位精度：< 100 米')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    } else if (permissionState === 'denied') {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('⚠️  天气组件警告')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.warn('❌ 浏览器定位权限被拒绝')
+      console.warn('📍 当前使用 IP 定位（精度低，可能不准确）')
+      console.log('💡 如需精准定位，请按以下步骤操作：')
+      console.log('   1. 点击地址栏左侧的 🔒 图标')
+      console.log('   2. 找到"位置"权限，选择"允许"')
+      console.log('   3. 刷新页面或点击天气图标')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    } else if (permissionState === 'granted') {
+      console.log('[NavWeather] ✅ 浏览器定位权限已授权，将使用精准定位')
+    }
+  }, 1000)
+}
+
+/**
+ * 设置自动更新
+ */
+const setupAutoRefresh = () => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+  }
+
+  refreshInterval = setInterval(async () => {
+    if (geolocation.state.location && !geolocation.state.isLoading && !weatherAPI.state.isLoading) {
+      console.log('[NavWeather] 🔄 自动更新天气...')
+      await weatherAPI.fetchWeather(geolocation.state.location)
+    }
+  }, UPDATE_INTERVALS.WEATHER_REFRESH)
+}
+
+// 生命周期
+onMounted(() => {
+  console.log('[NavWeather] 🚀 天气组件挂载，开始初始化...')
+
+  // 先设置状态监听器
+  console.log('[NavWeather] 🔧 设置状态监听器...')
+  watch([hasLocation, hasWeather, isLoading, hasError], ([newHasLocation, newHasWeather, newIsLoading, newHasError]) => {
+    console.log('[NavWeather] 🔍 状态变化:', {
+      hasLocation: newHasLocation,
+      hasWeather: newHasWeather,
+      isLoading: newIsLoading,
+      hasError: newHasError,
+      weatherIcon: weatherIcon.value,
+      timestamp: new Date().toISOString()
+    })
+  }, { immediate: true })
+  console.log('[NavWeather] ✅ 状态监听器设置完成')
+
+  // 异步初始化，等待完成后再检查状态
+  const init = async () => {
+    try {
+      await initializeWeather()
+      showPermissionHints()
+      setupAutoRefresh()
+
+      // 等待一个微任务确保state更新完成
+      await nextTick()
+
+      console.log('[NavWeather] 📊 初始化完成后状态检查:', {
+        hasLocation: hasLocation.value,
+        hasWeather: hasWeather.value,
+        isLoading: isLoading.value,
+        hasError: hasError.value,
+        weatherIcon: weatherIcon.value,
+        geoState: geolocation.state,
+        weatherState: weatherAPI.state
+      })
+    } catch (error) {
+      console.error('[NavWeather] ❌ 初始化失败:', error)
+    }
+  }
+
+  init()
+})
+
+onUnmounted(() => {
+  console.log('[NavWeather] 🛑 天气组件卸载，清理资源...')
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+    refreshInterval = null
+  }
+})
+
+// 监听位置变化，自动更新天气
+watch(
+  () => geolocation.state.location,
+  async (newLocation) => {
+    if (newLocation && !geolocation.state.isLoading) {
+      console.log('[NavWeather] 📍 位置更新，重新获取天气...')
+      await weatherAPI.fetchWeather(newLocation)
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -452,7 +334,7 @@ const handleWeatherClick = async (e: Event) => {
   align-items: center;
   height: 100%;
   margin-left: 8px;
-  /* 不做负外边距偏移，避免与后续图标重叠 */
+  position: relative; /* 为提示框定位 */
 }
 
 .divider {
@@ -487,6 +369,7 @@ const handleWeatherClick = async (e: Event) => {
   border: none;
   padding: 0;
   cursor: pointer;
+  position: relative;
 }
 
 .weather-link:hover {
@@ -498,28 +381,82 @@ const handleWeatherClick = async (e: Event) => {
   transform: scale(0.95);
 }
 
-.weather-emoji,
-.weather-loading {
-  font-size: 18px;
-  line-height: 18px;
-  display: block;
+.weather-tooltip-container {
+  position: fixed; /* 使用fixed定位避免层级问题 */
+  z-index: 9999; /* 最高层级 */
+  pointer-events: none; /* 不干扰鼠标事件 */
 }
 
-.weather-loading {
-  opacity: 0.5;
+/* 简化版提示框样式 */
+.simple-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  z-index: 9999;
+  animation: tooltipFadeIn 0.2s ease-out;
 }
 
-.weather-loading-state {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
     opacity: 1;
+    transform: translateY(0);
   }
-  50% {
-    opacity: 0.5;
-  }
+}
+
+.tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--vp-c-text-1);
+}
+
+.weather-info .city {
+  font-weight: 500;
+  color: var(--vp-c-brand);
+}
+
+.weather-info .description {
+  color: var(--vp-c-text-2);
+}
+
+.weather-info .temperature {
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  font-style: italic;
+}
+
+.loading {
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  font-style: italic;
+}
+
+.error {
+  font-size: 12px;
+  color: var(--vp-c-danger);
+  font-weight: 500;
 }
 
 /* 移动端适配 */
@@ -529,12 +466,15 @@ const handleWeatherClick = async (e: Event) => {
     height: 32px;
     margin: 0 2px;
   }
-  
-  .weather-emoji,
-  .weather-loading {
-    font-size: 16px;
-    line-height: 16px;
+
+  .divider {
+    height: 20px;
   }
 }
-</style>
 
+/* 深色主题适配 */
+:deep(.dark) .weather-tooltip-content {
+  background: var(--vp-c-bg);
+  border-color: var(--vp-c-divider);
+}
+</style>

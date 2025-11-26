@@ -1,0 +1,92 @@
+/* ============================================
+   玻璃态效果 - 内容区域样式
+   Glassmorphism Effect - Content Area Styles
+   ============================================ */
+
+@use './variables' as *;
+@use './mixins' as *;
+
+/* ========== 文档内容区 ========== */
+.VPDoc {
+  @include glass-performance;
+  
+  .container {
+    @include glass-effect(var(--glass-blur-content), var(--glass-bg-content), var(--glass-opacity-content));
+    @include glass-reduced-motion;
+    
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px auto;
+    
+    /* 确保内容在玻璃效果之上 */
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* ========== 文档容器 ========== */
+.vp-doc {
+  @include glass-effect(var(--glass-blur-content), var(--glass-bg-content), var(--glass-opacity-content));
+  @include glass-performance;
+  @include glass-reduced-motion;
+  
+  border-radius: 12px;
+  padding: 32px;
+  
+  /* 确保文字可读性 */
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== 首页内容区 ========== */
+.VPHome {
+  @include glass-performance;
+  
+  /* 首页主要内容区域 */
+  .VPHomeContent {
+    @include glass-effect(var(--glass-blur-content), var(--glass-bg-content), var(--glass-opacity-content));
+    @include glass-reduced-motion;
+    
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px auto;
+    
+    /* 确保与动态壁纸系统兼容 */
+    position: relative;
+    z-index: 5;
+  }
+  
+  /* 首页特性区域 */
+  .VPFeatures {
+    @include glass-performance;
+    position: relative;
+    z-index: 5;
+  }
+  
+  /* 首页 Hero 区域不应用玻璃效果，保持动态壁纸可见 */
+  .VPHero {
+    position: relative;
+    z-index: 3;
+  }
+}
+
+/* ========== 内容容器 ========== */
+.content-container {
+  @include glass-performance;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== 确保文字在玻璃效果背景上可读 ========== */
+.vp-doc,
+.VPDoc .container,
+.VPHome .VPHomeContent {
+  /* 文字阴影增强可读性 */
+  h1, h2, h3, h4, h5, h6 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  p, li, td {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
+  }
+}

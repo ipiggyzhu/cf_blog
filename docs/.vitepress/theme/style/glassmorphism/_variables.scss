@@ -1,0 +1,76 @@
+/* ============================================
+   玻璃态效果 - CSS 变量定义
+   Glassmorphism Effect - CSS Variables
+   ============================================ */
+
+:root {
+  /* ========== 模糊强度 (Blur Intensity) ========== */
+  --glass-blur-nav: 16px;        /* 导航栏 - 最强 */
+  --glass-blur-sidebar: 14px;    /* 侧边栏 */
+  --glass-blur-content: 12px;    /* 内容区 */
+  --glass-blur-card: 10px;       /* 卡片 - 最弱 */
+  
+  /* ========== 透明度 (Opacity) ========== */
+  --glass-opacity-nav: 0.75;     /* 导航栏 */
+  --glass-opacity-sidebar: 0.72; /* 侧边栏 */
+  --glass-opacity-content: 0.70; /* 内容区 */
+  --glass-opacity-card: 0.65;    /* 卡片 */
+  
+  /* ========== 背景色 (Background Color) ========== */
+  --glass-bg-nav: rgba(255, 255, 255, 0.75);
+  --glass-bg-sidebar: rgba(255, 255, 255, 0.72);
+  --glass-bg-content: rgba(255, 255, 255, 0.70);
+  --glass-bg-card: rgba(255, 255, 255, 0.65);
+  
+  /* ========== 边框 (Border) ========== */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+  --glass-border-hover: 1px solid rgba(255, 255, 255, 0.5);
+  --glass-border-color: rgba(255, 255, 255, 0.3);
+  --glass-border-color-hover: rgba(255, 255, 255, 0.5);
+  
+  /* ========== 阴影 (Shadow) ========== */
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --glass-shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.15);
+  
+  /* ========== 饱和度增强 (Saturation) ========== */
+  --glass-saturate: 180%;
+  
+  /* ========== 过渡动画 (Transition) ========== */
+  --glass-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== 暗色模式 (Dark Mode) ========== */
+.dark {
+  /* 背景色 - 暗色 */
+  --glass-bg-nav: rgba(30, 30, 30, 0.75);
+  --glass-bg-sidebar: rgba(30, 30, 30, 0.72);
+  --glass-bg-content: rgba(30, 30, 30, 0.70);
+  --glass-bg-card: rgba(30, 30, 30, 0.65);
+  
+  /* 边框 - 暗色 */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-border-hover: 1px solid rgba(255, 255, 255, 0.2);
+  --glass-border-color: rgba(255, 255, 255, 0.1);
+  --glass-border-color-hover: rgba(255, 255, 255, 0.2);
+  
+  /* 阴影 - 暗色 */
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* ========== 移动端优化 (Mobile Optimization) ========== */
+@media (max-width: 768px) {
+  :root {
+    /* 移动端降低模糊强度以提升性能 */
+    --glass-blur-nav: 8px;      /* 减少 50% */
+    --glass-blur-sidebar: 7px;  /* 减少 50% */
+    --glass-blur-content: 6px;  /* 减少 50% */
+    --glass-blur-card: 5px;     /* 减少 50% */
+    
+    /* 移动端略微提高透明度以提升性能 */
+    --glass-opacity-nav: 0.80;
+    --glass-opacity-sidebar: 0.77;
+    --glass-opacity-content: 0.75;
+    --glass-opacity-card: 0.70;
+  }
+}

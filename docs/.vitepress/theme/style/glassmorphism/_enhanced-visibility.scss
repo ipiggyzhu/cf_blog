@@ -1,0 +1,185 @@
+/* ============================================
+   增强玻璃效果可见性
+   添加彩色半透明背景使效果更明显
+   ============================================ */
+
+/* 为导航栏添加彩色渐变背景 */
+nav,
+header,
+[class*="nav"],
+[class*="Nav"] {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(240, 248, 255, 0.75) 50%,
+    rgba(230, 240, 255, 0.75) 100%
+  ) !important;
+  
+  .dark & {
+    background: linear-gradient(
+      135deg,
+      rgba(30, 30, 30, 0.75) 0%,
+      rgba(40, 40, 50, 0.75) 50%,
+      rgba(30, 35, 45, 0.75) 100%
+    ) !important;
+  }
+}
+
+/* 为侧边栏添加彩色渐变背景 */
+aside,
+.aside,
+[class*="sidebar"],
+[class*="Sidebar"] {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(248, 250, 255, 0.72) 100%
+  ) !important;
+  
+  .dark & {
+    background: linear-gradient(
+      180deg,
+      rgba(30, 30, 30, 0.72) 0%,
+      rgba(35, 35, 40, 0.72) 100%
+    ) !important;
+  }
+}
+
+/* 为内容区添加彩色渐变背景 */
+main,
+article,
+.content,
+[class*="content"],
+[class*="Content"] {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.70) 0%,
+    rgba(252, 252, 255, 0.70) 50%,
+    rgba(248, 250, 255, 0.70) 100%
+  ) !important;
+  
+  .dark & {
+    background: linear-gradient(
+      135deg,
+      rgba(30, 30, 30, 0.70) 0%,
+      rgba(35, 35, 38, 0.70) 50%,
+      rgba(30, 32, 38, 0.70) 100%
+    ) !important;
+  }
+}
+
+/* 为卡片添加彩色渐变背景 */
+.card,
+[class*="card"],
+[class*="Card"] {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(250, 252, 255, 0.65) 100%
+  ) !important;
+  
+  .dark & {
+    background: linear-gradient(
+      135deg,
+      rgba(30, 30, 30, 0.65) 0%,
+      rgba(35, 35, 40, 0.65) 100%
+    ) !important;
+  }
+  
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(245, 248, 255, 0.75) 100%
+    ) !important;
+    
+    .dark & {
+      background: linear-gradient(
+        135deg,
+        rgba(35, 35, 35, 0.75) 0%,
+        rgba(40, 40, 45, 0.75) 100%
+      ) !important;
+    }
+  }
+}
+
+/* 添加微妙的边框高光效果 */
+nav,
+header,
+aside,
+main,
+article,
+.card,
+[class*="card"],
+[class*="content"] {
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+  
+  .dark &::before {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+  }
+}
+
+/* 增强阴影效果使玻璃感更明显 */
+nav,
+header,
+[class*="nav"] {
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+aside,
+.aside,
+[class*="sidebar"] {
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+main,
+article,
+[class*="content"] {
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.card,
+[class*="card"] {
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  
+  &:hover {
+    box-shadow: 
+      0 12px 48px rgba(0, 0, 0, 0.12),
+      0 4px 16px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  }
+}

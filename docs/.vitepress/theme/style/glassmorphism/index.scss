@@ -1,0 +1,261 @@
+/* ============================================
+   玻璃态效果 - 主入口文件
+   Glassmorphism Effect - Main Entry Point
+   ============================================
+   
+   为整个页面添加现代化的玻璃态（Glassmorphism）视觉效果
+   
+   特性：
+   - 全局 CSS 变量系统
+   - 可复用的 SCSS Mixin
+   - 响应式设计支持
+   - 暗色模式支持
+   - 浏览器降级方案
+   - 性能优化
+   
+   ============================================ */
+
+/* 引入变量定义 */
+@use './variables' as *;
+
+/* 引入 Mixin 定义 */
+@use './mixins' as *;
+
+/* 引入各模块样式 */
+@use './nav';        /* 导航栏玻璃效果 */
+@use './content';    /* 内容区玻璃效果 */
+@use './card';       /* 卡片组件玻璃效果 */
+@use './sidebar';    /* 侧边栏玻璃效果 */
+@use './global-force'; /* 强制全局玻璃效果 */
+@use './enhanced-visibility'; /* 增强玻璃效果可见性 */
+
+/* ============================================
+   全局玻璃效果基础设置
+   ============================================ */
+
+/* 确保页面有正确的层级结构 */
+body {
+  /* 确保动态壁纸在最底层 */
+  position: relative;
+  z-index: 0;
+}
+
+/* 首页特殊处理 - 确保与动态壁纸系统兼容 */
+.VPHome {
+  /* 确保首页内容在壁纸之上 */
+  position: relative;
+  z-index: 1;
+  
+  /* 首页 Banner 区域保持透明，让壁纸可见 */
+  .tk-banner {
+    position: relative;
+    z-index: 2;
+    
+    /* Banner 内容应用轻微的玻璃效果 */
+    .tk-banner-content,
+    .banner-content {
+      @include glass-effect(var(--glass-blur-card), rgba(255, 255, 255, 0.1), 0.1);
+      @include glass-performance;
+      
+      border-radius: 16px;
+      padding: 32px;
+      
+      .dark & {
+        background: rgba(30, 30, 30, 0.1);
+      }
+    }
+  }
+}
+
+/* ============================================
+   强制应用玻璃效果到所有主要容器
+   ============================================ */
+
+/* 导航栏 - 使用更通用的选择器 */
+nav[class*="Nav"],
+header[class*="Nav"],
+.nav,
+[class*="nav-bar"],
+[class*="navbar"] {
+  background: var(--glass-bg-nav) !important;
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate)) !important;
+  border-bottom: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* 侧边栏 */
+aside,
+[class*="sidebar"],
+[class*="Sidebar"],
+.aside {
+  background: var(--glass-bg-sidebar) !important;
+  backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate)) !important;
+  border: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 12px !important;
+}
+
+/* 主内容区 */
+main,
+[class*="content"],
+[class*="Content"],
+article {
+  background: var(--glass-bg-content) !important;
+  backdrop-filter: blur(var(--glass-blur-content)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-content)) saturate(var(--glass-saturate)) !important;
+  border: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 12px !important;
+  padding: 24px !important;
+  margin: 16px !important;
+}
+
+/* ============================================
+   Teek 主题特定样式
+   ============================================ */
+
+/* Teek 主题的导航栏 */
+.tk-nav,
+.tk-navbar {
+  background: var(--glass-bg-nav) !important;
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate)) !important;
+}
+
+/* Teek 主题的侧边栏 */
+.tk-sidebar,
+.tk-aside {
+  background: var(--glass-bg-sidebar) !important;
+  backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-sidebar)) saturate(var(--glass-saturate)) !important;
+  border-radius: 12px !important;
+}
+
+/* Teek 主题的文档内容 */
+.tk-doc,
+.tk-content {
+  background: var(--glass-bg-content) !important;
+  backdrop-filter: blur(var(--glass-blur-content)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-content)) saturate(var(--glass-saturate)) !important;
+  border-radius: 12px !important;
+}
+
+/* ============================================
+   通用玻璃效果工具类
+   ============================================ */
+
+/* 轻度玻璃效果 */
+.glass-light {
+  @include glass-effect(8px, rgba(255, 255, 255, 0.5), 0.5);
+  @include glass-performance;
+  
+  .dark & {
+    background: rgba(30, 30, 30, 0.5);
+  }
+}
+
+/* 中度玻璃效果 */
+.glass-medium {
+  @include glass-effect(12px, rgba(255, 255, 255, 0.7), 0.7);
+  @include glass-performance;
+  
+  .dark & {
+    background: rgba(30, 30, 30, 0.7);
+  }
+}
+
+/* 重度玻璃效果 */
+.glass-heavy {
+  @include glass-effect(16px, rgba(255, 255, 255, 0.8), 0.8);
+  @include glass-performance;
+  
+  .dark & {
+    background: rgba(30, 30, 30, 0.8);
+  }
+}
+
+/* ============================================
+   性能优化和浏览器兼容性
+   ============================================ */
+
+/* 为所有玻璃效果元素添加性能优化 */
+.VPNav,
+.VPLocalNav,
+.VPSidebar,
+.VPDoc,
+.VPHome,
+.aside,
+.vp-doc,
+.tk-my,
+.about-card,
+.oss-card,
+.skill-card,
+.custom-block,
+.vp-code-group {
+  /* 硬件加速 */
+  @include glass-performance;
+  
+  /* 减少动画偏好设置支持 */
+  @include glass-reduced-motion;
+}
+
+/* ============================================
+   浏览器降级方案
+   ============================================ */
+
+/* 检测 backdrop-filter 支持 */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  /* 支持 backdrop-filter 的浏览器使用完整效果 */
+  .glass-supported {
+    backdrop-filter: blur(var(--glass-blur-content));
+    -webkit-backdrop-filter: blur(var(--glass-blur-content));
+  }
+}
+
+/* 不支持 backdrop-filter 的浏览器使用降级方案 */
+@supports not (backdrop-filter: blur(10px)) {
+  .VPNav,
+  .VPLocalNav,
+  .VPSidebar,
+  .aside,
+  .VPDocAside,
+  .vp-doc,
+  .VPDoc .container {
+    /* 使用更高透明度的纯色背景 */
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    
+    .dark & {
+      background: rgba(30, 30, 30, 0.9) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+/* ============================================
+   打印样式优化
+   ============================================ */
+
+@media print {
+  /* 打印时移除玻璃效果，使用纯色背景 */
+  .VPNav,
+  .VPLocalNav,
+  .VPSidebar,
+  .aside,
+  .VPDocAside,
+  .vp-doc,
+  .VPDoc .container,
+  .tk-my,
+  .about-card,
+  .oss-card,
+  .skill-card,
+  .custom-block {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: none !important;
+  }
+}

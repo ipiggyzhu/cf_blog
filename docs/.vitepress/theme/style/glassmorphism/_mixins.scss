@@ -1,0 +1,117 @@
+/* ============================================
+   玻璃态效果 - SCSS Mixins
+   Glassmorphism Effect - Reusable Mixins
+   ============================================ */
+
+/* ========== 基础玻璃效果 Mixin ========== */
+@mixin glass-effect($blur, $bg-color, $opacity: null) {
+  background: $bg-color;
+  backdrop-filter: blur($blur) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur($blur) saturate(var(--glass-saturate));
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  
+  /* 浏览器降级方案 - 不支持 backdrop-filter 时使用更高透明度 */
+  @supports not (backdrop-filter: blur($blur)) {
+    @if $opacity {
+      background: rgba(255, 255, 255, $opacity + 0.1);
+      
+      .dark & {
+        background: rgba(30, 30, 30, $opacity + 0.1);
+      }
+    } @else {
+      background: rgba(255, 255, 255, 0.85);
+      
+      .dark & {
+        background: rgba(30, 30, 30, 0.85);
+      }
+    }
+  }
+}
+
+/* ========== 玻璃效果 Hover 状态 ========== */
+@mixin glass-hover {
+  border: var(--glass-border-hover);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-2px);
+  transition: var(--glass-transition);
+}
+
+/* ========== 玻璃效果渐变边框 ========== */
+@mixin glass-gradient-border($angle: 135deg) {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      $angle,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.1)
+    );
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* 暗色模式下的渐变边框 */
+  .dark &::before {
+    background: linear-gradient(
+      $angle,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.05)
+    );
+  }
+}
+
+/* ========== 玻璃效果卡片 ========== */
+@mixin glass-card {
+  @include glass-effect(var(--glass-blur-card), var(--glass-bg-card), var(--glass-opacity-card));
+  border-radius: 12px;
+  overflow: hidden;
+  
+  &:hover {
+    @include glass-hover;
+  }
+}
+
+/* ========== 玻璃效果容器 ========== */
+@mixin glass-container($blur, $bg-color) {
+  @include glass-effect($blur, $bg-color);
+  border-radius: 8px;
+}
+
+/* ========== 性能优化 - 硬件加速 ========== */
+@mixin glass-performance {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* ========== 减少动画偏好设置支持 ========== */
+@mixin glass-reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: none;
+    animation: none;
+    
+    /* 降级为更高透明度的纯色背景 */
+    background: rgba(255, 255, 255, 0.9) !important;
+    
+    .dark & {
+      background: rgba(30, 30, 30, 0.9) !important;
+    }
+  }
+}
