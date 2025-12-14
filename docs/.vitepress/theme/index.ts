@@ -115,8 +115,12 @@ export default {
         }, 100);
       };
 
-      // 注册 Service Worker
-      useServiceWorker();
+      // 延迟注册 Service Worker，避免阻塞 LCP
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => useServiceWorker(), { timeout: 5000 });
+      } else {
+        setTimeout(() => useServiceWorker(), 3000);
+      }
 
       // 确保字体加载完成后再渲染（仅开发环境输出日志）
       if (document.fonts) {

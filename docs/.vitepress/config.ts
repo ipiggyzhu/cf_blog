@@ -542,7 +542,11 @@ export default defineConfig({
       sourcemap: false, // 禁用 sourcemap，加快构建并减小体积
       minify: 'esbuild', // 使用 esbuild 替代 terser，速度更快
       target: 'es2015', // 确保兼容性
-      // 移除 manualChunks 避免与 VitePress 的外部模块配置冲突
+      cssMinify: 'esbuild', // CSS 也用 esbuild 压缩
+      modulePreload: {
+        polyfill: false // 现代浏览器不需要 polyfill
+      }
+      // 注意：不要使用 manualChunks，会与 VitePress 内部配置冲突
     },
 
     // SSR 优化 - 确保主题和插件正确打包

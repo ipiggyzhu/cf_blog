@@ -12,6 +12,8 @@
   /* 使用 R2 存储的默认背景图作为占位，避免空白 */
   background: url('https://image.itpiggy.top/WallPaper/1.webp') center/cover no-repeat !important;
   background-color: var(--vp-c-bg) !important;
+  /* LCP 优化：立即渲染，不等待 JS */
+  contain: layout style;
 }
 
 /* 壁纸加载完成后移除预设背景 */

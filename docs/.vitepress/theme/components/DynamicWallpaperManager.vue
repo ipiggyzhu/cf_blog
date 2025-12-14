@@ -275,8 +275,7 @@ onUnmounted(() => {
   transition: opacity var(--bg-transition-duration) ease;
   z-index: -2;
   pointer-events: none;
-  will-change: opacity, transform;
-  animation: wallpaper-breathing 8s ease-in-out infinite;
+  will-change: opacity;
 }
 
 /* 图层 B */
@@ -292,8 +291,14 @@ onUnmounted(() => {
   transition: opacity var(--bg-transition-duration) ease;
   z-index: -1;
   pointer-events: none;
-  will-change: opacity, transform;
+  will-change: opacity;
+}
+
+/* 呼吸动画仅在背景加载完成后启用，避免阻塞 LCP */
+.VPHome .tk-banner.background-loaded::before,
+.VPHome .tk-banner.background-loaded::after {
   animation: wallpaper-breathing 8s ease-in-out infinite;
+  will-change: opacity, transform;
 }
 
 /* 图层显示控制 */

@@ -36,6 +36,15 @@ export const HeadData = [
   ["link", { rel: "dns-prefetch", href: "https://busuanzi.ibruce.info" }],
   ["link", { rel: "dns-prefetch", href: "https://bszi.eryajf.net" }],
 
+  // LCP 优化 - 预加载首屏壁纸图片
+  ["link", {
+    rel: "preload",
+    href: "https://image.itpiggy.top/WallPaper/1.webp",
+    as: "image",
+    type: "image/webp",
+    fetchpriority: "high"
+  }],
+
   [
     "meta",
     {
