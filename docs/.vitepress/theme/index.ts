@@ -1,7 +1,7 @@
 // 组件导入
 import Teek from "vitepress-theme-teek";
 import TeekLayoutProvider from "./components/TeekLayoutProvider.vue";
-import { defineComponent, h } from "vue";
+import { defineComponent, h, defineAsyncComponent } from "vue";
 import { useData } from "vitepress";
 // import notice from "./components/notice.vue";
 // import MNavLinks from "./components/MNavLinks.vue"; // 引入导航组件
@@ -48,11 +48,16 @@ import SLink from "./components/SLink/index.vue"; //友链
 // 导入关于我组件
 import About from "./components/About.vue"; //关于我
 
-// 导入情侣相册组件
-import CoupleAlbum from './components/CoupleAlbum/CoupleAlbum.vue'
-import PhotoCard from './components/CoupleAlbum/PhotoCard.vue'
+// 🚀 性能优化：大型组件懒加载
+// 情侣相册组件 - 按需加载（大组件，包含图片处理）
+const CoupleAlbum = defineAsyncComponent(() =>
+  import('./components/CoupleAlbum/CoupleAlbum.vue')
+)
+const PhotoCard = defineAsyncComponent(() =>
+  import('./components/CoupleAlbum/PhotoCard.vue')
+)
 
-// 导入天气组件
+// 导入天气组件（保持同步加载，因为在导航栏显示）
 import NavWeather from './components/NavWeather.vue'
 
 // 导入Service Worker
@@ -87,9 +92,10 @@ export default {
     app.component("confetti", confetti); // 注册五彩纸屑组件
     app.component("About", About); // 注册关于我组件
 
-    app.component('CoupleAlbum', CoupleAlbum) // 注册情侣相册组件
-    app.component('PhotoCard', PhotoCard)
-    
+    // 🚀 性能优化：懒加载组件注册
+    app.component('CoupleAlbum', CoupleAlbum) // 情侣相册（懒加载）
+    app.component('PhotoCard', PhotoCard) // 相册卡片（懒加载）
+
     app.component("NavWeather", NavWeather); // 注册导航栏天气组件
 
     // 注册全局组件
@@ -112,12 +118,16 @@ export default {
       // 注册 Service Worker
       useServiceWorker();
 
-      // 确保字体加载完成后再渲染
+      // 确保字体加载完成后再渲染（仅开发环境输出日志）
       if (document.fonts) {
         document.fonts.ready.then(() => {
-          console.log('[Fonts] All fonts loaded');
+          if (import.meta.env.DEV) {
+            console.log('[Fonts] All fonts loaded');
+          }
         }).catch((err) => {
-          console.warn('[Fonts] Font loading failed:', err);
+          if (import.meta.env.DEV) {
+            console.warn('[Fonts] Font loading failed:', err);
+          }
         });
       }
     }

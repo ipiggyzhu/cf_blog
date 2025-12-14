@@ -18,7 +18,8 @@ import {
   safeRemoveLocalStorage,
   isServerSide,
   isGeolocationSupported,
-  formatTemperature
+  formatTemperature,
+  devLog
 } from '../utils/helpers'
 import { useCache } from './useLocalStorage'
 
@@ -44,7 +45,7 @@ export function useGeolocation() {
     permissionState: 'unknown'
   })
 
-  console.log('[useGeolocation] 🔧 State初始化:', state.value)
+  devLog.log('[useGeolocation] 🔧 State初始化:', state.value)
 
   // 位置缓存
   const geoCache = useCache<LocationData>(CACHE_KEYS.GEOLOCATION, CACHE_DURATION.LOCATION)
@@ -70,9 +71,9 @@ export function useGeolocation() {
       // @ts-expect-error - 需要处理权限API类型
       const result = await navigator.permissions.query({ name: 'geolocation' })
       state.value.permissionState = result.state as 'prompt' | 'granted' | 'denied'
-      console.log(`[useGeolocation] 定位权限状态: ${state.value.permissionState}`)
+      devLog.log(`[useGeolocation] 定位权限状态: ${state.value.permissionState}`)
     } catch (error) {
-      console.warn('[useGeolocation] 获取权限状态失败:', error)
+      devLog.warn('[useGeolocation] 获取权限状态失败:', error)
       state.value.permissionState = 'unknown'
     }
   }
@@ -82,23 +83,23 @@ export function useGeolocation() {
    */
   const getBrowserLocation = async (): Promise<LocationData | null> => {
     if (!isSupported.value) {
-      console.warn('[useGeolocation] 浏览器不支持地理位置API')
+      devLog.warn('[useGeolocation] 浏览器不支持地理位置API')
       return null
     }
 
     return new Promise((resolve) => {
-      console.log('[useGeolocation] 正在请求浏览器定位...')
+      devLog.log('[useGeolocation] 正在请求浏览器定位...')
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location: LocationData = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           }
-          console.log(`[useGeolocation] ✅ 浏览器定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
+          devLog.log(`[useGeolocation] ✅ 浏览器定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
           resolve(location)
         },
         (error) => {
-          console.warn('[useGeolocation] 浏览器定位失败:', error.message)
+          devLog.warn('[useGeolocation] 浏览器定位失败:', error.message)
           if (error.code === 1) {
             state.value.permissionState = 'denied'
           }
@@ -120,11 +121,11 @@ export function useGeolocation() {
 
       if (data.status === '1' && data.regeocode) {
         const city = data.regeocode.addressComponent.city || data.regeocode.addressComponent.province
-        console.log(`[useGeolocation] 🏙️ 获取城市名称成功: ${city}`)
+        devLog.log(`[useGeolocation] 🏙️ 获取城市名称成功: ${city}`)
         return city
       }
     } catch (error) {
-      console.warn('[useGeolocation] 逆地理编码失败:', error)
+      devLog.warn('[useGeolocation] 逆地理编码失败:', error)
     }
     return ''
   }
@@ -149,11 +150,11 @@ export function useGeolocation() {
           longitude: (lon1 + lon2) / 2,
           city: data.city || data.province
         }
-        console.log(`[useGeolocation] ✓ 高德IP定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
+        devLog.log(`[useGeolocation] ✓ 高德IP定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
         return location
       }
     } catch (error) {
-      console.warn('[useGeolocation] 高德IP定位失败:', error)
+      devLog.warn('[useGeolocation] 高德IP定位失败:', error)
     }
     return null
   }
@@ -173,11 +174,11 @@ export function useGeolocation() {
           longitude: data.content.point.x,
           city: data.content.address_detail?.city || data.content.address
         }
-        console.log(`[useGeolocation] ✓ 百度IP定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
+        devLog.log(`[useGeolocation] ✓ 百度IP定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
         return location
       }
     } catch (error) {
-      console.warn('[useGeolocation] 百度IP定位失败:', error)
+      devLog.warn('[useGeolocation] 百度IP定位失败:', error)
     }
     return null
   }
@@ -198,7 +199,7 @@ export function useGeolocation() {
         }
       }
     } catch (error) {
-      console.warn('[useGeolocation] ipapi.co定位失败:', error)
+      devLog.warn('[useGeolocation] ipapi.co定位失败:', error)
     }
 
     // ip-api.com
@@ -213,7 +214,7 @@ export function useGeolocation() {
         }
       }
     } catch (error) {
-      console.warn('[useGeolocation] ip-api.com定位失败:', error)
+      devLog.warn('[useGeolocation] ip-api.com定位失败:', error)
     }
 
     return null
@@ -235,7 +236,7 @@ export function useGeolocation() {
         }
       }
     } catch (error) {
-      console.warn('[useGeolocation] Cloudflare定位不可用:', error)
+      devLog.warn('[useGeolocation] Cloudflare定位不可用:', error)
     }
     return null
   }
@@ -256,14 +257,14 @@ export function useGeolocation() {
       // 1. 检查缓存
       const cached = geoCache.get()
       if (cached) {
-        console.log('[useGeolocation] 📦 使用缓存的位置信息')
+        devLog.log('[useGeolocation] 📦 使用缓存的位置信息')
         state.value.location = cached
         await checkPermissionStatus()
         return cached
       }
 
       // 2. 浏览器定位（最精准）
-      console.log('[useGeolocation] 🌐 尝试浏览器定位...')
+      devLog.log('[useGeolocation] 🌐 尝试浏览器定位...')
       const browserLocation = await getBrowserLocation()
       if (browserLocation) {
         // 尝试获取城市名称
@@ -279,10 +280,10 @@ export function useGeolocation() {
           } as LocationCache))
 
           await checkPermissionStatus()
-          console.log(`[useGeolocation] ✅ 浏览器定位+逆编码成功，城市: ${cityName || '未知'}`)
+          devLog.log(`[useGeolocation] ✅ 浏览器定位+逆编码成功，城市: ${cityName || '未知'}`)
           return location
         } catch (error) {
-          console.warn('[useGeolocation] 逆地理编码失败，但位置已获取:', error)
+          devLog.warn('[useGeolocation] 逆地理编码失败，但位置已获取:', error)
 
           // 即使没有城市名也保存位置
           state.value.location = browserLocation
@@ -298,7 +299,7 @@ export function useGeolocation() {
       }
 
       // 3. 国内IP定位（高德、百度）
-      console.log('[useGeolocation] 📍 尝试国内IP定位...')
+      devLog.log('[useGeolocation] 📍 尝试国内IP定位...')
       const cnProviders = [
         getLocationFromGaode,
         getLocationFromBaidu
@@ -314,16 +315,16 @@ export function useGeolocation() {
               time: Date.now(),
               value: location
             } as LocationCache))
-            console.log(`[useGeolocation] ✓ 国内IP定位成功: ${location.city || '未知城市'}`)
+            devLog.log(`[useGeolocation] ✓ 国内IP定位成功: ${location.city || '未知城市'}`)
             return location
           }
         } catch (error) {
-          console.warn(`[useGeolocation] IP定位提供商失败:`, error)
+          devLog.warn(`[useGeolocation] IP定位提供商失败:`, error)
         }
       }
 
       // 4. 国际IP定位 + Cloudflare API
-      console.log('[useGeolocation] 🌍 尝试国际IP定位...')
+      devLog.log('[useGeolocation] 🌍 尝试国际IP定位...')
 
       // Cloudflare Pages Functions API（最稳定的备选）
       const cfLocation = await getLocationFromCloudflare()
@@ -334,7 +335,7 @@ export function useGeolocation() {
           time: Date.now(),
           value: cfLocation
         } as LocationCache))
-        console.log('[useGeolocation] ✓ Cloudflare定位成功')
+        devLog.log('[useGeolocation] ✓ Cloudflare定位成功')
         return cfLocation
       }
 
@@ -347,21 +348,21 @@ export function useGeolocation() {
           time: Date.now(),
           value: intlLocation
         } as LocationCache))
-        console.log('[useGeolocation] ✓ 国际IP定位成功:', intlLocation)
-        console.log('[useGeolocation] 📍 State更新后:', state.value)
+        devLog.log('[useGeolocation] ✓ 国际IP定位成功:', intlLocation)
+        devLog.log('[useGeolocation] 📍 State更新后:', state.value)
         return intlLocation
       }
 
       // 5. 所有方式都失败
       state.value.isError = true
       state.value.error = '无法获取位置信息'
-      console.error('[useGeolocation] ❌ 所有定位方式均失败')
+      devLog.error('[useGeolocation] ❌ 所有定位方式均失败')
       return null
 
     } catch (error) {
       state.value.isError = true
       state.value.error = error instanceof Error ? error.message : '位置获取失败'
-      console.error('[useGeolocation] 定位失败:', error)
+      devLog.error('[useGeolocation] 定位失败:', error)
       return null
     } finally {
       state.value.isLoading = false
@@ -373,7 +374,7 @@ export function useGeolocation() {
    * 清除位置缓存并重新获取
    */
   const refreshLocation = async (): Promise<LocationData | null> => {
-    console.log('[useGeolocation] 🔄 刷新位置信息...')
+    devLog.log('[useGeolocation] 🔄 刷新位置信息...')
     geoCache.clear()
     safeRemoveLocalStorage(CACHE_KEYS.GEOLOCATION)
     return getCurrentLocation()
@@ -383,7 +384,7 @@ export function useGeolocation() {
    * 手动清除所有位置相关缓存
    */
   const clearAllCaches = (): void => {
-    console.log('[useGeolocation] 🗑️ 清除所有位置缓存')
+    devLog.log('[useGeolocation] 🗑️ 清除所有位置缓存')
     geoCache.clear()
     safeRemoveLocalStorage(CACHE_KEYS.GEOLOCATION)
   }
