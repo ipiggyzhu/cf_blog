@@ -38,15 +38,21 @@ export const devLog = {
  * @returns Promise<T>
  */
 export async function withTimeout<T>(promise: Promise<T>, ms = 5000): Promise<T> {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), ms)
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`请求超时 (${ms}ms)`))
+    }, ms)
+  })
 
   try {
-    // @ts-expect-error - 需要处理AbortController类型
-    const result = await promise
-    return result as T
+    const result = await Promise.race([promise, timeoutPromise])
+    return result
   } finally {
-    clearTimeout(timeout)
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
   }
 }
 

@@ -9,7 +9,8 @@
 
 /* 首页动态壁纸专用样式 - 优先级更高 */
 .VPHome .tk-banner {
-  background: var(--vp-c-bg) !important;
+  /* 使用 R2 存储的默认背景图作为占位，避免空白 */
+  background: url('https://image.itpiggy.top/WallPaper/1.webp') center/cover no-repeat !important;
   background-color: var(--vp-c-bg) !important;
 }
 

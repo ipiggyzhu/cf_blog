@@ -34,9 +34,9 @@
         </div>
         <!-- 正常状态 -->
         <div class="weather-info" v-else-if="uiState.hasLocation && uiState.hasWeather">
-          <span v-if="geolocation.state.location?.city" class="city">{{ geolocation.state.location.city }} · </span>
-          <span class="description">{{ weatherAPI.state.weather?.description }}</span>
-          <span class="temperature">{{ Math.round(weatherAPI.state.weather?.temperature || 0) }}°C</span>
+          <span v-if="geolocation.state.value.location?.city" class="city">{{ geolocation.state.value.location.city }} · </span>
+          <span class="description">{{ weatherAPI.state.value.weather?.description }}</span>
+          <span class="temperature">{{ Math.round(weatherAPI.state.value.weather?.temperature || 0) }}°C</span>
         </div>
         <!-- 错误状态 -->
         <div class="weather-info" v-else-if="uiState.hasError">
@@ -78,10 +78,10 @@ devLog.log('[NavWeather] ✅ 组合式函数初始化完成')
 
 // 合并后的 UI 状态计算属性（优化性能）
 const uiState = computed(() => ({
-  hasLocation: !!geolocation.state.location,
-  hasWeather: !!weatherAPI.state.weather,
-  isLoading: geolocation.state.isLoading || weatherAPI.state.isLoading,
-  hasError: geolocation.state.isError || weatherAPI.state.isError
+  hasLocation: !!geolocation.state.value.location,
+  hasWeather: !!weatherAPI.state.value.weather,
+  isLoading: geolocation.state.value.isLoading || weatherAPI.state.value.isLoading,
+  hasError: geolocation.state.value.isError || weatherAPI.state.value.isError
 }))
 
 // 天气图标
@@ -92,9 +92,13 @@ const tooltipText = computed(() => {
   if (uiState.value.hasError) {
     return '点击重新获取位置'
   }
+  // 确保 location 存在才调用 getTooltipText
+  if (!geolocation.state.value.location) {
+    return '获取位置中...'
+  }
   return weatherAPI.getTooltipText(
-    geolocation.state.location!,
-    weatherAPI.state.weather
+    geolocation.state.value.location,
+    weatherAPI.state.value.weather
   )
 })
 
@@ -146,17 +150,13 @@ const initializeWeather = async () => {
 const handleWeatherClick = async () => {
   devLog.log('[NavWeather] 🔄 手动刷新天气...')
 
-  // 显示加载状态
-  geolocation.state.isLoading = true
-  weatherAPI.state.isLoading = true
-
   try {
-    // 1. 刷新位置
+    // 1. 刷新位置（会自动设置 loading 状态）
     await geolocation.refreshLocation()
 
     // 2. 如果有新位置，刷新天气
-    if (geolocation.state.location) {
-      await weatherAPI.refreshWeather(geolocation.state.location)
+    if (geolocation.state.value.location) {
+      await weatherAPI.refreshWeather(geolocation.state.value.location)
     }
 
     // 3. 显示成功提示
@@ -166,9 +166,6 @@ const handleWeatherClick = async () => {
 
   } catch (error) {
     devLog.error('[NavWeather] ❌ 刷新失败:', error)
-  } finally {
-    geolocation.state.isLoading = false
-    weatherAPI.state.isLoading = false
   }
 }
 
@@ -180,7 +177,7 @@ const showPermissionHints = () => {
 
   // 延迟执行，避免控制台信息混乱
   setTimeout(() => {
-    const permissionState = geolocation.state.permissionState
+    const permissionState = geolocation.state.value.permissionState
 
     if (permissionState === 'prompt') {
       devLog.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -216,9 +213,9 @@ const setupAutoRefresh = () => {
   }
 
   refreshInterval = setInterval(async () => {
-    if (geolocation.state.location && !geolocation.state.isLoading && !weatherAPI.state.isLoading) {
+    if (geolocation.state.value.location && !geolocation.state.value.isLoading && !weatherAPI.state.value.isLoading) {
       devLog.log('[NavWeather] 🔄 自动更新天气...')
-      await weatherAPI.fetchWeather(geolocation.state.location)
+      await weatherAPI.fetchWeather(geolocation.state.value.location)
     }
   }, UPDATE_INTERVALS.WEATHER_REFRESH)
 }
@@ -253,9 +250,9 @@ onUnmounted(() => {
 
 // 监听位置变化，自动更新天气
 watch(
-  () => geolocation.state.location,
+  () => geolocation.state.value.location,
   async (newLocation) => {
-    if (newLocation && !geolocation.state.isLoading) {
+    if (newLocation && !geolocation.state.value.isLoading) {
       devLog.log('[NavWeather] 📍 位置更新，重新获取天气...')
       await weatherAPI.fetchWeather(newLocation)
     }
