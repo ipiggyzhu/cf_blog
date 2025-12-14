@@ -17,7 +17,8 @@ import {
   getEnvToken,
   isServerSide,
   formatTemperature,
-  generateWeatherCacheKey
+  generateWeatherCacheKey,
+  devLog
 } from '../utils/helpers'
 import { useCache } from './useLocalStorage'
 
@@ -43,7 +44,7 @@ export function useWeatherAPI() {
     lastUpdated: null
   })
 
-  console.log('[useWeatherAPI] 🔧 State初始化:', state.value)
+  devLog.log('[useWeatherAPI] 🔧 State初始化:', state.value)
 
   // 计算属性
   const weatherIcon = computed(() => {
@@ -67,7 +68,7 @@ export function useWeatherAPI() {
   const fetchFromCaiyun = async (lat: number, lon: number): Promise<WeatherData | null> => {
     const token = getEnvToken()
     if (!token) {
-      console.log('[useWeatherAPI] 彩云Token未配置，使用备选方案')
+      devLog.log('[useWeatherAPI] 彩云Token未配置，使用备选方案')
       return null
     }
 
@@ -86,7 +87,7 @@ export function useWeatherAPI() {
       }
       throw new Error('彩云天气API返回数据格式异常')
     } catch (error) {
-      console.warn('[useWeatherAPI] 彩云天气获取失败:', error)
+      devLog.warn('[useWeatherAPI] 彩云天气获取失败:', error)
       return null
     }
   }
@@ -112,7 +113,7 @@ export function useWeatherAPI() {
         description: WEATHER_DESC_MAP[skycon] || '天气'
       }
     } catch (error) {
-      console.warn('[useWeatherAPI] Open-Meteo获取失败:', error)
+      devLog.warn('[useWeatherAPI] Open-Meteo获取失败:', error)
       return null
     }
   }
@@ -144,20 +145,20 @@ export function useWeatherAPI() {
       // 检查缓存
       const cachedWeather = weatherCache.get()
       if (cachedWeather) {
-        console.log('[useWeatherAPI] 📦 使用缓存的天气数据:', cachedWeather)
+        devLog.log('[useWeatherAPI] 📦 使用缓存的天气数据:', cachedWeather)
         state.value.weather = cachedWeather
         state.value.lastUpdated = Date.now()
-        console.log('[useWeatherAPI] 🌤️ 缓存State更新后:', state.value)
+        devLog.log('[useWeatherAPI] 🌤️ 缓存State更新后:', state.value)
         return cachedWeather
       }
 
       // 优先尝试彩云天气（配置token的情况下）
-      console.log('[useWeatherAPI] 🌤️ 尝试彩云天气...')
+      devLog.log('[useWeatherAPI] 🌤️ 尝试彩云天气...')
       let weatherData = await fetchFromCaiyun(location.latitude, location.longitude)
 
       // 彩云失败则使用Open-Meteo作为备选
       if (!weatherData) {
-        console.log('[useWeatherAPI] 🌤️ 彩云不可用，尝试Open-Meteo...')
+        devLog.log('[useWeatherAPI] 🌤️ 彩云不可用，尝试Open-Meteo...')
         weatherData = await fetchFromOpenMeteo(location.latitude, location.longitude)
       }
 
@@ -171,14 +172,14 @@ export function useWeatherAPI() {
       state.value.weather = weatherData
       state.value.lastUpdated = Date.now()
 
-      console.log('[useWeatherAPI] ✅ 天气获取成功: ${weatherData.description} ${formatTemperature(weatherData.temperature)}°C')
-      console.log('[useWeatherAPI] 🌤️ State更新后:', state.value)
+      devLog.log(`[useWeatherAPI] ✅ 天气获取成功: ${weatherData.description} ${formatTemperature(weatherData.temperature)}°C`)
+      devLog.log('[useWeatherAPI] 🌤️ State更新后:', state.value)
       return weatherData
 
     } catch (error) {
       state.value.isError = true
       state.value.error = error instanceof Error ? error.message : '天气获取失败'
-      console.error('[useWeatherAPI] ❌ 获取天气失败:', error)
+      devLog.error('[useWeatherAPI] ❌ 获取天气失败:', error)
 
       // 保底数据
       const fallbackWeather: WeatherData = {
@@ -187,7 +188,7 @@ export function useWeatherAPI() {
         description: '天气'
       }
       state.value.weather = fallbackWeather
-      console.log('[useWeatherAPI] ⚠️ 使用保底数据:', state.value)
+      devLog.log('[useWeatherAPI] ⚠️ 使用保底数据:', state.value)
       return fallbackWeather
 
     } finally {
@@ -199,7 +200,7 @@ export function useWeatherAPI() {
    * 刷新天气数据
    */
   const refreshWeather = async (location: LocationData): Promise<WeatherData | null> => {
-    console.log('[useWeatherAPI] 🔄 刷新天气数据...')
+    devLog.log('[useWeatherAPI] 🔄 刷新天气数据...')
     // 清除相关缓存
     const cacheKey = generateWeatherCacheKey(location.latitude, location.longitude)
     // 这里可以实现缓存清除逻辑
@@ -210,7 +211,7 @@ export function useWeatherAPI() {
    * 清除天气缓存
    */
   const clearWeatherCache = (): void => {
-    console.log('[useWeatherAPI] 🗑️ 清除所有天气缓存')
+    devLog.log('[useWeatherAPI] 🗑️ 清除所有天气缓存')
     // 可以遍历所有以天气前缀开头的缓存键并清除
     // 这个实现需要根据具体的localStorage管理策略来调整
   }

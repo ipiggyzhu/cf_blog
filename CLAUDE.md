@@ -4,155 +4,202 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **VitePress-based personal technical blog** built with Vue 3 and the vitepress-theme-teek theme. The site features custom components, analytics integration, comments, and is deployed to Cloudflare Pages with automatic CI/CD via Cloud Native Build (CNB).
+This is a **VitePress-based personal technical blog** built with Vue 3 and the vitepress-theme-teek theme. The site features custom components, analytics integration, comments, and is deployed to Cloudflare Pages with automatic CI/CD.
 
 **Tech Stack:**
 - VitePress 1.6.3 with Vue 3.5.16
 - vitepress-theme-teek 1.4.6 (professional blog theme)
-- TypeScript configuration, Vue SFC components
+- TypeScript, Vue SFC components, SCSS styling
 - Cloudflare Pages hosting with Workers functions
 - pnpm package manager (primary), npm as fallback
+- Node.js >=18.0.0, pnpm >=8.0.0
 
 ## Essential Commands
 
 ```bash
 # Development
 pnpm install                    # Install dependencies (preferred)
-npm install                      # Alternative if pnpm not available
-pnpm docs:dev                    # Start dev server at localhost:5173
-pnpm docs:build                  # Build static site to docs/.vitepress/dist
-pnpm docs:preview                # Preview built site locally
+pnpm docs:dev                   # Start dev server at localhost:5173 with hot reload
+pnpm docs:build                 # Build static site to docs/.vitepress/dist
+pnpm docs:preview               # Preview built site locally
 
-# Deployment Scripts
-./shell/teek.sh                  # Full build and deploy workflow (Linux/Mac)
-./shell/teek.bat                 # Full build and deploy workflow (Windows)
-./shell/teek-run-dev.sh          # Quick dev server start
-./shell/teek-run-build.sh        # Quick build only
-
-# Testing Single Components
+# Component Testing
 # Components are in docs/.vitepress/theme/components/
-# Import and test in any markdown file under docs/
+# To test: import and use in any markdown file under docs/
+# Dev server supports hot reload for Vue components and markdown
 ```
 
 ## High-Level Architecture
 
-### Content Structure & URL Transformation
+### Content Organization & URL System
 
-The blog uses a **category-based content organization** with automatic URL transformation rules defined in `docs/.vitepress/ConfigHyde/Nav.ts`:
+The blog uses **category-based folders** with **automatic URL transformation** via UUID5 hashing. This separates physical file structure from public URLs.
+
+**Key Pattern**: Physical folders → Friendly URL paths (defined in `docs/.vitepress/ConfigHyde/Nav.ts` and `docs/.vitepress/config.ts` lines 573-596)
 
 ```
-Physical Structure → URL Path
-docs/10.运维/      → /linux/$uuid5
-docs/15.前端/      → /qianduan/$uuid5
-docs/20.编程/      → /code/$uuid5
-docs/25.黑客/      → /hacker/$uuid5
-docs/30.专题/      → /zhuanti/$uuid5
-docs/45.娱乐/      → /yule/{movie|music|photo}/$uuid5
-docs/50.小屋/      → /xiaowu/{inner|time|wenan}/$uuid5
-docs/55.兴趣/      → /xingqu/{reading|travel}/$uuid5
-docs/60.关于/      → /about/$uuid5
+docs/10.运维/       → /linux/$uuid5
+docs/15.前端/       → /qianduan/$uuid5
+docs/20.编程/       → /code/$uuid5
+docs/25.黑客/       → /hacker/$uuid5
+docs/30.专题/       → /zhuanti/$uuid5
+docs/45.娱乐/10.电影/ → /yule/movie/$uuid5
+docs/50.小屋/10.精神小屋/ → /xiaowu/inner/$uuid5
+docs/55.兴趣/10.读书/ → /xingqu/reading/$uuid5
+docs/60.关于/       → /about/$uuid5
 ```
 
-URLs are generated using UUID5 hashing based on folder structure, providing consistent, SEO-friendly URLs while maintaining flexible file organization.
+**Critical**: The transformation logic is in `docs/.vitepress/theme/composables/useTransform.ts`:
+- `$uuidN` placeholders generate random N-character strings (max 10)
+- `removeLevel: 99` clears all path prefixes before adding new ones
+- Date handling: automatically subtracts 8 hours to compensate for timezone conversion
+- Rules are processed in order; first match wins
 
-### Theme Customization Architecture
+### Theme Extension Pattern
 
-The blog extends vitepress-theme-teek with custom components and configurations:
+The project extends vitepress-theme-teek through a **three-layer architecture**:
 
-1. **Theme Entry**: `docs/.vitepress/theme/index.ts` registers all custom components
-2. **Config Modules**: `docs/.vitepress/ConfigHyde/` contains modular configurations:
-   - `Nav.ts` - Navigation and URL transformation rules
-   - `Comment.ts` - Twikoo comment system config
-   - `Cover.ts` - Article cover image mappings
-   - `Wallaper.ts` - Dynamic wallpaper settings
-3. **Custom Components**: 29 Vue components in `docs/.vitepress/theme/components/`
-4. **Styles**: SCSS files in `docs/.vitepress/theme/styles/`
+1. **Theme Entry** (`docs/.vitepress/theme/index.ts`):
+   - Registers all custom components globally
+   - Configures Vue error handlers and warnings
+   - Initializes NProgress router transitions
+   - Sets up Service Worker for PWA functionality
+   - Wraps layout with `TeekLayoutProvider` for dependency injection
 
-### Serverless Functions
+2. **Modular Configuration** (`docs/.vitepress/ConfigHyde/`):
+   - `Comment.ts` - Twikoo comment system
+   - `Cover.ts` & `Wallaper.ts` - Image assets
+   - `Nav.ts`, `SocialLinks.ts` - Navigation structure
+   - `Head.ts` - HTML head tags and meta
 
-Cloudflare Workers functions in `/functions/`:
-- `geo.js` & `api/geo.js` - Geolocation API using CF headers with ipapi.co fallback
+3. **Custom Components** (`docs/.vitepress/theme/components/`):
+   - 29+ Vue 3 components using Composition API
+   - Notable: `NavWeather.vue`, `DynamicWallpaperManager.vue`, `CoupleAlbum/`
+   - All components auto-registered in theme/index.ts
+
+4. **Composables** (`docs/.vitepress/theme/composables/`):
+   - `useTransform.ts` - URL transformation engine
+   - `useRuntime.ts` - Site runtime calculations
+   - `useRibbon.ts` - Canvas animations
+   - `useServiceWorker.ts`, `useWeatherAPI.ts`, `useGeolocation.ts` - Feature integrations
+
+**Component Registration Pattern**: Add to `theme/index.ts` using `app.component('ComponentName', ComponentFile)` for global availability.
+
+### Cloudflare Pages Functions
+
+Serverless edge functions in `/functions/` (deployed automatically with Pages):
+
+- `geo.js` & `api/geo.js` - Geolocation API using Cloudflare request headers with ipapi.co fallback
 - `api/images.js` - Image handling endpoint
+- **R2 Storage**: Bound via `wrangler.toml` (binding: `R2_BUCKET`, bucket: `cf-blog`)
 
-Configuration in `wrangler.toml` includes R2 bucket binding for object storage.
+### VitePress Build Pipeline
 
-### Build & Deployment Pipeline
+**Local Build Flow**:
+1. VitePress processes markdown + frontmatter → HTML pages
+2. `vitepress-plugin-auto-frontmatter` injects metadata from folder structure
+3. Vue components compiled by Vite (esbuild minification, ES2015 target)
+4. Output: Static site in `docs/.vitepress/dist/`
 
-**Local Build Process:**
-1. VitePress processes markdown files with frontmatter
-2. vitepress-plugin-auto-frontmatter generates metadata from folder structure
-3. Vue components are compiled and bundled by Vite
-4. Static site generated to `docs/.vitepress/dist/`
+**Critical Build Configs** (in `docs/.vitepress/config.ts`):
+- `rewrites`: Uses `createRewrites()` from teek theme for URL mapping
+- `vite.ssr.noExternal`: Bundles `vitepress-theme-teek` and `canvas-confetti` for SSR
+- `vite.build.minify: 'esbuild'` - Faster than terser
+- `vite.build.sourcemap: false` - Disabled for performance
+- `vite.optimizeDeps.exclude`: Prevents pre-bundling theme and core libs
 
-**CI/CD Pipeline** (`.cnb.yml`):
-1. Triggered on push to main branch
-2. Uses Node.js 22 Docker image with 64 CPUs
-3. Configures npm Taobao mirror for China
-4. Installs dependencies with pnpm
-5. Builds site with `pnpm docs:build`
-6. Deploys to EdgeOne Pages
-7. Generates knowledge base embeddings (bge-m3 model)
+**Deployment**: Push to `master` branch triggers automatic Cloudflare Pages deployment (configured via `.cnb/web_trigger.yml`).
 
-### Component Communication Pattern
+### Vue Component Architecture
 
-Components use Vue 3 Composition API with:
-- **Props/Events** for parent-child communication
-- **Provide/Inject** for theme-wide settings (via TeekLayoutProvider)
-- **Composables** in `theme/composables/` for shared logic:
-  - `useRibbon.ts` - Canvas ribbon animation
-  - `useRuntime.ts` - Site runtime calculations
-  - `useTransform.ts` - URL transformation logic
+Vue 3 Composition API patterns:
+- **Props/Events**: Parent-child communication
+- **Provide/Inject**: Theme-wide settings via `TeekLayoutProvider`
+- **Composables**: Shared logic in `theme/composables/` (see list above)
+- **Error Handling**: Global Vue error handler in `theme/index.ts` + `utils/errorHandler.ts`
 
-### Analytics Integration
+### Analytics & Tracking
 
-Multiple analytics providers configured in `docs/.vitepress/config.ts`:
-- Busuanzi (Chinese visitor counter) - Automatic integration
-- Google Analytics (G-K5GNDW3L7K) - Via gtag
-- Baidu Analytics (d5ee872d9aa1ef8021f4a3921b2e9c2a) - Via hm.js
-- Vercel Analytics & Speed Insights - Via npm packages
+Multiple analytics configured in `docs/.vitepress/config.ts` (lines 332-345):
+- **Busuanzi** (Chinese visitor counter) - Custom endpoint with retry logic
+- **Google Analytics** (G-K5GNDW3L7K)
+- **Baidu Analytics** (d5ee872d9aa1ef8021f4a3921b2e9c2a)
+- **Vercel Analytics** & Speed Insights (via npm packages)
 
-### Key Configuration Files
+Note: `ERR_BLOCKED_BY_CLIENT` errors are expected (ad blockers), don't affect site functionality.
 
-- `docs/.vitepress/config.ts` (596 lines) - Main VitePress and theme configuration
-- `package.json` - Dependencies and npm scripts
-- `wrangler.toml` - Cloudflare Workers and Pages settings
-- `.cnb.yml` - CI/CD pipeline configuration
-- `docs/index.md` - Homepage with YAML configuration for theme features
+## Key Configuration Files
 
-### Custom Features Implementation
+- **`docs/.vitepress/config.ts`** (624 lines) - Master configuration
+  - Lines 1-360: Teek theme config (blogger info, post style, cards, analytics, code blocks)
+  - Lines 363-623: VitePress config (rewrites, markdown, sitemap, themeConfig, Vite, plugins)
+  - Lines 564-612: AutoFrontmatter plugin with URL transformation rules
+- **`package.json`** - Dependencies and scripts
+- **`wrangler.toml`** - Cloudflare Workers and R2 binding
+- **`docs/index.md`** - Homepage with YAML frontmatter for theme features
+- **`docs/.vitepress/theme/composables/useTransform.ts`** - URL transformation engine
 
-**Weather Widget** (`NavWeather.vue`):
-- Uses geolocation API from Cloudflare Workers
-- Fetches weather data and displays in navigation bar
-- Error handling with fallback to IP-based location
+## Notable Custom Features
 
-**Live2D Animation** (`OhMyLive2D.vue`):
-- Loads models from `docs/public/live2d/models/`
-- Integrates oh-my-live2d library
-- Download scripts available for additional models
+**NavWeather.vue** (Weather Widget):
+- Geolocation via Cloudflare Workers → Weather API
+- Displays in navigation bar with error handling
+
+**DynamicWallpaperManager.vue**:
+- Sources configured in `ConfigHyde/Wallaper.ts`
+- Smooth transitions, dark mode support
+
+**CoupleAlbum/** (Photo Gallery):
+- `CoupleAlbum.vue` + `PhotoCard.vue` components
+- Registered globally for use in markdown
 
 **Comment System**:
-- Twikoo provider configured in `ConfigHyde/Comment.ts`
-- Supports two-way commenting on articles
-- Chinese language UI
+- Twikoo provider (Chinese, two-way comments)
+- Config in `ConfigHyde/Comment.ts`
 
-**Dynamic Wallpaper** (`DynamicWallpaperManager.vue`):
-- Multiple wallpaper sources configured in `Wallaper.ts`
-- Smooth transitions between wallpapers
-- Dark mode support
+**Search**:
+- Local search (not Algolia) - configured lines 437-460 in config.ts
+- Fuzzy matching, Chinese translations
+
+**PWA Features**:
+- Service Worker via `useServiceWorker.ts` composable
+- Registered in theme/index.ts for offline support
 
 ## Development Workflow
 
-1. **Adding New Content**: Create markdown files in appropriate category folders
-2. **Custom Components**: Add to `docs/.vitepress/theme/components/`, register in `theme/index.ts`
-3. **Configuration Changes**: Modify `docs/.vitepress/config.ts` or relevant `ConfigHyde/` module
-4. **Testing**: Use `pnpm docs:dev` for hot-reload development
-5. **Deployment**: Push to main branch triggers automatic deployment via CNB
+### Adding Content
+1. Create `.md` files in category folders (e.g., `docs/10.运维/`, `docs/20.编程/`)
+2. Frontmatter is auto-generated by `vitepress-plugin-auto-frontmatter`
+3. URLs transform automatically based on folder rules (see useTransform.ts)
 
-## Important Notes
+### Adding Components
+1. Create Vue SFC in `docs/.vitepress/theme/components/`
+2. Register globally in `docs/.vitepress/theme/index.ts`:
+   ```ts
+   import MyComponent from './components/MyComponent.vue'
+   app.component('MyComponent', MyComponent)
+   ```
+3. Use in markdown: `<MyComponent />`
+4. Test with `pnpm docs:dev` (hot reload enabled)
 
-- The site uses Chinese as primary language with multi-language support
-- All markdown files should include proper frontmatter or rely on auto-generation
-- Component styles use SCSS with theme variables from vitepress-theme-teek
-- URL transformations are automatic based on folder structure - don't hardcode URLs
-- Build output goes to `docs/.vitepress/dist/` for Cloudflare Pages deployment
+### Modifying Configuration
+- **Theme settings**: Edit `docs/.vitepress/config.ts` (lines 1-360 for Teek config)
+- **Navigation/URLs**: Edit `docs/.vitepress/ConfigHyde/Nav.ts` or config.ts lines 564-612
+- **Analytics/Comments**: Edit respective ConfigHyde modules
+- **Styles**: Add/edit SCSS in `docs/.vitepress/theme/styles/`
+
+### Deployment
+- Automatic: Push to `master` branch → Cloudflare Pages auto-deploys
+- Manual: Run `pnpm docs:build` → Upload `docs/.vitepress/dist/`
+
+## Critical Constraints
+
+- **Primary Language**: Chinese (UI, content, comments, search translations)
+- **URL Transformation**: Never hardcode article URLs - they're auto-generated from folder structure
+- **Frontmatter**: Auto-generated by plugin; manual additions preserved if not in `exclude` list
+- **Cover Images**: Auto-assigned from `Cover.ts` if not specified in frontmatter
+- **Date Timezone**: Dates automatically adjusted -8 hours in useTransform.ts (China timezone compensation)
+- **Build Output**: Always `docs/.vitepress/dist/` (configured in wrangler.toml line 4)
+- **SSR Compatibility**: Theme and canvas-confetti bundled via `vite.ssr.noExternal`
+- **Component Styles**: Use SCSS with theme variables from vitepress-theme-teek (imported in theme/index.ts)
+- **Branch**: Deployment branch is `master` (not `main`)

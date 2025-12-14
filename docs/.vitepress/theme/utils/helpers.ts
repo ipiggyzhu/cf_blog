@@ -6,6 +6,32 @@
 import type { WeatherData } from '../types/weather'
 
 /**
+ * 开发环境日志工具
+ * 仅在开发环境输出日志，生产环境静默
+ */
+export const devLog = {
+  log: (...args: any[]) => {
+    if (import.meta.env.DEV) {
+      console.log(...args)
+    }
+  },
+  warn: (...args: any[]) => {
+    if (import.meta.env.DEV) {
+      console.warn(...args)
+    }
+  },
+  error: (...args: any[]) => {
+    // 错误日志始终输出
+    console.error(...args)
+  },
+  info: (...args: any[]) => {
+    if (import.meta.env.DEV) {
+      console.info(...args)
+    }
+  }
+}
+
+/**
  * 异步操作超时封装
  * @param promise - 原始Promise
  * @param ms - 超时时间（毫秒）

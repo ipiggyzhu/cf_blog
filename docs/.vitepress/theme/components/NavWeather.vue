@@ -14,8 +14,8 @@
     >
       <WeatherIcon
         :icon="weatherIcon"
-        :is-loading="geolocation.state.isLoading || weatherAPI.state.isLoading"
-        :has-error="geolocation.state.isError || weatherAPI.state.isError"
+        :is-loading="uiState.isLoading"
+        :has-error="uiState.hasError"
       />
     </button>
     <div class="divider divider-right"></div>
@@ -29,17 +29,17 @@
     >
       <div class="tooltip-content">
         <!-- 加载状态 -->
-        <div class="weather-info" v-if="isLoading">
+        <div class="weather-info" v-if="uiState.isLoading">
           <span class="loading">获取位置和天气中...</span>
         </div>
         <!-- 正常状态 -->
-        <div class="weather-info" v-else-if="hasLocation && hasWeather">
+        <div class="weather-info" v-else-if="uiState.hasLocation && uiState.hasWeather">
           <span v-if="geolocation.state.location?.city" class="city">{{ geolocation.state.location.city }} · </span>
           <span class="description">{{ weatherAPI.state.weather?.description }}</span>
           <span class="temperature">{{ Math.round(weatherAPI.state.weather?.temperature || 0) }}°C</span>
         </div>
         <!-- 错误状态 -->
-        <div class="weather-info" v-else-if="hasError">
+        <div class="weather-info" v-else-if="uiState.hasError">
           <span class="error">点击重新获取位置</span>
         </div>
         <!-- 无数据状态 -->
@@ -48,7 +48,7 @@
         </div>
 
         <!-- 精准定位提示 -->
-        <div class="hint" v-if="!geolocation.isPreciseLocation && !hasError && hasLocation && hasWeather && !isLoading">
+        <div class="hint" v-if="!geolocation.isPreciseLocation && !uiState.hasError && uiState.hasLocation && uiState.hasWeather && !uiState.isLoading">
           点击允许浏览器定位获得更精准位置
         </div>
       </div>
@@ -62,6 +62,7 @@ import WeatherIcon from './nav-weather/WeatherIcon.vue'
 import { useGeolocation } from '../composables/useGeolocation'
 import { useWeatherAPI } from '../composables/useWeatherAPI'
 import { UPDATE_INTERVALS } from '../utils/constants'
+import { devLog } from '../utils/helpers'
 
 // 状态
 const showTooltip = ref(false)
@@ -70,72 +71,31 @@ let tooltipTimeout: number | null = null
 const weatherButton = ref<HTMLElement | null>(null)
 
 // 组合式函数
-console.log('[NavWeather] 🚀 初始化组合式函数...')
+devLog.log('[NavWeather] 🚀 初始化组合式函数...')
 const geolocation = useGeolocation()
 const weatherAPI = useWeatherAPI()
-console.log('[NavWeather] ✅ 组合式函数初始化完成:', {
-  geolocation: !!geolocation,
-  weatherAPI: !!weatherAPI
-})
+devLog.log('[NavWeather] ✅ 组合式函数初始化完成')
 
-// 计算属性
-const weatherIcon = computed(() => {
-  return weatherAPI.weatherIcon.value
-})
+// 合并后的 UI 状态计算属性（优化性能）
+const uiState = computed(() => ({
+  hasLocation: !!geolocation.state.location,
+  hasWeather: !!weatherAPI.state.weather,
+  isLoading: geolocation.state.isLoading || weatherAPI.state.isLoading,
+  hasError: geolocation.state.isError || weatherAPI.state.isError
+}))
 
-// 调试计算属性
-const hasLocation = computed(() => {
-  const result = !!geolocation.state.location
-  console.log('[NavWeather] 🔍 hasLocation计算:', {
-    location: geolocation.state.location,
-    result
-  })
-  return result
-})
+// 天气图标
+const weatherIcon = computed(() => weatherAPI.weatherIcon.value)
 
-const hasWeather = computed(() => {
-  const result = !!weatherAPI.state.weather
-  console.log('[NavWeather] 🔍 hasWeather计算:', {
-    weather: weatherAPI.state.weather,
-    result
-  })
-  return result
-})
-
-const isLoading = computed(() => {
-  const result = geolocation.state.isLoading || weatherAPI.state.isLoading
-  console.log('[NavWeather] 🔍 isLoading计算:', {
-    geoLoading: geolocation.state.isLoading,
-    weatherLoading: weatherAPI.state.isLoading,
-    result
-  })
-  return result
-})
-
-const hasError = computed(() => {
-  const result = geolocation.state.isError || weatherAPI.state.isError
-  console.log('[NavWeather] 🔍 hasError计算:', {
-    geoError: geolocation.state.isError,
-    weatherError: weatherAPI.state.isError,
-    result
-  })
-  return result
-})
-
+// 提示文本
 const tooltipText = computed(() => {
-  if (geolocation.state.isError || weatherAPI.state.isError) {
+  if (uiState.value.hasError) {
     return '点击重新获取位置'
   }
   return weatherAPI.getTooltipText(
     geolocation.state.location!,
     weatherAPI.state.weather
   )
-})
-
-const errorText = computed(() => {
-  if (geolocation.state.error) return geolocation.state.error
-  if (weatherAPI.state.error) return weatherAPI.state.error
-  return '未知错误'
 })
 
 /**
@@ -166,13 +126,13 @@ const hideTooltipWithDelay = () => {
  * 初始化流程
  */
 const initializeWeather = async () => {
-  console.log('[NavWeather] 🔧 初始化天气组件...')
+  devLog.log('[NavWeather] 🔧 初始化天气组件...')
 
   // 1. 获取位置
   const location = await geolocation.getCurrentLocation()
 
   if (!location) {
-    console.warn('[NavWeather] ⚠️ 无法获取位置信息')
+    devLog.warn('[NavWeather] ⚠️ 无法获取位置信息')
     return
   }
 
@@ -184,7 +144,7 @@ const initializeWeather = async () => {
  * 刷新天气（点击触发）
  */
 const handleWeatherClick = async () => {
-  console.log('[NavWeather] 🔄 手动刷新天气...')
+  devLog.log('[NavWeather] 🔄 手动刷新天气...')
 
   // 显示加载状态
   geolocation.state.isLoading = true
@@ -201,11 +161,11 @@ const handleWeatherClick = async () => {
 
     // 3. 显示成功提示
     setTimeout(() => {
-      console.log('[NavWeather] ✅ 刷新完成')
+      devLog.log('[NavWeather] ✅ 刷新完成')
     }, 300)
 
   } catch (error) {
-    console.error('[NavWeather] ❌ 刷新失败:', error)
+    devLog.error('[NavWeather] ❌ 刷新失败:', error)
   } finally {
     geolocation.state.isLoading = false
     weatherAPI.state.isLoading = false
@@ -223,26 +183,26 @@ const showPermissionHints = () => {
     const permissionState = geolocation.state.permissionState
 
     if (permissionState === 'prompt') {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('🌤️  天气组件提示')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('💡 当前使用 IP 定位（精度较低，误差可达几十公里）')
-      console.log('✨ 点击天气图标并允许浏览器定位，可获得精准位置')
-      console.log('📍 浏览器定位精度：< 100 米')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      devLog.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      devLog.log('🌤️  天气组件提示')
+      devLog.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      devLog.log('💡 当前使用 IP 定位（精度较低，误差可达几十公里）')
+      devLog.log('✨ 点击天气图标并允许浏览器定位，可获得精准位置')
+      devLog.log('📍 浏览器定位精度：< 100 米')
+      devLog.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } else if (permissionState === 'denied') {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('⚠️  天气组件警告')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.warn('❌ 浏览器定位权限被拒绝')
-      console.warn('📍 当前使用 IP 定位（精度低，可能不准确）')
-      console.log('💡 如需精准定位，请按以下步骤操作：')
-      console.log('   1. 点击地址栏左侧的 🔒 图标')
-      console.log('   2. 找到"位置"权限，选择"允许"')
-      console.log('   3. 刷新页面或点击天气图标')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      devLog.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      devLog.log('⚠️  天气组件警告')
+      devLog.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      devLog.warn('❌ 浏览器定位权限被拒绝')
+      devLog.warn('📍 当前使用 IP 定位（精度低，可能不准确）')
+      devLog.log('💡 如需精准定位，请按以下步骤操作：')
+      devLog.log('   1. 点击地址栏左侧的 🔒 图标')
+      devLog.log('   2. 找到"位置"权限，选择"允许"')
+      devLog.log('   3. 刷新页面或点击天气图标')
+      devLog.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } else if (permissionState === 'granted') {
-      console.log('[NavWeather] ✅ 浏览器定位权限已授权，将使用精准定位')
+      devLog.log('[NavWeather] ✅ 浏览器定位权限已授权，将使用精准定位')
     }
   }, 1000)
 }
@@ -257,7 +217,7 @@ const setupAutoRefresh = () => {
 
   refreshInterval = setInterval(async () => {
     if (geolocation.state.location && !geolocation.state.isLoading && !weatherAPI.state.isLoading) {
-      console.log('[NavWeather] 🔄 自动更新天气...')
+      devLog.log('[NavWeather] 🔄 自动更新天气...')
       await weatherAPI.fetchWeather(geolocation.state.location)
     }
   }, UPDATE_INTERVALS.WEATHER_REFRESH)
@@ -265,43 +225,18 @@ const setupAutoRefresh = () => {
 
 // 生命周期
 onMounted(() => {
-  console.log('[NavWeather] 🚀 天气组件挂载，开始初始化...')
+  devLog.log('[NavWeather] 🚀 天气组件挂载，开始初始化...')
 
-  // 先设置状态监听器
-  console.log('[NavWeather] 🔧 设置状态监听器...')
-  watch([hasLocation, hasWeather, isLoading, hasError], ([newHasLocation, newHasWeather, newIsLoading, newHasError]) => {
-    console.log('[NavWeather] 🔍 状态变化:', {
-      hasLocation: newHasLocation,
-      hasWeather: newHasWeather,
-      isLoading: newIsLoading,
-      hasError: newHasError,
-      weatherIcon: weatherIcon.value,
-      timestamp: new Date().toISOString()
-    })
-  }, { immediate: true })
-  console.log('[NavWeather] ✅ 状态监听器设置完成')
-
-  // 异步初始化，等待完成后再检查状态
   const init = async () => {
     try {
       await initializeWeather()
       showPermissionHints()
       setupAutoRefresh()
 
-      // 等待一个微任务确保state更新完成
       await nextTick()
-
-      console.log('[NavWeather] 📊 初始化完成后状态检查:', {
-        hasLocation: hasLocation.value,
-        hasWeather: hasWeather.value,
-        isLoading: isLoading.value,
-        hasError: hasError.value,
-        weatherIcon: weatherIcon.value,
-        geoState: geolocation.state,
-        weatherState: weatherAPI.state
-      })
+      devLog.log('[NavWeather] 📊 初始化完成:', uiState.value)
     } catch (error) {
-      console.error('[NavWeather] ❌ 初始化失败:', error)
+      devLog.error('[NavWeather] ❌ 初始化失败:', error)
     }
   }
 
@@ -309,7 +244,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  console.log('[NavWeather] 🛑 天气组件卸载，清理资源...')
+  devLog.log('[NavWeather] 🛑 天气组件卸载，清理资源...')
   if (refreshInterval) {
     clearInterval(refreshInterval)
     refreshInterval = null
@@ -321,7 +256,7 @@ watch(
   () => geolocation.state.location,
   async (newLocation) => {
     if (newLocation && !geolocation.state.isLoading) {
-      console.log('[NavWeather] 📍 位置更新，重新获取天气...')
+      devLog.log('[NavWeather] 📍 位置更新，重新获取天气...')
       await weatherAPI.fetchWeather(newLocation)
     }
   }
