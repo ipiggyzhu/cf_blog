@@ -8,7 +8,8 @@ import { teekBlogCardConfig } from "../config/teekConfig";
 import { useRibbon } from "../composables/useRibbon";
 import { useRuntime } from "../composables/useRuntime";
 import ConfigSwitch from "./ConfigSwitch.vue";
-import ContributeChart from "./ContributeChart.vue";
+import { defineAsyncComponent } from "vue";
+const ContributeChart = defineAsyncComponent(() => import("./ContributeChart.vue"));
 import NotFound from "./404.vue";
 import BannerImgArrow from "./BannerImgArrow.vue"; //导入横幅图片箭头组件
 
@@ -56,7 +57,6 @@ const { start: startRuntime, stop: stopRuntime } = useRuntime("2025-09-21 00:00:
   prefix: `<span style="width: 16px; display: inline-block; vertical-align: -3px; margin-right: 3px;">${clockIcon}</span>小破站已运行 `,
 });
 
-// Vercel Analytics将通过其他方式集成
 
 const watchRuntimeAndRibbon = async (layout: string, style: string) => {
   const isHome = layout === "home";

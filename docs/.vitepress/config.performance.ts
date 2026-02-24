@@ -50,8 +50,6 @@ export const performanceConfig: UserConfig = {
       'vue',
       'vue-router',
       'vitepress',
-      '@vercel/analytics',
-      '@vercel/speed-insights',
     ],
     // exclude: [] // 已清理 - 移除了oh-my-live2d等不需要的依赖项
   },

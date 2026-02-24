@@ -541,7 +541,7 @@ export default defineConfig({
       reportCompressedSize: false, // 禁用压缩大小报告，加快构建
       sourcemap: false, // 禁用 sourcemap，加快构建并减小体积
       minify: 'esbuild', // 使用 esbuild 替代 terser，速度更快
-      target: 'es2015', // 确保兼容性
+      target: 'es2020', // 现代浏览器，更小 bundle
       // 移除 manualChunks 避免与 VitePress 的外部模块配置冲突
     },
 
@@ -552,11 +552,8 @@ export default defineConfig({
 
     // 优化依赖预构建
     optimizeDeps: {
-      include: [
-        'vue',
-        'echarts'
-      ],
-      exclude: ['@vueuse/core', 'vitepress', 'vitepress-theme-teek']
+      include: ['vue'],
+      exclude: ['echarts', 'vitepress', 'vitepress-theme-teek']
     },    
 
     plugins: [
