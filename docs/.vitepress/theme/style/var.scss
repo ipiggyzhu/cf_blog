@@ -122,6 +122,17 @@ span {
   align-items: center;
 }
 
+/* 页脚 __list 内图标与文字垂直对齐 */
+.tk-footer-info__list__item {
+  align-items: center;
+}
+
+.tk-footer-info__list__item svg,
+.tk-footer-info__list__item img {
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
 /* 移动端页脚微章布局 */
 @media (max-width: 768px) {
   .tk-footer-info p {
