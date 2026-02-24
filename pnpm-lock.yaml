@@ -8,12 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@vercel/analytics':
-        specifier: ^1.5.0
-        version: 1.5.0(vue@3.5.25)
-      '@vercel/speed-insights':
-        specifier: ^1.2.0
-        version: 1.2.0(vue@3.5.25)
       canvas-confetti:
         specifier: ^1.9.3
         version: 1.9.4
@@ -39,9 +33,6 @@ importers:
       sass:
         specifier: ^1.89.1
         version: 1.94.2
-      terser:
-        specifier: ^5.36.0
-        version: 5.44.1
       vitepress:
         specifier: ^1.6.3
         version: 1.6.4(@algolia/client-search@5.45.0)(postcss@8.5.6)(sass@1.94.2)(search-insights@2.17.3)(terser@5.44.1)
