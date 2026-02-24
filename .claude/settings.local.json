@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm docs:build:*)",
+      "Bash(git checkout:*)",
+      "Bash(while read f)",
+      "Bash(do echo \"$f\")",
+      "Bash(done)",
+      "mcp__ace-tool__search_context"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
