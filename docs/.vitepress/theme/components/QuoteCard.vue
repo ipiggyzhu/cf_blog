@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 // 中英文对照的每日英语数据 - 使用 R2 存储的图片，确保国内访问稳定
 const quotes = [
@@ -194,16 +194,36 @@ const initializeImage = (quote) => {
   }
 }
 
-// 移除了自动切换功能，现在只显示随机的一条格言
+// 自动轮询切换格言
+let autoSwitchTimer = null
+const SWITCH_INTERVAL = 8000 // 8秒切换一次
+
+const switchQuote = () => {
+  isChanging.value = true
+  setTimeout(() => {
+    const newQuote = getRandomQuote()
+    currentQuote.value = newQuote
+    initializeImage(newQuote)
+    isChanging.value = false
+  }, 300) // 等淡出动画完成再切换内容
+}
 
 // 组件挂载时初始化
 onMounted(() => {
   // 随机选择一条格言显示
   const initialQuote = getRandomQuote()
   currentQuote.value = initialQuote
-  
-  // 初始化图片
   initializeImage(initialQuote)
+
+  // 启动自动轮询
+  autoSwitchTimer = setInterval(switchQuote, SWITCH_INTERVAL)
+})
+
+onUnmounted(() => {
+  if (autoSwitchTimer) {
+    clearInterval(autoSwitchTimer)
+    autoSwitchTimer = null
+  }
 })
 </script>
 

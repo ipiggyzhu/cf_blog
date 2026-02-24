@@ -1,210 +1,106 @@
 /**
  * Cloudflare Pages Function - R2 壁纸图片列表 API
- * 自动列出 R2 存储桶中的所有壁纸图片
- * 增强版：添加超时保护和完善的错误处理
+ * 使用 Cache API 缓存 R2 list 结果，减少重复调用
  */
+import { corsPreflightResponse, jsonResponse, withTimeout } from "../_lib/http.js";
 
-// 超时包装函数
-async function withTimeout(promise, timeoutMs = 5000) {
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Request timeout')), timeoutMs);
-  });
-  return Promise.race([promise, timeoutPromise]);
+const IMAGE_DOMAIN = "https://image.itpiggy.top";
+const WALLPAPER_PREFIX = "WallPaper/";
+const IMAGE_RE = /\.(jpg|jpeg|png|webp|gif)$/i;
+const FALLBACK_IMAGES = Array.from(
+  { length: 25 },
+  (_, i) => `${IMAGE_DOMAIN}/WallPaper/${i + 1}.webp`
+);
+
+const R2_LIST_TIMEOUT = 4000;
+const BROWSER_TTL = 300;
+const EDGE_TTL = 900;
+const STALE_TTL = 86400;
+const ERROR_TTL = 60;
+
+function normalizeCacheKey(request) {
+  const url = new URL(request.url);
+  url.search = "";
+  return new Request(url.toString(), { method: "GET" });
 }
 
-export async function onRequestGet({ env }) {
+function buildPayload({ images, mode, fallback, startTime, error = null }) {
+  return {
+    success: true,
+    data: images,
+    count: images.length,
+    images,
+    domain: IMAGE_DOMAIN,
+    mode, fallback, error,
+    timestamp: new Date().toISOString(),
+    responseTime: Date.now() - startTime,
+  };
+}
+
+function cacheControl(isError = false) {
+  if (isError) return `public, max-age=${ERROR_TTL}, s-maxage=${ERROR_TTL}`;
+  return `public, max-age=${BROWSER_TTL}, s-maxage=${EDGE_TTL}, stale-while-revalidate=${STALE_TTL}`;
+}
+
+function withCacheMarker(response, marker) {
+  const headers = new Headers(response.headers);
+  headers.set("x-images-cache", marker);
+  return new Response(response.body, { status: response.status, headers });
+}
+
+export async function onRequestGet({ request, env, waitUntil }) {
+  // 1. 先查 Cache API
+  const cache = globalThis.caches?.default;
+  const cacheKey = normalizeCacheKey(request);
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return withCacheMarker(cached, "HIT");
+  }
+
   const startTime = Date.now();
-  
   try {
-    // 固定壁纸列表作为备用（如果 R2 绑定失败）
-    const fallbackImages = [
-      'https://image.itpiggy.top/WallPaper/1.webp',
-      'https://image.itpiggy.top/WallPaper/2.webp',
-      'https://image.itpiggy.top/WallPaper/3.webp',
-      'https://image.itpiggy.top/WallPaper/4.webp',
-      'https://image.itpiggy.top/WallPaper/5.webp',
-      'https://image.itpiggy.top/WallPaper/6.webp',
-      'https://image.itpiggy.top/WallPaper/7.webp',
-      'https://image.itpiggy.top/WallPaper/8.webp',
-      'https://image.itpiggy.top/WallPaper/9.webp',
-      'https://image.itpiggy.top/WallPaper/10.webp',
-      'https://image.itpiggy.top/WallPaper/11.webp',
-      'https://image.itpiggy.top/WallPaper/12.webp',
-      'https://image.itpiggy.top/WallPaper/13.webp',
-      'https://image.itpiggy.top/WallPaper/14.webp',
-      'https://image.itpiggy.top/WallPaper/15.webp',
-      'https://image.itpiggy.top/WallPaper/16.webp',
-      'https://image.itpiggy.top/WallPaper/17.webp',
-      'https://image.itpiggy.top/WallPaper/18.webp',
-      'https://image.itpiggy.top/WallPaper/19.webp',
-      'https://image.itpiggy.top/WallPaper/20.webp',
-      'https://image.itpiggy.top/WallPaper/21.webp',
-      'https://image.itpiggy.top/WallPaper/22.webp',
-      'https://image.itpiggy.top/WallPaper/23.webp',
-      'https://image.itpiggy.top/WallPaper/24.webp',
-      'https://image.itpiggy.top/WallPaper/25.webp',
-    ];
-
-    // 检查 R2 绑定是否存在
+    let payload;
     if (!env.R2_BUCKET) {
-      console.warn('⚠️ R2_BUCKET 未绑定，使用固定图片列表');
-      return new Response(JSON.stringify({
-        success: true,
-        data: fallbackImages,
-        count: fallbackImages.length,
-        images: fallbackImages,
-        domain: 'https://image.itpiggy.top',
-        mode: 'fallback',
-        fallback: true,
-        timestamp: new Date().toISOString(),
-        responseTime: Date.now() - startTime
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Cache-Control': 'public, max-age=300'
-        }
+      payload = buildPayload({ images: FALLBACK_IMAGES, mode: "fallback-no-r2", fallback: true, startTime });
+    } else {
+      const listed = await withTimeout(
+        env.R2_BUCKET.list({ prefix: WALLPAPER_PREFIX, limit: 1000 }),
+        R2_LIST_TIMEOUT
+      );
+      const images = listed.objects
+        .filter(obj => {
+          const fileName = obj.key.split("/").pop();
+          return fileName && IMAGE_RE.test(fileName);
+        })
+        .map(obj => `${IMAGE_DOMAIN}/${obj.key}`);
+
+      payload = buildPayload({
+        images: images.length > 0 ? images : FALLBACK_IMAGES,
+        mode: images.length > 0 ? "dynamic" : "fallback-empty",
+        fallback: images.length === 0,
+        startTime,
       });
     }
 
-    // 自动列出 WallPaper 目录下的所有图片（带超时保护）
-    const listed = await withTimeout(
-      env.R2_BUCKET.list({
-        prefix: 'WallPaper/',
-        limit: 1000
-      }),
-      5000
-    );
-
-    // 过滤出图片文件并构建完整 URL
-    const images = listed.objects
-      .filter(obj => {
-        // 只要图片文件，排除文件夹
-        const fileName = obj.key.split('/').pop();
-        return fileName && /\.(jpg|jpeg|png|webp|gif)$/i.test(fileName);
-      })
-      .map(obj => `https://image.itpiggy.top/${obj.key}`);
-
-    // 如果没有找到图片，使用备用列表
-    if (images.length === 0) {
-      console.warn('⚠️ R2 中没有找到图片，使用备用列表');
-      return new Response(JSON.stringify({
-        success: true,
-        data: fallbackImages,
-        count: fallbackImages.length,
-        images: fallbackImages,
-        domain: 'https://image.itpiggy.top',
-        mode: 'fallback-empty',
-        fallback: true,
-        timestamp: new Date().toISOString(),
-        responseTime: Date.now() - startTime
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Cache-Control': 'public, max-age=300'
-        }
-      });
+    const response = jsonResponse(payload, { cacheControl: cacheControl(false) });
+    if (cache) {
+      const write = cache.put(cacheKey, response.clone());
+      if (waitUntil) waitUntil(write); else await write;
     }
-
-    // 返回动态获取的图片列表
-    return new Response(JSON.stringify({
-      success: true,
-      data: images,
-      count: images.length,
-      images: images,
-      domain: 'https://image.itpiggy.top',
-      mode: 'dynamic',
-      fallback: false,
-      timestamp: new Date().toISOString(),
-      responseTime: Date.now() - startTime
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'public, max-age=300'
-      }
-    });
-
+    return withCacheMarker(response, "MISS");
   } catch (error) {
-    console.error('❌ API 错误:', {
-      message: error.message,
-      stack: error.stack,
-      timestamp: new Date().toISOString()
-    });
-    
-    // 出错时返回备用图片
-    const fallbackImages = [
-      'https://image.itpiggy.top/WallPaper/1.webp',
-      'https://image.itpiggy.top/WallPaper/2.webp',
-      'https://image.itpiggy.top/WallPaper/3.webp',
-      'https://image.itpiggy.top/WallPaper/4.webp',
-      'https://image.itpiggy.top/WallPaper/5.webp',
-      'https://image.itpiggy.top/WallPaper/6.webp',
-      'https://image.itpiggy.top/WallPaper/7.webp',
-      'https://image.itpiggy.top/WallPaper/8.webp',
-      'https://image.itpiggy.top/WallPaper/9.webp',
-      'https://image.itpiggy.top/WallPaper/10.webp',
-      'https://image.itpiggy.top/WallPaper/11.webp',
-      'https://image.itpiggy.top/WallPaper/12.webp',
-      'https://image.itpiggy.top/WallPaper/13.webp',
-      'https://image.itpiggy.top/WallPaper/14.webp',
-      'https://image.itpiggy.top/WallPaper/15.webp',
-      'https://image.itpiggy.top/WallPaper/16.webp',
-      'https://image.itpiggy.top/WallPaper/17.webp',
-      'https://image.itpiggy.top/WallPaper/18.webp',
-      'https://image.itpiggy.top/WallPaper/19.webp',
-      'https://image.itpiggy.top/WallPaper/20.webp',
-      'https://image.itpiggy.top/WallPaper/21.webp',
-      'https://image.itpiggy.top/WallPaper/22.webp',
-      'https://image.itpiggy.top/WallPaper/23.webp',
-      'https://image.itpiggy.top/WallPaper/24.webp',
-      'https://image.itpiggy.top/WallPaper/25.webp',
-    ];
+    console.error("Images API error:", { message: error?.message, timestamp: new Date().toISOString() });
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: fallbackImages,
-      count: fallbackImages.length,
-      images: fallbackImages,
-      domain: 'https://image.itpiggy.top',
-      mode: 'fallback-error',
-      fallback: true,
-      error: error.message,
-      timestamp: new Date().toISOString(),
-      responseTime: Date.now() - startTime
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'public, max-age=60'
-      }
-    });
+    const response = jsonResponse(
+      buildPayload({ images: FALLBACK_IMAGES, mode: "fallback-error", fallback: true, error: error?.message, startTime }),
+      { cacheControl: cacheControl(true) }
+    );
+    if (cache) {
+      const write = cache.put(cacheKey, response.clone());
+      if (waitUntil) waitUntil(write); else await write;
+    }
+    return withCacheMarker(response, "MISS");
   }
 }
 
-// 处理 CORS 预检
-export async function onRequestOptions() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Max-Age': '86400'
-    }
-  });
-}
-
+export const onRequestOptions = corsPreflightResponse;

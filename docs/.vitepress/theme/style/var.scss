@@ -109,33 +109,37 @@ span {
 
 
 // ----
-/* 页脚微章居中 */
+/* 页脚微章居中 + 与下方 __list 行对齐 */
 .tk-footer-info p {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 页脚 __list 行也加 align-items 保持一致 */
+.tk-footer-info__list {
+  align-items: center;
 }
 
 /* 移动端页脚微章布局 */
 @media (max-width: 768px) {
   .tk-footer-info p {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     flex-wrap: wrap;
     font-weight: 500;
+    gap: 6px;
   }
 
   .tk-footer-info p a {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0.2rem;
   }
 }
 
-/* 页脚微章图片 */
+/* 页脚微章图片 - 用 gap 替代 margin，避免左右不对称 */
 .tk-footer-info p img {
-  margin-left: 10px;
+  margin-left: 0;
 }
 
 

@@ -47,12 +47,20 @@
 /
   Cache-Control: public, max-age=300, must-revalidate
 
-# API 响应 - 不缓存或短期缓存
+# API 响应 - 短期缓存
 /api/*
   Cache-Control: public, max-age=60, must-revalidate
 
+# 壁纸列表 API - 强化边缘缓存，降低 R2 list 压力
+/api/images
+  Cache-Control: public, max-age=300, s-maxage=900, must-revalidate
+
+# 地理位置 API - 私有缓存，避免跨用户串用地理数据
+/api/geo
+  Cache-Control: private, max-age=300, must-revalidate
+
 /geo
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: private, max-age=300, must-revalidate
 
 # 安全头
 /*

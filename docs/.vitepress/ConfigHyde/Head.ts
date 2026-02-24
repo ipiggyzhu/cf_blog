@@ -58,13 +58,15 @@ export const HeadData = [
     { name: "msvalidate.01", content: "48CABE70F538B8D117567176ABF325AF" },
   ], // Bing 收录验证
   ["link", { rel: "icon", href: "/img/logo.png", type: "image/png" }],
-  // 阿里在线矢量库 - 添加错误处理
+  // 阿里在线矢量库 - 异步加载避免渲染阻塞
   [
     "link",
     {
-      rel: "stylesheet",
+      rel: "preload",
+      as: "style",
       href: "https://at.alicdn.com/t/font_2989306_w303erbip9.css",
       crossorigin: "anonymous",
+      onload: "this.onload=null;this.rel='stylesheet'",
     },
   ],
   [
@@ -77,15 +79,7 @@ export const HeadData = [
       onerror: "console.warn('Icon font failed to load')",
     },
   ],
-  // umami统计
-  [
-    "script",
-    {
-      // src: "https://umami.onedayxyy.cn/script.js", // 原作者的统计服务，已禁用
-      "data-website-id": "0d806f5d-cffa-41ec-98bf-862b2273ce4a",
-      defer: "defer",
-    },
-  ],
+  // umami统计 - 已禁用（src 未配置）
   [
     "noscript",
     {},

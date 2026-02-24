@@ -56,29 +56,11 @@ export function loadGoogleAnalytics(id: string): void {
 }
 
 /**
- * 延迟加载Vercel Analytics
- */
-export function loadVercelAnalytics(): void {
-  if (typeof window === 'undefined') return
-
-  setTimeout(async () => {
-    try {
-      const { inject } = await import('@vercel/analytics')
-      inject()
-      console.log('[Analytics] 📊 Vercel Analytics loaded (delayed)')
-    } catch (error) {
-      console.warn('[Analytics] Vercel Analytics not available:', error)
-    }
-  }, 3000)
-}
-
-/**
  * 统一初始化所有分析工具（延迟加载）
  */
 export function initAnalytics(config: {
   baidu?: string
   google?: string
-  vercel?: boolean
 }): void {
   if (typeof window === 'undefined') return
 
@@ -90,14 +72,11 @@ export function initAnalytics(config: {
   }
 }
 
-function loadAnalytics(config: { baidu?: string; google?: string; vercel?: boolean }): void {
+function loadAnalytics(config: { baidu?: string; google?: string }): void {
   if (config.baidu) {
     loadBaiduAnalytics(config.baidu)
   }
   if (config.google) {
     loadGoogleAnalytics(config.google)
-  }
-  if (config.vercel) {
-    loadVercelAnalytics()
   }
 }
