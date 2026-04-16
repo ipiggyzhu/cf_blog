@@ -2,8 +2,8 @@
 
 // 壁纸服务配置 - 统一配置服务地址，一处修改全局生效
 export const WALLPAPER_SERVICE_CONFIG = {
-  baseUrl: 'https://blog.itpiggy.top',
-  // baseUrl: 'https://blog.itpiggy.top',
+  baseUrl: 'https://blog.itpiggy.us',
+  // baseUrl: 'https://blog.itpiggy.us',
   apiEndpoint: '/api/images',
   get fullUrl() {
     return `${this.baseUrl}${this.apiEndpoint}`
@@ -12,31 +12,31 @@ export const WALLPAPER_SERVICE_CONFIG = {
 
 // 备用图片列表（使用您自己的壁纸）
 const fallbackImages = [
-  "https://image.itpiggy.top/WallPaper/1.webp",
-  "https://image.itpiggy.top/WallPaper/2.webp",
-  "https://image.itpiggy.top/WallPaper/3.webp",
-  "https://image.itpiggy.top/WallPaper/4.webp",
-  "https://image.itpiggy.top/WallPaper/5.webp",
-  "https://image.itpiggy.top/WallPaper/6.webp",
-  "https://image.itpiggy.top/WallPaper/7.webp",
-  "https://image.itpiggy.top/WallPaper/8.webp",
-  "https://image.itpiggy.top/WallPaper/9.webp",
-  "https://image.itpiggy.top/WallPaper/10.webp",
-  "https://image.itpiggy.top/WallPaper/11.webp",
-  "https://image.itpiggy.top/WallPaper/12.webp",
-  "https://image.itpiggy.top/WallPaper/13.webp",
-  "https://image.itpiggy.top/WallPaper/14.webp",
-  "https://image.itpiggy.top/WallPaper/15.webp",
-  "https://image.itpiggy.top/WallPaper/16.webp",
-  "https://image.itpiggy.top/WallPaper/17.webp",
-  "https://image.itpiggy.top/WallPaper/18.webp",
-  "https://image.itpiggy.top/WallPaper/19.webp",
-  "https://image.itpiggy.top/WallPaper/20.webp",
-  "https://image.itpiggy.top/WallPaper/21.webp",
-  "https://image.itpiggy.top/WallPaper/22.webp",
-  "https://image.itpiggy.top/WallPaper/23.webp",
-  "https://image.itpiggy.top/WallPaper/24.webp",
-  "https://image.itpiggy.top/WallPaper/25.webp",
+  "https://image.itpiggy.us/WallPaper/1.webp",
+  "https://image.itpiggy.us/WallPaper/2.webp",
+  "https://image.itpiggy.us/WallPaper/3.webp",
+  "https://image.itpiggy.us/WallPaper/4.webp",
+  "https://image.itpiggy.us/WallPaper/5.webp",
+  "https://image.itpiggy.us/WallPaper/6.webp",
+  "https://image.itpiggy.us/WallPaper/7.webp",
+  "https://image.itpiggy.us/WallPaper/8.webp",
+  "https://image.itpiggy.us/WallPaper/9.webp",
+  "https://image.itpiggy.us/WallPaper/10.webp",
+  "https://image.itpiggy.us/WallPaper/11.webp",
+  "https://image.itpiggy.us/WallPaper/12.webp",
+  "https://image.itpiggy.us/WallPaper/13.webp",
+  "https://image.itpiggy.us/WallPaper/14.webp",
+  "https://image.itpiggy.us/WallPaper/15.webp",
+  "https://image.itpiggy.us/WallPaper/16.webp",
+  "https://image.itpiggy.us/WallPaper/17.webp",
+  "https://image.itpiggy.us/WallPaper/18.webp",
+  "https://image.itpiggy.us/WallPaper/19.webp",
+  "https://image.itpiggy.us/WallPaper/20.webp",
+  "https://image.itpiggy.us/WallPaper/21.webp",
+  "https://image.itpiggy.us/WallPaper/22.webp",
+  "https://image.itpiggy.us/WallPaper/23.webp",
+  "https://image.itpiggy.us/WallPaper/24.webp",
+  "https://image.itpiggy.us/WallPaper/25.webp",
 ];
 // 随机打乱数组的函数
 function shuffleArray<T>(array: T[]): T[] {
@@ -74,7 +74,7 @@ async function fetchDynamicWallpapers(): Promise<string[]> {
     const images = data.images || [];
     
     // API 现在返回完整的 URL（包含域名），直接使用
-    // 格式：https://image.itpiggy.top/cf-blog/WallPaper/1.png
+    // 格式：https://image.itpiggy.us/cf-blog/WallPaper/1.png
     const wallpapers = images.filter((imagePath: string) => {
       // 确保是有效的 URL
       return imagePath && (imagePath.startsWith('http://') || imagePath.startsWith('https://'));

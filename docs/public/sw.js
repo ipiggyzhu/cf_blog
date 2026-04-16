@@ -64,8 +64,8 @@ self.addEventListener('fetch', (event) => {
   // Skip external resources - 跳过所有外部域名的请求，避免拦截导致加载失败
   if (
     url.hostname !== self.location.hostname &&
-    !url.hostname.includes('blog.itpiggy.top') &&
-    !url.hostname.includes('image.itpiggy.top')
+    !url.hostname.includes('blog.itpiggy.us') &&
+    !url.hostname.includes('image.itpiggy.us')
   ) {
     // 跳过所有外部域名：Google Fonts, Cloudflare Insights, Analytics等
     return;

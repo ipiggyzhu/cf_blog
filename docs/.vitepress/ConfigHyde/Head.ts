@@ -32,7 +32,7 @@ export const HeadData = [
 
   // 预连接优化 - 添加 crossorigin 以提高加载性能
   ["link", { rel: "preconnect", href: "https://at.alicdn.com", crossorigin: "" }],
-  ["link", { rel: "preconnect", href: "https://image.itpiggy.top", crossorigin: "" }],
+  ["link", { rel: "preconnect", href: "https://image.itpiggy.us", crossorigin: "" }],
   ["link", { rel: "dns-prefetch", href: "https://busuanzi.ibruce.info" }],
   ["link", { rel: "dns-prefetch", href: "https://bszi.eryajf.net" }],
 

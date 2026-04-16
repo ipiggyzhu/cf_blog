@@ -72,7 +72,7 @@ const teekConfig = defineTeekConfig({
     shape: "circle-rotate", // 头像风格：square 为方形头像，circle 为圆形头像，circle-rotate 可支持鼠标悬停旋转
     name: "Casual", // 侧边栏个人昵称
     slogan: "心向暖阳，静待花开", // 侧边栏个人座右铭
-    circleBgImg: "https://image.itpiggy.top/WallPaper/22.webp", // 侧边栏个人头像圆形背景图
+    circleBgImg: "https://image.itpiggy.us/WallPaper/22.webp", // 侧边栏个人头像圆形背景图
     circleBgMask: false, // 头像圆形背景图是否显示遮罩层
     color: "#fff",
 
@@ -175,7 +175,7 @@ const teekConfig = defineTeekConfig({
   // 风险链接提示页
   riskLink: {
     enabled: true, //是否启用风险链接提示功能
-    whitelist: ["https://blog.itpiggy.top/", "https://image.itpiggy.top/", /https:\/\/github.com/, /https:\/\/giee.com/], // 白名单，匹配到的链接不提示风险
+    whitelist: ["https://blog.itpiggy.us/", "https://image.itpiggy.us/", /https:\/\/github.com/, /https:\/\/giee.com/], // 白名单，匹配到的链接不提示风险
     blacklist: [], // 黑名单，匹配到的链接提示风险
   },
 
@@ -390,7 +390,7 @@ export default defineConfig({
     },
   },
   sitemap: {
-    hostname: "https://blog.itpiggy.top",
+    hostname: "https://blog.itpiggy.us",
     // transformItems: items => {
     //   const permalinkItemBak: typeof items = [];
     //   // 使用永久链接生成 sitemap

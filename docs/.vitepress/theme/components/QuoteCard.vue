@@ -49,7 +49,7 @@ const quotes = [
     chinese: "开始行动的方法就是停止空谈，开始实干。",
     author: "华特·迪士尼",
     source: "Walt Disney",
-    image: "https://image.itpiggy.top/Cover/1.webp",
+    image: "https://image.itpiggy.us/Cover/1.webp",
     alt: "Beautiful sunrise over mountains"
   },
   {
@@ -57,7 +57,7 @@ const quotes = [
     chinese: "生活就是在你忙于制定其他计划时，在你身上发生的事。",
     author: "约翰·列侬",
     source: "John Lennon",
-    image: "https://image.itpiggy.top/Cover/2.webp",
+    image: "https://image.itpiggy.us/Cover/2.webp",
     alt: "Peaceful nature scene"
   },
   {
@@ -65,7 +65,7 @@ const quotes = [
     chinese: "未来属于那些相信梦想之美的人。",
     author: "埃莉诺·罗斯福",
     source: "Eleanor Roosevelt",
-    image: "https://image.itpiggy.top/Cover/3.webp",
+    image: "https://image.itpiggy.us/Cover/3.webp",
     alt: "Dream-like sky"
   },
   {
@@ -73,7 +73,7 @@ const quotes = [
     chinese: "你一直是我的朋友，这本身就是一件了不起的事。",
     author: "夏洛特",
     source: "Charlotte's Web",
-    image: "https://image.itpiggy.top/Cover/4.webp",
+    image: "https://image.itpiggy.us/Cover/4.webp",
     alt: "Friendship theme"
   },
   {
@@ -81,7 +81,7 @@ const quotes = [
     chinese: "毕竟，明天又是新的一天！",
     author: "郝思嘉",
     source: "Gone with the Wind",
-    image: "https://image.itpiggy.top/Cover/5.webp",
+    image: "https://image.itpiggy.us/Cover/5.webp",
     alt: "New day sunrise"
   },
   {
@@ -89,7 +89,7 @@ const quotes = [
     chinese: "困难之中蕴含着机遇。",
     author: "阿尔伯特·爱因斯坦",
     source: "Albert Einstein",
-    image: "https://image.itpiggy.top/Cover/6.webp",
+    image: "https://image.itpiggy.us/Cover/6.webp",
     alt: "Opportunity landscape"
   },
   {
@@ -97,7 +97,7 @@ const quotes = [
     chinese: "你比你想象的更勇敢，比你看起来更强大，比你认为的更聪明。",
     author: "A.A.米尔恩",
     source: "Winnie the Pooh",
-    image: "https://image.itpiggy.top/Cover/7.webp",
+    image: "https://image.itpiggy.us/Cover/7.webp",
     alt: "Inspiring forest scene"
   },
   {
@@ -105,7 +105,7 @@ const quotes = [
     chinese: "生命中最大的荣耀不在于从不跌倒，而在于每次跌倒后都能重新站起。",
     author: "纳尔逊·曼德拉",
     source: "Nelson Mandela",
-    image: "https://image.itpiggy.top/Cover/8.webp",
+    image: "https://image.itpiggy.us/Cover/8.webp",
     alt: "Rising sun motivation"
   },
   {
@@ -113,7 +113,7 @@ const quotes = [
     chinese: "成功不是终点，失败不是致命的：重要的是继续前进的勇气。",
     author: "温斯顿·丘吉尔",
     source: "Winston Churchill",
-    image: "https://image.itpiggy.top/Cover/9.webp",
+    image: "https://image.itpiggy.us/Cover/9.webp",
     alt: "Mountain peak success"
   },
   {
@@ -121,7 +121,7 @@ const quotes = [
     chinese: "前进缓慢没关系，只要你不停止脚步。",
     author: "孔子",
     source: "Confucius",
-    image: "https://image.itpiggy.top/Cover/10.webp",
+    image: "https://image.itpiggy.us/Cover/10.webp",
     alt: "Steady progress"
   }
 ]
@@ -136,11 +136,11 @@ const maxRetries = 3
 
 // 备用图片URLs - 使用 R2 存储的图片作为备用，确保稳定性
 const fallbackImages = [
-  'https://image.itpiggy.top/Cover/1.webp',
-  'https://image.itpiggy.top/Cover/2.webp',
-  'https://image.itpiggy.top/Cover/3.webp',
-  'https://image.itpiggy.top/Cover/4.webp',
-  'https://image.itpiggy.top/Cover/5.webp',
+  'https://image.itpiggy.us/Cover/1.webp',
+  'https://image.itpiggy.us/Cover/2.webp',
+  'https://image.itpiggy.us/Cover/3.webp',
+  'https://image.itpiggy.us/Cover/4.webp',
+  'https://image.itpiggy.us/Cover/5.webp',
   '/img/logo.png', // 本地备用图片
 ]
 
