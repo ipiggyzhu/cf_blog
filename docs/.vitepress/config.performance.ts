@@ -86,7 +86,7 @@ export const imageOptimizationTips = {
   // 使用 Cloudflare Images 或 R2
   cloudflareR2: true,
   // 图片 CDN 加速
-  cdn: 'https://image.itpiggy.top',
+  cdn: 'https://image.itpiggy.us',
   // 懒加载
   lazyLoad: true,
 }

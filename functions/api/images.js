@@ -4,7 +4,7 @@
  */
 import { corsPreflightResponse, jsonResponse, withTimeout } from "../_lib/http.js";
 
-const IMAGE_DOMAIN = "https://image.itpiggy.top";
+const IMAGE_DOMAIN = "https://image.itpiggy.us";
 const WALLPAPER_PREFIX = "WallPaper/";
 const IMAGE_RE = /\.(jpg|jpeg|png|webp|gif)$/i;
 const FALLBACK_IMAGES = Array.from(
