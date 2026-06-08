@@ -1,0 +1,118 @@
+/* 全局性能优化样式 */
+
+/* GPU 加速 - 提升动画性能 */
+.tk-post-item,
+.VPFeature,
+.tk-page-card,
+.VPButton,
+div[class*="language-"],
+.vp-code-group,
+.vp-doc img {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* 字体渲染优化 */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 图片懒加载优化 */
+img {
+  content-visibility: auto;
+}
+
+/* 减少重绘 */
+.tk-banner,
+.VPHome,
+.VPDoc {
+  contain: layout style paint;
+}
+
+/* 滚动性能优化 */
+.VPDoc,
+.tk-post-list,
+.VPSidebar {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 减少布局抖动 */
+.tk-post-item img,
+.vp-doc img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 优化焦点样式 */
+:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 无障碍增强 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 跳过导航链接 */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 10000;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* 打印样式优化 */
+@media print {
+  .VPNav,
+  .VPSidebar,
+  .VPFooter,
+  .tk-back-top,
+  .tk-to-comment,
+  .tk-home-card-list-left {
+    display: none !important;
+  }
+
+  .VPDoc,
+  .tk-home-card-list-right {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+}

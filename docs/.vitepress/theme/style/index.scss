@@ -17,6 +17,8 @@
 @use "./vp-code-shadow.scss" as *; // 代码块阴影
 
 @use "./ScrollBar.scss" as *; // 滚动条样式
+@use "./theme-transition.scss" as *; // 深色模式过渡动画
+@use "./performance.scss" as *; // 性能优化样式
 
 @use "./blockquote-one.scss" as *; // 自定义块
 @use "./blogger-fix.scss" as *; // 修复博主信息卡片背景图层级问题

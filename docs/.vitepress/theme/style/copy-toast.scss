@@ -1,0 +1,94 @@
+/**
+ * 代码块复制 Toast 样式 —— 毛玻璃风格居中提示
+ * 由 theme/utils/copyToast.ts 控制生命周期
+ */
+
+.tk-copy-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% - 8px)) scale(0.94);
+
+  min-width: 128px;
+  max-width: min(360px, 86vw);
+  padding: 12px 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #fff;
+  text-align: center;
+  font-feature-settings: 'tnum';
+
+  background: rgba(28, 28, 32, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+
+  transition:
+    opacity 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &::before {
+    content: '✓';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(74, 222, 128, 0.22);
+    color: #4ade80;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  &[data-type='error']::before {
+    content: '!';
+    background: rgba(248, 113, 113, 0.22);
+    color: #f87171;
+  }
+
+  &--visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// 浅色模式微调：保持深色 toast（现代 macOS / iOS 风格，在两种主题下都好看）
+html.dark .tk-copy-toast {
+  background: rgba(22, 22, 26, 0.88);
+}
+
+@media (max-width: 640px) {
+  .tk-copy-toast {
+    padding: 10px 18px;
+    font-size: 13px;
+    min-width: 108px;
+    border-radius: 12px;
+  }
+}
+
+// 尊重减少动效偏好
+@media (prefers-reduced-motion: reduce) {
+  .tk-copy-toast {
+    transition-duration: 80ms;
+  }
+}

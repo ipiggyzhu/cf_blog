@@ -1,10 +1,75 @@
+/* 代码块阴影样式优化 */
 .vp-doc {
   div[class*="language-"],
   .vp-code-group {
-    box-shadow: var(--vp-shadow-5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 
+                0 2px 6px rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
   }
 
+  /* 代码块悬停效果 */
+  div[class*="language-"]:hover,
+  .vp-code-group:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 
+                0 4px 10px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  /* 深色模式下的代码块阴影 */
+  html.dark & {
+    div[class*="language-"],
+    .vp-code-group {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 
+                  0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    div[class*="language-"]:hover,
+    .vp-code-group:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 
+                  0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* 代码组内的代码块不添加额外阴影 */
   .vp-code-group div[class*="language-"] {
     box-shadow: none;
+    border-radius: 0;
+  }
+
+  .vp-code-group div[class*="language-"]:hover {
+    transform: none;
+  }
+
+  /* 行内代码样式优化 */
+  code {
+    background-color: var(--vp-c-bg-soft);
+    color: var(--vp-c-text-code);
+    padding: 3px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  code:hover {
+    background-color: var(--vp-c-bg-mute);
+  }
+}
+
+/* 移动端代码块优化 */
+@media (max-width: 768px) {
+  .vp-doc {
+    div[class*="language-"],
+    .vp-code-group {
+      border-radius: 8px;
+    }
+
+    div[class*="language-"]:hover,
+    .vp-code-group:hover {
+      transform: none;
+    }
   }
 }

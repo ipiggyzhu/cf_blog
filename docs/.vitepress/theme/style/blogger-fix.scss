@@ -63,11 +63,77 @@
 /* 优化文字可读性 */
 .tk-my__blogger .name {
   color: #fff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
   font-weight: bold;
 }
 
 .tk-my__blogger .slogan {
-  color: rgba(255, 255, 255, 0.9) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 修复层级冲突 - 确保导航栏在最上层 */
+.VPNav {
+  position: sticky;
+  top: 0;
+  z-index: 1000 !important;
+}
+
+/* 修复模态框和弹出层的层级 */
+.VPLocalNav,
+.VPNavScreenMenuLink {
+  z-index: 999 !important;
+}
+
+/* 修复侧边栏层级 */
+.VPSidebar {
+  z-index: 10 !important;
+}
+
+/* 修复图片预览的层级 */
+.medium-zoom-overlay,
+.medium-zoom-image--opened {
+  z-index: 9999 !important;
+}
+
+/* 修复回到顶部按钮层级 */
+.tk-back-top,
+.tk-to-comment {
+  z-index: 100 !important;
+}
+
+/* 防止内容溢出导致布局问题 */
+.tk-home-card-list-left,
+.tk-home-card-list-right {
+  overflow: visible !important;
+  max-width: 100%;
+}
+
+/* 修复文章卡片溢出 */
+.tk-post-item {
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 修复代码块溢出 */
+.vp-doc pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* 修复表格溢出 */
+.vp-doc table {
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+/* 深色模式下的博主卡片文字优化 */
+html.dark .tk-my__blogger .name {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+html.dark .tk-my__blogger .slogan {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }

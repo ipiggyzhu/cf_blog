@@ -30,10 +30,12 @@
   .VPHero .actions {
     flex-direction: column;
     gap: 12px;
+    width: 100%;
   }
 
   .VPHero .action {
     width: 100%;
+    max-width: 300px;
     text-align: center;
   }
 
@@ -41,6 +43,7 @@
   .tk-home-card-list {
     flex-direction: column !important;
     padding: 0 16px;
+    gap: 16px;
   }
 
   .tk-home-card-list-left,
@@ -67,6 +70,7 @@
   /* 文章封面图 */
   .tk-post-item .cover-img {
     height: 180px;
+    object-fit: cover;
   }
 
   /* 侧边栏 */
@@ -82,15 +86,18 @@
   .VPDoc h1 {
     font-size: 28px;
     margin-top: 24px;
+    word-wrap: break-word;
   }
 
   .VPDoc h2 {
     font-size: 24px;
     margin-top: 32px;
+    word-wrap: break-word;
   }
 
   .VPDoc h3 {
     font-size: 20px;
+    word-wrap: break-word;
   }
 
   /* 代码块 */
@@ -100,17 +107,25 @@
     border-radius: 0;
   }
 
+  /* 代码块内容横向滚动 */
+  div[class*='language-'] pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* 表格横向滚动 */
   .vp-doc table {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* 图片适配 */
   .vp-doc img {
     max-width: 100%;
     height: auto;
+    border-radius: 8px;
   }
 
   /* 目录 */
@@ -122,6 +137,7 @@
   .tk-pagination {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 8px;
   }
 
   /* 评论区 */
@@ -132,18 +148,39 @@
   /* 页脚 */
   .VPFooter {
     padding: 24px 16px;
+    text-align: center;
   }
 
   /* 回到顶部按钮 */
   .tk-back-top {
     right: 16px;
     bottom: 80px;
+    width: 44px;
+    height: 44px;
   }
 
   /* 滚动到评论按钮 */
   .tk-to-comment {
     right: 16px;
     bottom: 140px;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* 卡片间距优化 */
+  .tk-page-card {
+    margin-bottom: 12px;
+  }
+
+  /* 文章信息标签 */
+  .tk-post-info {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* 搜索框 */
+  .VPNavBarSearch {
+    padding: 0 12px;
   }
 }
 
@@ -178,6 +215,17 @@
   .tk-post-item .cover-img {
     height: 150px;
   }
+
+  /* 导航栏菜单项 */
+  .VPNavBarMenuGroup {
+    padding: 8px 12px;
+  }
+
+  /* 更紧凑的按钮 */
+  .VPButton {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
 }
 
 /* 平板设备 */
@@ -202,22 +250,84 @@
 
 /* 触摸设备优化 */
 @media (hover: none) and (pointer: coarse) {
-  /* 增大可点击区域 */
+  /* 增大可点击区域 - 符合iOS和Android的最小触摸目标尺寸 */
   a,
-  button {
+  button,
+  .VPButton,
+  .VPLink {
     min-height: 44px;
     min-width: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 8px 12px;
   }
 
-  /* 移除 hover 效果 */
-  .tk-post-item:hover {
+  /* 移除 hover 效果，避免触摸设备的 "粘性" hover */
+  .tk-post-item:hover,
+  .VPFeatures .items .item:hover,
+  .vp-doc img:hover,
+  div[class*="language-"]:hover,
+  .vp-code-group:hover {
     transform: none;
+    box-shadow: initial;
   }
 
-  .VPFeatures .items .item:hover {
-    transform: none;
+  /* 为触摸设备优化的反馈 - 使用 active 替代 hover */
+  .tk-post-item:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  .VPButton:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+
+  /* 增大导航菜单的触摸区域 */
+  .VPNavBarMenuLink,
+  .VPNavBarMenuGroup {
+    padding: 12px 16px;
+  }
+
+  /* 优化表单元素的触摸体验 */
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    font-size: 16px; /* 防止iOS自动缩放 */
+  }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 896px) and (orientation: landscape) {
+  .VPHero {
+    padding: 32px 24px;
+  }
+
+  .VPHero .name,
+  .VPHero .text {
+    font-size: 28px !important;
+  }
+
+  .VPHero .image {
+    max-height: 200px;
+  }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* 使用更清晰的边框 */
+  .tk-post-item,
+  .tk-page-card {
+    border-width: 0.5px;
+  }
+
+  /* 优化阴影渲染 */
+  .vp-doc img,
+  div[class*="language-"],
+  .vp-code-group {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 }

@@ -1,0 +1,138 @@
+/* 深色模式切换过渡动画优化 */
+
+/* 为所有可能改变的属性添加平滑过渡 */
+html {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 主要容器元素的过渡 */
+body,
+.VPNav,
+.VPSidebar,
+.VPDoc,
+.VPFooter,
+.VPHome,
+.tk-banner,
+.tk-home-card-list,
+.tk-post-item,
+.tk-my,
+.vp-doc {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 链接和按钮的过渡 */
+a,
+button,
+.VPButton,
+.VPLink {
+  transition: 
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 代码块的过渡 */
+div[class*="language-"],
+.vp-code-group,
+pre,
+code {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 卡片和面板的过渡 */
+.tk-page-card,
+.VPFeature,
+.custom-block {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 输入框的过渡 */
+input,
+textarea,
+select {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* SVG 图标的过渡 */
+svg {
+  transition: 
+    fill 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 图片和媒体元素的过渡 */
+img,
+video {
+  transition: 
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 滚动条的过渡 */
+::-webkit-scrollbar-thumb {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 尊重用户的动画偏好设置 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 深色模式特定优化 */
+html.dark {
+  /* 深色模式下的文字对比度增强 */
+  .vp-doc h1,
+  .vp-doc h2,
+  .vp-doc h3,
+  .vp-doc h4,
+  .vp-doc h5,
+  .vp-doc h6 {
+    color: var(--vp-c-text-1);
+  }
+  
+  /* 深色模式下的链接颜色 */
+  .vp-doc a {
+    color: var(--vp-c-brand-1);
+  }
+  
+  /* 深色模式下的代码块背景 */
+  div[class*="language-"],
+  .vp-code-group {
+    background-color: var(--vp-code-block-bg);
+  }
+}
+
+/* 浅色模式特定优化 */
+html:not(.dark) {
+  /* 浅色模式下确保文字清晰可读 */
+  .vp-doc {
+    color: var(--vp-c-text-1);
+  }
+}
