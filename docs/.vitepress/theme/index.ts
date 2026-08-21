@@ -1,12 +1,8 @@
 // 组件导入
 import Teek from "vitepress-theme-teek";
 import TeekLayoutProvider from "./components/TeekLayoutProvider.vue";
-import { defineComponent, h, defineAsyncComponent } from "vue";
+import { defineComponent, h } from "vue";
 import { useData } from "vitepress";
-// import notice from "./components/notice.vue";
-// import MNavLinks from "./components/MNavLinks.vue"; // 引入导航组件
-import confetti from "./components/Confetti.vue"; //导入五彩纸屑组件
-// import NavIcon from "./components/NavIcon.vue"; //导入导航栏图标
 
 // Teek 在线主题包引用（需安装 Teek 在线版本）
 import "vitepress-theme-teek/index.css"; // 引入主题样式
@@ -48,25 +44,11 @@ import SLink from "./components/SLink/index.vue"; //友链
 // 导入关于我组件
 import About from "./components/About.vue"; //关于我
 
-// 🚀 性能优化：大型组件懒加载
-// 情侣相册组件 - 按需加载（大组件，包含图片处理）
-const CoupleAlbum = defineAsyncComponent(() =>
-  import('./components/CoupleAlbum/CoupleAlbum.vue')
-)
-const PhotoCard = defineAsyncComponent(() =>
-  import('./components/CoupleAlbum/PhotoCard.vue')
-)
-
-// 导入天气组件（保持同步加载，因为在导航栏显示）
-import NavWeather from './components/NavWeather.vue'
-
 // 导入Service Worker
 import { useServiceWorker } from './composables/useServiceWorker'
 
 // 导入错误处理器
 import { errorHandler } from './utils/errorHandler'
-
-// import "./style/sidebar-icon.scss";
 
 export default {
   extends: Teek,
@@ -87,19 +69,9 @@ export default {
         console.warn('[Vue Warning]', msg, trace);
       }
     };
-    // 注册组件
-    // app.component("MNavLinks", MNavLinks); // 注册导航组件
-    app.component("confetti", confetti); // 注册五彩纸屑组件
-    app.component("About", About); // 注册关于我组件
-
-    // 🚀 性能优化：懒加载组件注册
-    app.component('CoupleAlbum', CoupleAlbum) // 情侣相册（懒加载）
-    app.component('PhotoCard', PhotoCard) // 相册卡片（懒加载）
-
-    app.component("NavWeather", NavWeather); // 注册导航栏天气组件
-
-    // 注册全局组件
-    app.component("friend-link", SLink);
+    // 注册全局组件（供 markdown 直接使用）
+    app.component("About", About); // 关于我页面
+    app.component("friend-link", SLink); // 友链列表
 
     // 非SSR环境下配置路由进度条、错误处理和Service Worker
     // @ts-expect-error

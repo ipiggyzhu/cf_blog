@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import WeatherIcon from './nav-weather/WeatherIcon.vue'
 import { useGeolocation } from '../composables/useGeolocation'
 import { useWeatherAPI } from '../composables/useWeatherAPI'
@@ -92,10 +92,11 @@ const tooltipText = computed(() => {
   if (uiState.value.hasError) {
     return '点击重新获取位置'
   }
-  return weatherAPI.getTooltipText(
-    geolocation.state.location!,
-    weatherAPI.state.weather
-  )
+  const location = geolocation.state.location
+  if (!location) {
+    return '加载天气中...'
+  }
+  return weatherAPI.getTooltipText(location, weatherAPI.state.weather)
 })
 
 /**
@@ -142,33 +143,24 @@ const initializeWeather = async () => {
 
 /**
  * 刷新天气（点击触发）
+ * 加载状态由 refreshLocation / refreshWeather 内部维护，
+ * 这里不能直接写 state —— 两个 composable 返回的都是 readonly，赋值会被静默丢弃。
  */
 const handleWeatherClick = async () => {
   devLog.log('[NavWeather] 🔄 手动刷新天气...')
 
-  // 显示加载状态
-  geolocation.state.isLoading = true
-  weatherAPI.state.isLoading = true
-
   try {
-    // 1. 刷新位置
-    await geolocation.refreshLocation()
+    // 1. 刷新位置（会清掉位置缓存）
+    const location = await geolocation.refreshLocation()
 
-    // 2. 如果有新位置，刷新天气
-    if (geolocation.state.location) {
-      await weatherAPI.refreshWeather(geolocation.state.location)
+    // 2. 有新位置则刷新天气（会清掉该坐标的天气缓存）
+    if (location) {
+      await weatherAPI.refreshWeather(location)
     }
 
-    // 3. 显示成功提示
-    setTimeout(() => {
-      devLog.log('[NavWeather] ✅ 刷新完成')
-    }, 300)
-
+    devLog.log('[NavWeather] ✅ 刷新完成')
   } catch (error) {
     devLog.error('[NavWeather] ❌ 刷新失败:', error)
-  } finally {
-    geolocation.state.isLoading = false
-    weatherAPI.state.isLoading = false
   }
 }
 
@@ -249,18 +241,8 @@ onUnmounted(() => {
     clearInterval(refreshInterval)
     refreshInterval = null
   }
+  clearHideTimeout()
 })
-
-// 监听位置变化，自动更新天气
-watch(
-  () => geolocation.state.location,
-  async (newLocation) => {
-    if (newLocation && !geolocation.state.isLoading) {
-      devLog.log('[NavWeather] 📍 位置更新，重新获取天气...')
-      await weatherAPI.fetchWeather(newLocation)
-    }
-  }
-)
 </script>
 
 <style scoped>

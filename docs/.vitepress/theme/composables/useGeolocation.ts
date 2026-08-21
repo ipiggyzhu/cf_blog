@@ -1,10 +1,14 @@
 /**
  * 地理位置组合式函数
- * @description 处理地理位置获取逻辑，包括多种定位策略
+ * @description 处理地理位置获取逻辑，按 浏览器定位 → Cloudflare 边缘 → 国际 IP 的顺序降级
+ *
+ * 说明：这里刻意不接入高德/百度 IP 定位——它们的 web 服务 key 必须明文写进前端，
+ * 放在公开仓库里等于把配额送人；且返回的是 GCJ-02 / BD-09 加密坐标，
+ * 直接喂给天气 API 会有几百米偏差。Cloudflare 边缘定位对国内访客同样有效。
  */
 
-import { ref, computed, readonly, type ComputedRef } from 'vue'
-import type { LocationData, LocationCache } from '../types/weather'
+import { ref, computed, readonly } from 'vue'
+import type { LocationData } from '../types/weather'
 import {
   CACHE_KEYS,
   CACHE_DURATION,
@@ -12,13 +16,9 @@ import {
   GEOLOCATION_DEFAULT_OPTIONS
 } from '../utils/constants'
 import {
-  withTimeout,
-  safeGetLocalStorage,
-  safeSetLocalStorage,
-  safeRemoveLocalStorage,
+  fetchJsonWithTimeout,
   isServerSide,
   isGeolocationSupported,
-  formatTemperature,
   devLog
 } from '../utils/helpers'
 import { useCache } from './useLocalStorage'
@@ -45,8 +45,6 @@ export function useGeolocation() {
     permissionState: 'unknown'
   })
 
-  devLog.log('[useGeolocation] 🔧 State初始化:', state.value)
-
   // 位置缓存
   const geoCache = useCache<LocationData>(CACHE_KEYS.GEOLOCATION, CACHE_DURATION.LOCATION)
 
@@ -68,14 +66,23 @@ export function useGeolocation() {
     }
 
     try {
-      // @ts-expect-error - 需要处理权限API类型
-      const result = await navigator.permissions.query({ name: 'geolocation' })
+      const result = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
       state.value.permissionState = result.state as 'prompt' | 'granted' | 'denied'
       devLog.log(`[useGeolocation] 定位权限状态: ${state.value.permissionState}`)
     } catch (error) {
       devLog.warn('[useGeolocation] 获取权限状态失败:', error)
       state.value.permissionState = 'unknown'
     }
+  }
+
+  /**
+   * 记录定位结果：写入状态与缓存
+   */
+  const commitLocation = (location: LocationData, source: string): LocationData => {
+    state.value.location = location
+    geoCache.set(location)
+    devLog.log(`[useGeolocation] ✓ ${source}定位成功: ${location.city || '未知城市'}`)
+    return location
   }
 
   /**
@@ -91,16 +98,14 @@ export function useGeolocation() {
       devLog.log('[useGeolocation] 正在请求浏览器定位...')
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const location: LocationData = {
+          resolve({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
-          }
-          devLog.log(`[useGeolocation] ✅ 浏览器定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
-          resolve(location)
+          })
         },
         (error) => {
           devLog.warn('[useGeolocation] 浏览器定位失败:', error.message)
-          if (error.code === 1) {
+          if (error.code === error.PERMISSION_DENIED) {
             state.value.permissionState = 'denied'
           }
           resolve(null)
@@ -111,124 +116,12 @@ export function useGeolocation() {
   }
 
   /**
-   * 高德地图逆地理编码
-   */
-  const getCityNameFromGaode = async (lat: number, lon: number): Promise<string> => {
-    try {
-      const url = `https://restapi.amap.com/v3/geocode/regeo?key=REDACTED_AMAP_KEY&location=${lon},${lat}`
-      const response = await withTimeout(fetch(url), TIMEOUTS.GEOCODING_REQUEST)
-      const data = await response.json()
-
-      if (data.status === '1' && data.regeocode) {
-        const city = data.regeocode.addressComponent.city || data.regeocode.addressComponent.province
-        devLog.log(`[useGeolocation] 🏙️ 获取城市名称成功: ${city}`)
-        return city
-      }
-    } catch (error) {
-      devLog.warn('[useGeolocation] 逆地理编码失败:', error)
-    }
-    return ''
-  }
-
-  /**
-   * 高德地图IP定位（国内首选）
-   */
-  const getLocationFromGaode = async (): Promise<LocationData | null> => {
-    try {
-      const url = 'https://restapi.amap.com/v3/ip?key=REDACTED_AMAP_KEY'
-      const response = await withTimeout(fetch(url), TIMEOUTS.DEFAULT_API)
-      const data = await response.json()
-
-      if (data.status === '1' && data.rectangle) {
-        // 高德返回矩形范围，取中心点
-        const coords = data.rectangle.split(';')
-        const [lon1, lat1] = coords[0].split(',').map(Number)
-        const [lon2, lat2] = coords[1].split(',').map(Number)
-
-        const location: LocationData = {
-          latitude: (lat1 + lat2) / 2,
-          longitude: (lon1 + lon2) / 2,
-          city: data.city || data.province
-        }
-        devLog.log(`[useGeolocation] ✓ 高德IP定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
-        return location
-      }
-    } catch (error) {
-      devLog.warn('[useGeolocation] 高德IP定位失败:', error)
-    }
-    return null
-  }
-
-  /**
-   * 百度地图IP定位（备选）
-   */
-  const getLocationFromBaidu = async (): Promise<LocationData | null> => {
-    try {
-      const url = 'https://api.map.baidu.com/location/ip?ak=REDACTED_BAIDU_KEY&coor=bd09ll'
-      const response = await withTimeout(fetch(url), TIMEOUTS.DEFAULT_API)
-      const data = await response.json()
-
-      if (data.status === 0 && data.content && data.content.point) {
-        const location: LocationData = {
-          latitude: data.content.point.y,
-          longitude: data.content.point.x,
-          city: data.content.address_detail?.city || data.content.address
-        }
-        devLog.log(`[useGeolocation] ✓ 百度IP定位成功: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`)
-        return location
-      }
-    } catch (error) {
-      devLog.warn('[useGeolocation] 百度IP定位失败:', error)
-    }
-    return null
-  }
-
-  /**
-   * 国际IP定位服务（最后备选）
-   */
-  const getLocationFromIntl = async (): Promise<LocationData | null> => {
-    // ipapi.co
-    try {
-      const response = await withTimeout(fetch('https://ipapi.co/json/'), TIMEOUTS.DEFAULT_API)
-      const data = await response.json()
-      if (data.latitude && data.longitude) {
-        return {
-          latitude: data.latitude,
-          longitude: data.longitude,
-          city: data.city
-        }
-      }
-    } catch (error) {
-      devLog.warn('[useGeolocation] ipapi.co定位失败:', error)
-    }
-
-    // ip-api.com
-    try {
-      const response = await withTimeout(fetch('https://ip-api.com/json/?lang=zh-CN'), TIMEOUTS.DEFAULT_API)
-      const data = await response.json()
-      if (data.lat && data.lon) {
-        return {
-          latitude: data.lat,
-          longitude: data.lon,
-          city: data.city
-        }
-      }
-    } catch (error) {
-      devLog.warn('[useGeolocation] ip-api.com定位失败:', error)
-    }
-
-    return null
-  }
-
-  /**
-   * Cloudflare Pages Functions定位（本地API）
+   * Cloudflare Pages Functions 定位（边缘地理信息，零额外依赖）
    */
   const getLocationFromCloudflare = async (): Promise<LocationData | null> => {
     try {
-      const response = await withTimeout(fetch('/api/geo'), TIMEOUTS.DEFAULT_API)
-      const data = await response.json()
-
-      if (data && data.ok && data.latitude && data.longitude) {
+      const data = await fetchJsonWithTimeout<any>('/api/geo', TIMEOUTS.DEFAULT_API)
+      if (data?.ok && data.latitude !== null && data.longitude !== null) {
         return {
           latitude: Number(data.latitude),
           longitude: Number(data.longitude),
@@ -238,6 +131,34 @@ export function useGeolocation() {
     } catch (error) {
       devLog.warn('[useGeolocation] Cloudflare定位不可用:', error)
     }
+    return null
+  }
+
+  /**
+   * 国际IP定位服务（最后备选）
+   */
+  const getLocationFromIntl = async (): Promise<LocationData | null> => {
+    try {
+      const data = await fetchJsonWithTimeout<any>('https://ipapi.co/json/', TIMEOUTS.DEFAULT_API)
+      if (data.latitude && data.longitude) {
+        return { latitude: data.latitude, longitude: data.longitude, city: data.city }
+      }
+    } catch (error) {
+      devLog.warn('[useGeolocation] ipapi.co定位失败:', error)
+    }
+
+    try {
+      const data = await fetchJsonWithTimeout<any>(
+        'https://ip-api.com/json/?lang=zh-CN',
+        TIMEOUTS.DEFAULT_API
+      )
+      if (data.lat && data.lon) {
+        return { latitude: data.lat, longitude: data.lon, city: data.city }
+      }
+    } catch (error) {
+      devLog.warn('[useGeolocation] ip-api.com定位失败:', error)
+    }
+
     return null
   }
 
@@ -254,111 +175,40 @@ export function useGeolocation() {
     state.value.error = null
 
     try {
-      // 1. 检查缓存
+      // 1. 命中缓存直接返回
       const cached = geoCache.get()
       if (cached) {
         devLog.log('[useGeolocation] 📦 使用缓存的位置信息')
         state.value.location = cached
-        await checkPermissionStatus()
         return cached
       }
 
-      // 2. 浏览器定位（最精准）
+      // 2. 浏览器定位（最精准），城市名由 /api/geo 补齐
       devLog.log('[useGeolocation] 🌐 尝试浏览器定位...')
       const browserLocation = await getBrowserLocation()
       if (browserLocation) {
-        // 尝试获取城市名称
-        try {
-          const cityName = await getCityNameFromGaode(browserLocation.latitude, browserLocation.longitude)
-          const location = { ...browserLocation, city: cityName }
-
-          state.value.location = location
-          geoCache.set(location)
-          safeSetLocalStorage(CACHE_KEYS.GEOLOCATION, ({
-            time: Date.now(),
-            value: location
-          } as LocationCache))
-
-          await checkPermissionStatus()
-          devLog.log(`[useGeolocation] ✅ 浏览器定位+逆编码成功，城市: ${cityName || '未知'}`)
-          return location
-        } catch (error) {
-          devLog.warn('[useGeolocation] 逆地理编码失败，但位置已获取:', error)
-
-          // 即使没有城市名也保存位置
-          state.value.location = browserLocation
-          geoCache.set(browserLocation)
-          safeSetLocalStorage(CACHE_KEYS.GEOLOCATION, ({
-            time: Date.now(),
-            value: browserLocation
-          } as LocationCache))
-
-          await checkPermissionStatus()
-          return browserLocation
-        }
+        const edgeLocation = await getLocationFromCloudflare()
+        return commitLocation(
+          { ...browserLocation, city: edgeLocation?.city || '' },
+          '浏览器'
+        )
       }
 
-      // 3. 国内IP定位（高德、百度）
-      devLog.log('[useGeolocation] 📍 尝试国内IP定位...')
-      const cnProviders = [
-        getLocationFromGaode,
-        getLocationFromBaidu
-      ]
-
-      for (const provider of cnProviders) {
-        try {
-          const location = await provider()
-          if (location) {
-            state.value.location = location
-            geoCache.set(location)
-            safeSetLocalStorage(CACHE_KEYS.GEOLOCATION, ({
-              time: Date.now(),
-              value: location
-            } as LocationCache))
-            devLog.log(`[useGeolocation] ✓ 国内IP定位成功: ${location.city || '未知城市'}`)
-            return location
-          }
-        } catch (error) {
-          devLog.warn(`[useGeolocation] IP定位提供商失败:`, error)
-        }
-      }
-
-      // 4. 国际IP定位 + Cloudflare API
-      devLog.log('[useGeolocation] 🌍 尝试国际IP定位...')
-
-      // Cloudflare Pages Functions API（最稳定的备选）
+      // 3. Cloudflare 边缘定位
+      devLog.log('[useGeolocation] 📍 尝试 Cloudflare 边缘定位...')
       const cfLocation = await getLocationFromCloudflare()
-      if (cfLocation) {
-        state.value.location = cfLocation
-        geoCache.set(cfLocation)
-        safeSetLocalStorage(CACHE_KEYS.GEOLOCATION, ({
-          time: Date.now(),
-          value: cfLocation
-        } as LocationCache))
-        devLog.log('[useGeolocation] ✓ Cloudflare定位成功')
-        return cfLocation
-      }
+      if (cfLocation) return commitLocation(cfLocation, 'Cloudflare')
 
-      // 国际IP定位（最后备选）
+      // 4. 国际 IP 定位（最后备选）
+      devLog.log('[useGeolocation] 🌍 尝试国际IP定位...')
       const intlLocation = await getLocationFromIntl()
-      if (intlLocation) {
-        state.value.location = intlLocation
-        geoCache.set(intlLocation)
-        safeSetLocalStorage(CACHE_KEYS.GEOLOCATION, ({
-          time: Date.now(),
-          value: intlLocation
-        } as LocationCache))
-        devLog.log('[useGeolocation] ✓ 国际IP定位成功:', intlLocation)
-        devLog.log('[useGeolocation] 📍 State更新后:', state.value)
-        return intlLocation
-      }
+      if (intlLocation) return commitLocation(intlLocation, '国际IP')
 
       // 5. 所有方式都失败
       state.value.isError = true
       state.value.error = '无法获取位置信息'
       devLog.error('[useGeolocation] ❌ 所有定位方式均失败')
       return null
-
     } catch (error) {
       state.value.isError = true
       state.value.error = error instanceof Error ? error.message : '位置获取失败'
@@ -376,17 +226,15 @@ export function useGeolocation() {
   const refreshLocation = async (): Promise<LocationData | null> => {
     devLog.log('[useGeolocation] 🔄 刷新位置信息...')
     geoCache.clear()
-    safeRemoveLocalStorage(CACHE_KEYS.GEOLOCATION)
     return getCurrentLocation()
   }
 
   /**
-   * 手动清除所有位置相关缓存
+   * 手动清除位置缓存
    */
   const clearAllCaches = (): void => {
-    devLog.log('[useGeolocation] 🗑️ 清除所有位置缓存')
+    devLog.log('[useGeolocation] 🗑️ 清除位置缓存')
     geoCache.clear()
-    safeRemoveLocalStorage(CACHE_KEYS.GEOLOCATION)
   }
 
   return {

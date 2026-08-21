@@ -1,53 +1,33 @@
 <script setup lang="ts" name="TeekLayoutProvider">
-import type { TeekConfig } from "vitepress-theme-teek";
 import Teek, { teekConfigContext, clockIcon } from "vitepress-theme-teek";
 import { useData } from "vitepress";
 import { watch, nextTick, ref, provide } from "vue";
-// import { teekDocConfig } from "../config/teekConfig";
-import { teekBlogCardConfig } from "../config/teekConfig";
+// Teek 运行期配置的唯一来源，config.ts 里的 defineTeekConfig 用的是同一个对象
+import { teekThemeConfig } from "../config/teekConfig";
 import { useRibbon } from "../composables/useRibbon";
 import { useRuntime } from "../composables/useRuntime";
-import ConfigSwitch from "./ConfigSwitch.vue";
 import { defineAsyncComponent } from "vue";
 const ContributeChart = defineAsyncComponent(() => import("./ContributeChart.vue"));
 import NotFound from "./404.vue";
 import BannerImgArrow from "./BannerImgArrow.vue"; //导入横幅图片箭头组件
 
 import NoticeContent from "./NoticeContent.vue"; //导入公告组件
-//import GlobalGreet from "./GlobalGreet.vue";  //导入全局问候组件
 import TitleChange from "./TitleChange.vue" //导入网页标题变化
 import ScrollProgressBar from "./ScrollProgressBar.vue" //导入顶部滚动条组件
 
 import DocFooterCopyright from "./DocFooterCopyright.vue"; //导入文档页脚版权组件
-
 
 import BackTop from "./BackTop.vue"; //导入回到顶部组件
 import Clock from "./Clock.vue"; // 时钟组件
 import NavWeather from "./NavWeather.vue"; // 导航栏天气组件
 import DynamicWallpaperManager from "./DynamicWallpaperManager.vue"; //导入动态壁纸管理器
 
-
-// @ts-ignore
-// import InformationCard from "./InformationCard.vue";  //导入信息卡片和舔狗日记组件
-
 import NoticeCard from "./NoticeCard.vue";
 import QuoteCard from "./QuoteCard.vue";
-// import RouteSwitchingLoading from "./RouteSwitchingLoading.vue"; // 过渡动画组件 - 已禁用
 
-
-
-const ns = "layout-provider";
 const { frontmatter } = useData();
 
-// // 默认文档风
-// const currentStyle = ref("doc");
-// const teekConfig = ref(teekDocConfig);
-
-
-// 默认博客 卡片风
-const currentStyle = ref("blog-card");
-const teekConfig = ref(teekBlogCardConfig);
-provide(teekConfigContext, teekConfig);
+provide(teekConfigContext, ref(teekThemeConfig));
 
 // 彩带背景
 const { start: startRibbon, stop: stopRibbon } = useRibbon({ immediate: false, clickReRender: true });
@@ -57,31 +37,18 @@ const { start: startRuntime, stop: stopRuntime } = useRuntime("2025-09-21 00:00:
   prefix: `<span style="width: 16px; display: inline-block; vertical-align: -3px; margin-right: 3px;">${clockIcon}</span>小破站已运行 `,
 });
 
-
-const watchRuntimeAndRibbon = async (layout: string, style: string) => {
-  const isHome = layout === "home";
-  const isDoc = [undefined, "doc"].includes(layout);
-  const isBlog = style.startsWith("blog");
-
+// 只有首页显示运行时长；彩带目前是关闭状态
+const watchRuntimeAndRibbon = async (layout: string) => {
   await nextTick();
-  if (isHome && isBlog) startRuntime();
+
+  if (layout === "home") startRuntime();
   else stopRuntime();
 
-  // 关闭彩带背景，直接停止彩带
   stopRibbon();
-
-  // 如果需要恢复彩带功能，可以注释上面一行，取消下面注释
-  // if ((isHome && isBlog && style !== "blog-body") || (isDoc && teekConfig.value.pageStyle)) startRibbon();
-  // else stopRibbon();
+  // 如需恢复彩带背景，把上面一行换成 startRibbon()
 };
 
-watch(frontmatter, async newVal => watchRuntimeAndRibbon(newVal.layout, currentStyle.value), { immediate: true });
-
-const handleConfigSwitch = (config: TeekConfig, style: string) => {
-  teekConfig.value = config;
-
-  watchRuntimeAndRibbon(frontmatter.value.layout, style);
-};
+watch(frontmatter, async newVal => watchRuntimeAndRibbon(newVal.layout), { immediate: true });
 </script>
 
 
@@ -91,27 +58,10 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
     <template #layout-top>
       <!-- 动态壁纸管理器 -->
       <DynamicWallpaperManager />
-      <!-- 全局问候组件 -->
-      <!-- <GlobalGreet /> -->
       <!-- 顶部滚动条组件 -->
       <ScrollProgressBar />
       <!--网页标题切换组件  -->
       <TitleChange />
-      <!-- 返回顶部组件 -->
-      <!--<BackToTop /> -->
-
-      <!-- 路由切换遮罩动画组件 - 已禁用，提升加载速度 -->
-      <!-- <RouteSwitchingLoading /> -->
-    </template>
-
-    <template #teek-theme-enhance-bottom>
-      <div :class="[ns, 'flx-align-center']">
-        <ConfigSwitch v-model="currentStyle" @switch="handleConfigSwitch" />
-      </div>
-    </template>
-
-    <template #nav-screen-content-after>
-      <ConfigSwitch v-model="currentStyle" @switch="handleConfigSwitch" />
     </template>
 
     <template #teek-archives-top-before>
@@ -156,15 +106,10 @@ const handleConfigSwitch = (config: TeekConfig, style: string) => {
       <Clock/>
     </template>
 
-    <!-- 自定义 logo 组件已禁用，使用 VitePress 默认 logo 配置 -->
-
     <!-- 文章末尾版权说明 -->
     <template #doc-footer-before>
       <DocFooterCopyright />
     </template>
-
-
-        
   </Teek.Layout>
 </template>
 

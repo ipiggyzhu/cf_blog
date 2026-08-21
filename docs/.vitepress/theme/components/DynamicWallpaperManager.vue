@@ -6,17 +6,15 @@
 import { onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vitepress'
 import { inBrowser } from 'vitepress'
-import { fetchDynamicWallpapers, WALLPAPER_SERVICE_CONFIG } from '../../ConfigHyde/Wallaper'
+import {
+  fetchDynamicWallpapers,
+  fetchWallpaperLibrary,
+  FALLBACK_WALLPAPERS
+} from '../../ConfigHyde/Wallaper'
 
 // 路由检测 - 只在首页启用动态壁纸
 const route = useRoute()
 let isHomePage = false
-
-// SSR 检测 - 仅在浏览器环境运行
-if (!inBrowser) {
-  // 在服务端渲染时，直接退出，不执行任何操作
-  console.log('🖼️ 服务端渲染环境，动态壁纸系统不启动')
-}
 
 // 检查是否为首页
 function checkIsHomePage(): boolean {
@@ -26,6 +24,14 @@ function checkIsHomePage(): boolean {
 
 // 停止所有动态壁纸相关功能
 function stopWallpaperSystem() {
+  if (initialFetchTimeoutId) {
+    clearTimeout(initialFetchTimeoutId)
+    initialFetchTimeoutId = null
+  }
+  if (stabilityTimeoutId) {
+    clearTimeout(stabilityTimeoutId)
+    stabilityTimeoutId = null
+  }
   if (fetchLibraryIntervalId) {
     clearInterval(fetchLibraryIntervalId)
     fetchLibraryIntervalId = null
@@ -36,21 +42,14 @@ function stopWallpaperSystem() {
   }
   stopServiceMonitoring()
 
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+
   // 清理呼吸动画类
-  const backgroundElements = document.querySelectorAll('.wallpaper-breathing')
-  backgroundElements.forEach(element => {
+  document.querySelectorAll('.wallpaper-breathing').forEach(element => {
     element.classList.remove('wallpaper-breathing')
   })
 
-  console.log('🖼️ 动态壁纸系统已停止（非首页）')
-}
-
-// 启动动态壁纸系统（仅首页）
-function startWallpaperSystem() {
-  if (!isHomePage) return
-
-  console.log('🖼️ 动态壁纸系统启动（首页）')
-  // 壁纸系统启动逻辑将在 onMounted 中调用
+  console.log('🖼️ 动态壁纸系统已停止')
 }
 
 // 定义时间间隔配置
@@ -61,6 +60,8 @@ const SERVICE_CHECK_INTERVAL = 15 * 1000 // 15秒检测一次服务状态（当�
 let fetchLibraryIntervalId: number | null = null // 图库请求定时器
 let switchImageIntervalId: number | null = null // 图片切换定时器
 let serviceCheckIntervalId: number | null = null // 服务检测定时器
+let initialFetchTimeoutId: number | null = null // 首次拉取图库的延迟定时器
+let stabilityTimeoutId: number | null = null // banner 容器初始化的延迟定时器
 let currentImages: string[] = [] // 当前图库
 let currentDisplayImage: string = '' // 当前展示的图片
 let isUsingFallback: boolean = false // 是否正在使用备用图片
@@ -206,15 +207,6 @@ function queueSwitch(imageSrc: string) {
 
   // 尝试立即处理队列
   setTimeout(processPendingQueue, 100)
-}
-
-// 添加过渡动画样式
-function addTransitionStyles(element: HTMLElement) {
-  if (!element.style.transition || !element.style.transition.includes('opacity')) {
-    element.style.transition = element.style.transition 
-      ? `${element.style.transition}, opacity 0.3s ease-in-out`
-      : 'opacity 0.3s ease-in-out'
-  }
 }
 
 // 简化的内容层稳定性函数（CSS变量方案下不再需要复杂的DOM操作）
@@ -458,65 +450,6 @@ async function updateBannerBackgroundWithCSS(imageSrc: string): Promise<boolean>
   }
 }
 
-// 确保双图层呼吸动画同步
-function ensureBreathingAnimationSync() {
-  const bannerEl = document.querySelector('.tk-banner') as HTMLElement
-
-  if (bannerEl) {
-    // 通过重置animation触发同步
-    const resetAnimation = () => {
-      bannerEl.style.setProperty('--animation-state', 'paused')
-
-      // 使用requestAnimationFrame确保DOM更新
-      requestAnimationFrame(() => {
-        bannerEl.style.setProperty('--animation-state', 'running')
-        console.log('🔄 双图层呼吸动画已同步')
-      })
-    }
-
-    // 在双图层模式时重置动画确保同步
-    if (bannerEl.classList.contains('dual-layer')) {
-      resetAnimation()
-    }
-  }
-}
-
-// 添加呼吸动画到所有Banner背景元素（向后兼容）
-function addBreathingAnimation() {
-  console.log('💨 呼吸动画已通过CSS伪元素自动启用')
-
-  // 现在呼吸动画主要通过::before和::after伪元素实现
-  // 这个函数保留用于向后兼容旧的背景元素
-  const selectors = [
-    '.tk-banner .tk-banner__bg',
-    '.tk-banner .tk-banner-bg',
-    '.tk-banner [class*="banner"][class*="bg"]',
-    '.banner-bg',
-    '.tk-banner-bg'
-  ]
-
-  selectors.forEach(selector => {
-    const elements = document.querySelectorAll(selector)
-    elements.forEach(element => {
-      if (!element.classList.contains('wallpaper-breathing')) {
-        element.classList.add('wallpaper-breathing')
-        console.log('🌟 添加补充呼吸动画到:', selector)
-      }
-    })
-  })
-
-  // 确保伪元素动画同步
-  ensureBreathingAnimationSync()
-}
-
-// 旧的双图层函数已被CSS变量方案替代
-// 保留用于向后兼容或作为降级方案
-function updateBannerBackground(imageSrc: string): boolean {
-  console.warn('⚠️ 使用了旧的双图层方法，建议使用updateBannerBackgroundWithCSS')
-  // 降级到CSS变量方案
-  return updateBannerBackgroundWithCSS(imageSrc)
-}
-
 // 从当前图库中随机选择一张图片展示（带去重逻辑）
 async function displayRandomImage() {
   // 检查图库是否为空
@@ -567,7 +500,7 @@ async function displayRandomImage() {
       
       if (fallbackPreloadSuccess) {
         currentDisplayImage = fallbackImg
-        updateBannerBackgroundWithCSS(fallbackImg)
+        await updateBannerBackgroundWithCSS(fallbackImg)
         return
       } else {
         console.error('备用图片也加载失败')
@@ -583,12 +516,13 @@ async function displayRandomImage() {
     currentDisplayImage = randomImg
 
     // 使用新的CSS变量方法更新Banner背景
-    const success = updateBannerBackgroundWithCSS(randomImg)
+    // 注意：必须 await —— 不加 await 拿到的是 Promise（恒为真值），下面的重试分支永远进不去
+    const success = await updateBannerBackgroundWithCSS(randomImg)
 
     if (!success) {
       // 如果立即更新失败，等待DOM更新后再试
       await nextTick()
-      updateBannerBackgroundWithCSS(randomImg)
+      await updateBannerBackgroundWithCSS(randomImg)
     }
     
     // CSS变量方案下，呼吸动画通过伪元素自动应用，无需手动添加
@@ -625,35 +559,9 @@ async function displayRandomImage() {
 }
 
 
-// 检测图集服务是否可用（快速检测，用于初始加载）
+// 检测图集服务是否可用（复用统一的带超时请求，不再手写一份 fetch）
 async function checkServiceAvailability(): Promise<boolean> {
-  try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 2000) // 2秒快速超时，避免影响页面加载
-    
-    const response = await fetch(WALLPAPER_SERVICE_CONFIG.fullUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      signal: controller.signal
-    })
-    
-    clearTimeout(timeoutId)
-    
-    if (!response.ok) {
-      return false
-    }
-    
-    const data = await response.json()
-    if (!data.images || !Array.isArray(data.images) || data.images.length === 0) {
-      return false
-    }
-    
-    return true
-  } catch (error) {
-    return false
-  }
+  return (await fetchWallpaperLibrary()) !== null
 }
 
 // 服务状态监控（仅在使用备用图片时运行）
@@ -700,37 +608,9 @@ function startServiceMonitoring() {
   }
 }
 
-// 获取备用图片列表
+// 获取备用图片列表（唯一来源在 ConfigHyde/Wallaper.ts，这里只取副本避免被就地修改）
 function getFallbackImages(): string[] {
-  // 使用您自己的 R2 壁纸 - 扩展备用图片数量
-  const fallbackImages = [
-    "https://image.itpiggy.us/WallPaper/1.webp",
-    "https://image.itpiggy.us/WallPaper/2.webp",
-    "https://image.itpiggy.us/WallPaper/3.webp",
-    "https://image.itpiggy.us/WallPaper/4.webp",
-    "https://image.itpiggy.us/WallPaper/5.webp",
-    "https://image.itpiggy.us/WallPaper/6.webp",
-    "https://image.itpiggy.us/WallPaper/7.webp",
-    "https://image.itpiggy.us/WallPaper/8.webp",
-    "https://image.itpiggy.us/WallPaper/9.webp",
-    "https://image.itpiggy.us/WallPaper/10.webp",
-    "https://image.itpiggy.us/WallPaper/11.webp",
-    "https://image.itpiggy.us/WallPaper/12.webp",
-    "https://image.itpiggy.us/WallPaper/13.webp",
-    "https://image.itpiggy.us/WallPaper/14.webp",
-    "https://image.itpiggy.us/WallPaper/15.webp",
-    "https://image.itpiggy.us/WallPaper/16.webp",
-    "https://image.itpiggy.us/WallPaper/17.webp",
-    "https://image.itpiggy.us/WallPaper/18.webp",
-    "https://image.itpiggy.us/WallPaper/19.webp",
-    "https://image.itpiggy.us/WallPaper/20.webp",
-    "https://image.itpiggy.us/WallPaper/21.webp",
-    "https://image.itpiggy.us/WallPaper/22.webp",
-    "https://image.itpiggy.us/WallPaper/23.webp",
-    "https://image.itpiggy.us/WallPaper/24.webp",
-    "https://image.itpiggy.us/WallPaper/25.webp",
-  ]
-  return fallbackImages
+  return [...FALLBACK_WALLPAPERS]
 }
 
 // 从图集服务器获取图库列表
@@ -784,186 +664,109 @@ async function fetchImageLibrary() {
   }
 }
 
-onMounted(async () => {
+// 页面可见性变化监听 —— 必须是稳定引用，否则 removeEventListener 摘不掉
+function handleVisibilityChange() {
+  const bannerEl = document.querySelector('.tk-banner') as HTMLElement
+
+  if (bannerEl) {
+    bannerEl.classList.toggle('paused', document.hidden)
+  }
+
+  // 同时处理其他可能的背景元素
+  document.querySelectorAll('.wallpaper-breathing').forEach(element => {
+    element.classList.toggle('paused', document.hidden)
+  })
+}
+
+// 首屏立即显示一张壁纸（缓存优先），避免黑色/闪烁背景
+function showInitialWallpaper() {
+  const lastImage = getLastImage()
+  const cachedImages = loadImagesFromCache()
+
+  if (cachedImages.length > 0) {
+    currentImages = cachedImages
+    console.log(`📦 加载缓存图库: ${cachedImages.length} 张图片`)
+  } else {
+    currentImages = getFallbackImages()
+    saveImagesToCache(currentImages)
+  }
+
+  const initialImage =
+    lastImage || currentImages[Math.floor(Math.random() * currentImages.length)]
+
+  console.log('🎯 立即显示壁纸:', initialImage)
+  currentDisplayImage = initialImage
+
+  // 确保banner容器正确设置后再显示壁纸
+  ensureBannerContentStability()
+  initBannerBackground(initialImage)
+}
+
+// 启动动态壁纸系统（仅首页）
+function startWallpaperSystem() {
+  if (!isHomePage || switchImageIntervalId) return
+
+  console.log('🖼️ 动态壁纸系统启动（首页）')
+
+  showInitialWallpaper()
+
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+
+  // 延迟拉取真实图库，先让缓存壁纸渲染出来
+  // fetchImageLibrary 内部已带超时与降级，不需要再单独探活一次
+  initialFetchTimeoutId = window.setTimeout(async () => {
+    initialFetchTimeoutId = null
+    console.log('🔍 开始更新图库...')
+    await fetchImageLibrary()
+
+    if (!fetchLibraryIntervalId) {
+      fetchLibraryIntervalId = window.setInterval(fetchImageLibrary, FETCH_LIBRARY_INTERVAL)
+    }
+  }, 1000)
+
+  // 设置定时器：每10秒切换图片
+  switchImageIntervalId = window.setInterval(displayRandomImage, SWITCH_IMAGE_INTERVAL)
+  console.log(`⏰ 壁纸切换定时器已启动，间隔: ${SWITCH_IMAGE_INTERVAL / 1000}秒`)
+
+  // 初始化基本设置（CSS变量方案下大大简化）
+  stabilityTimeoutId = window.setTimeout(() => {
+    stabilityTimeoutId = null
+    ensureBannerContentStability()
+    console.log('🌟 CSS变量背景系统初始化完成')
+  }, 500)
+}
+
+onMounted(() => {
   // 仅在浏览器环境运行
   if (!inBrowser) {
     console.log('⏹️ 服务端环境，动态壁纸系统不启动')
     return
   }
 
-  // 检查是否为首页
   isHomePage = checkIsHomePage()
-  console.log('🖼️ 动态壁纸管理器启动 - 当前页面:', route.path, '是否首页:', isHomePage)
+  console.log('🖼️ 动态壁纸管理器挂载 - 当前页面:', route.path, '是否首页:', isHomePage)
 
-  if (!isHomePage) {
-    console.log('⏹️ 非首页，动态壁纸系统不启动')
-    return
-  }
+  startWallpaperSystem()
 
-  // 立即显示缓存的壁纸，避免黑色背景
-  const lastImage = getLastImage()
-  const cachedImages = loadImagesFromCache()
-
-  if (lastImage) {
-    console.log('🎯 发现缓存壁纸，立即显示:', lastImage)
-    currentDisplayImage = lastImage
-
-    // 确保banner容器正确设置后再显示壁纸
-    ensureBannerContentStability()
-
-    // 立即显示缓存的壁纸，避免任何背景色闪烁
-    initBannerBackground(lastImage)
-
-    // 如果有缓存图库，优先使用
-    if (cachedImages.length > 0) {
-      currentImages = cachedImages
-      console.log(`📦 加载缓存图库: ${cachedImages.length} 张图片`)
-    } else {
-      // 没有缓存图库时使用备用图片
-      currentImages = getFallbackImages()
-    }
-  } else if (cachedImages.length > 0) {
-    // 没有上次图片但有缓存图库，立即显示一张
-    currentImages = cachedImages
-    console.log(`📦 加载缓存图库: ${cachedImages.length} 张图片`)
-
-    ensureBannerContentStability()
-
-    const randomImg = cachedImages[Math.floor(Math.random() * cachedImages.length)]
-    currentDisplayImage = randomImg
-    initBannerBackground(randomImg)
-  } else {
-    // 没有任何缓存，使用备用图片立即显示
-    currentImages = getFallbackImages()
-    
-    // 保存备用图库到缓存
-    saveImagesToCache(currentImages)
-
-    ensureBannerContentStability()
-
-    const randomImg = currentImages[Math.floor(Math.random() * currentImages.length)]
-    currentDisplayImage = randomImg
-    initBannerBackground(randomImg)
-    console.log('🔄 使用备用壁纸立即显示:', randomImg)
-  }
-
-  // 页面可见性变化监听 - 优化性能
-  const handleVisibilityChange = () => {
-    const bannerEl = document.querySelector('.tk-banner') as HTMLElement
-
-    if (bannerEl) {
-      if (document.hidden) {
-        // 页面隐藏时暂停伪元素动画
-        bannerEl.classList.add('paused')
-      } else {
-        // 页面可见时恢复伪元素动画
-        bannerEl.classList.remove('paused')
-      }
-    }
-
-    // 同时处理其他可能的背景元素
-    const backgroundElements = document.querySelectorAll('.wallpaper-breathing')
-    backgroundElements.forEach(element => {
-      if (document.hidden) {
-        element.classList.add('paused')
-      } else {
-        element.classList.remove('paused')
-      }
-    })
-  }
-
-  document.addEventListener('visibilitychange', handleVisibilityChange)
-  
-  // 等待一个切换间隔后开始异步检测和切换
-  setTimeout(async () => {
-    console.log('🔍 开始检测图集服务状态并更新图库...')
-
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2秒检测
-
-      const response = await fetch(WALLPAPER_SERVICE_CONFIG.fullUrl, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' },
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        // 服务可用：获取最新图库
-        console.log('✅ 图集服务可用，更新动态图库')
-        await fetchImageLibrary()
-
-        // 设置定时器：每60秒更新图库
-        fetchLibraryIntervalId = window.setInterval(fetchImageLibrary, FETCH_LIBRARY_INTERVAL)
-      } else {
-        throw new Error('服务响应异常')
-      }
-    } catch (error) {
-      // 服务不可用：确保使用备用图片并启动监控
-      console.log('❌ 图集服务不可用，确保使用备用壁纸')
-      if (!isUsingFallback) {
-        currentImages = getFallbackImages()
-        isUsingFallback = true
-        saveImagesToCache(currentImages) // 保存备用图库到缓存
-      }
-
-      // 启动服务监控，等待服务恢复
-      startServiceMonitoring()
-    }
-  }, 1000) // 延迟1秒开始检测，确保缓存壁纸已显示
-  
-  // 设置定时器：每10秒切换图片（确保统一的切换间隔）
-  switchImageIntervalId = window.setInterval(displayRandomImage, SWITCH_IMAGE_INTERVAL)
-  console.log(`⏰ 壁纸切换定时器已启动，间隔: ${SWITCH_IMAGE_INTERVAL / 1000}秒`)
-
-  // 初始化基本设置（CSS变量方案下大大简化）
-  setTimeout(() => {
-    ensureBannerContentStability()
-    console.log('🌟 CSS变量背景系统初始化完成')
-  }, 500)
-
-  // 监听路由变化
-  watch(() => route.path, (newPath) => {
+  // 监听路由变化：离开首页停掉，回到首页重新启动（不再整页 reload）
+  watch(() => route.path, () => {
     const newIsHomePage = checkIsHomePage()
-    console.log('🧭 路由变化:', newPath, '是否首页:', newIsHomePage)
+    if (newIsHomePage === isHomePage) return
 
-    if (newIsHomePage !== isHomePage) {
-      isHomePage = newIsHomePage
+    isHomePage = newIsHomePage
 
-      if (isHomePage) {
-        console.log('🏠 切换到首页，启动动态壁纸系统')
-        // 如果切换回首页，重新启动系统（但此时组件应该重新挂载）
-        location.reload() // 简单重载确保干净状态
-      } else {
-        console.log('🚪 离开首页，停止动态壁纸系统')
-        stopWallpaperSystem()
-      }
+    if (isHomePage) {
+      console.log('🏠 切换到首页，启动动态壁纸系统')
+      nextTick(() => startWallpaperSystem())
+    } else {
+      console.log('🚪 离开首页，停止动态壁纸系统')
+      stopWallpaperSystem()
     }
   })
 })
 
 onUnmounted(() => {
-  // 清理图库获取定时器
-  if (fetchLibraryIntervalId) {
-    clearInterval(fetchLibraryIntervalId)
-    fetchLibraryIntervalId = null
-  }
-  
-  // 清理图片切换定时器  
-  if (switchImageIntervalId) {
-    clearInterval(switchImageIntervalId)
-    switchImageIntervalId = null
-  }
-  
-  // 清理服务检测定时器
-  stopServiceMonitoring()
-
-  // 清理页面可见性监听器
-  document.removeEventListener('visibilitychange', () => {})
-
-  console.log('🖼️ 动态壁纸管理器已停止')
+  stopWallpaperSystem()
 })
 </script>
 

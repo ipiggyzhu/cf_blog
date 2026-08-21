@@ -1,109 +1,85 @@
-// 首页壁纸 - 动态获取本地图片服务器的图片
+// 首页壁纸 - 动态获取图片服务的图库，失败则回落到内置列表
 
 // 壁纸服务配置 - 统一配置服务地址，一处修改全局生效
+// 注意：这里用的是绝对地址，好处是本地 dev（localhost:5173）也能拿到真实图库，
+// 代价是预览域名（*.pages.dev）会跨域打到生产站，靠 /api/images 的 CORS: * 兜住。
 export const WALLPAPER_SERVICE_CONFIG = {
   baseUrl: 'https://blog.itpiggy.us',
-  // baseUrl: 'https://blog.itpiggy.us',
   apiEndpoint: '/api/images',
+  timeout: 4000,
   get fullUrl() {
     return `${this.baseUrl}${this.apiEndpoint}`
   }
 }
 
-// 备用图片列表（使用您自己的壁纸）
-const fallbackImages = [
-  "https://image.itpiggy.us/WallPaper/1.webp",
-  "https://image.itpiggy.us/WallPaper/2.webp",
-  "https://image.itpiggy.us/WallPaper/3.webp",
-  "https://image.itpiggy.us/WallPaper/4.webp",
-  "https://image.itpiggy.us/WallPaper/5.webp",
-  "https://image.itpiggy.us/WallPaper/6.webp",
-  "https://image.itpiggy.us/WallPaper/7.webp",
-  "https://image.itpiggy.us/WallPaper/8.webp",
-  "https://image.itpiggy.us/WallPaper/9.webp",
-  "https://image.itpiggy.us/WallPaper/10.webp",
-  "https://image.itpiggy.us/WallPaper/11.webp",
-  "https://image.itpiggy.us/WallPaper/12.webp",
-  "https://image.itpiggy.us/WallPaper/13.webp",
-  "https://image.itpiggy.us/WallPaper/14.webp",
-  "https://image.itpiggy.us/WallPaper/15.webp",
-  "https://image.itpiggy.us/WallPaper/16.webp",
-  "https://image.itpiggy.us/WallPaper/17.webp",
-  "https://image.itpiggy.us/WallPaper/18.webp",
-  "https://image.itpiggy.us/WallPaper/19.webp",
-  "https://image.itpiggy.us/WallPaper/20.webp",
-  "https://image.itpiggy.us/WallPaper/21.webp",
-  "https://image.itpiggy.us/WallPaper/22.webp",
-  "https://image.itpiggy.us/WallPaper/23.webp",
-  "https://image.itpiggy.us/WallPaper/24.webp",
-  "https://image.itpiggy.us/WallPaper/25.webp",
-];
+// 图片 CDN 域名与内置壁纸数量
+const IMAGE_DOMAIN = 'https://image.itpiggy.us'
+const FALLBACK_COUNT = 25
+
+/**
+ * 内置备用壁纸列表 —— 全站唯一来源
+ * DynamicWallpaperManager 与首页 Banner 都从这里取，不要再复制一份
+ */
+export const FALLBACK_WALLPAPERS: string[] = Array.from(
+  { length: FALLBACK_COUNT },
+  (_, i) => `${IMAGE_DOMAIN}/WallPaper/${i + 1}.webp`
+)
+
 // 随机打乱数组的函数
 function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
+  const shuffled = [...array]
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
   }
-  return shuffled;
+  return shuffled
 }
 
-// 动态获取图片列表的函数
-async function fetchDynamicWallpapers(): Promise<string[]> {
+/**
+ * 请求图库服务，带超时（超时会真正 abort，不会挂住定时刷新）
+ */
+export async function fetchWallpaperLibrary(): Promise<string[] | null> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), WALLPAPER_SERVICE_CONFIG.timeout)
+
   try {
-    // 使用统一配置的图片服务API
     const response = await fetch(WALLPAPER_SERVICE_CONFIG.fullUrl, {
       method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    
-    // 检查 API 是否成功返回数据
+      headers: { Accept: 'application/json' },
+      signal: controller.signal
+    })
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+
+    const data = await response.json()
     if (!data.success) {
-      console.warn('API 返回失败:', data.error);
-      return shuffleArray(fallbackImages);
+      console.warn('API 返回失败:', data.error)
+      return null
     }
-    
-    const images = data.images || [];
-    
-    // API 现在返回完整的 URL（包含域名），直接使用
-    // 格式：https://image.itpiggy.us/cf-blog/WallPaper/1.png
-    const wallpapers = images.filter((imagePath: string) => {
-      // 确保是有效的 URL
-      return imagePath && (imagePath.startsWith('http://') || imagePath.startsWith('https://'));
-    });
-    
-    console.log(`✅ 成功获取 ${wallpapers.length} 张壁纸，域名: ${data.domain || '未知'}`);
-    
-    // 如果获取到图片，随机打乱后返回，否则返回随机打乱的备用图片
-    return wallpapers.length > 0 ? shuffleArray(wallpapers) : shuffleArray(fallbackImages);
-    
+
+    // API 返回完整 URL（含域名），这里只做有效性过滤
+    const wallpapers: string[] = (data.images || []).filter(
+      (url: string) => url && (url.startsWith('http://') || url.startsWith('https://'))
+    )
+
+    if (wallpapers.length === 0) return null
+
+    console.log(`✅ 成功获取 ${wallpapers.length} 张壁纸，域名: ${data.domain || '未知'}`)
+    return shuffleArray(wallpapers)
   } catch (error) {
-    console.warn('❌ 无法获取动态壁纸，使用备用图片:', error);
-    return shuffleArray(fallbackImages);
+    console.warn('❌ 无法获取动态壁纸:', error)
+    return null
+  } finally {
+    clearTimeout(timeoutId)
   }
 }
 
-// 创建一个Promise来获取壁纸
-let wallpaperPromise: Promise<string[]> | null = null;
-
-// 获取壁纸的函数
-function getWallpapers(): Promise<string[]> {
-  if (!wallpaperPromise) {
-    wallpaperPromise = fetchDynamicWallpapers();
-  }
-  return wallpaperPromise;
+/**
+ * 获取壁纸列表，失败时回落到打乱后的内置列表
+ */
+export async function fetchDynamicWallpapers(): Promise<string[]> {
+  return (await fetchWallpaperLibrary()) ?? shuffleArray(FALLBACK_WALLPAPERS)
 }
 
-// 导出的Wallpaper数组 - 在服务端渲染时使用随机打乱的备用图片，客户端动态加载
-export const Wallpaper: string[] = shuffleArray(fallbackImages);
-
-// 导出动态获取函数供主题使用
-export { getWallpapers, fetchDynamicWallpapers };
+// 导出的 Wallpaper 数组 - 构建期使用打乱后的内置图片，运行期由组件动态替换
+export const Wallpaper: string[] = shuffleArray(FALLBACK_WALLPAPERS)

@@ -3,7 +3,7 @@
  * @description 定义天气相关的常量配置
  */
 
-import type { WeatherProviderConfig, GeolocationProviderConfig, WMOMapping } from '../types/weather'
+import type { WMOMapping } from '../types/weather'
 
 // 缓存键名常量
 export const CACHE_KEYS = {
@@ -14,16 +14,14 @@ export const CACHE_KEYS = {
 // 缓存时间常量（毫秒）
 export const CACHE_DURATION = {
   LOCATION: 5 * 60 * 1000,      // 5分钟
-  WEATHER: 10 * 60 * 1000,      // 10分钟
-  LOCATION_PERMISSION: 24 * 60 * 60 * 1000  // 24小时
+  WEATHER: 10 * 60 * 1000       // 10分钟
 } as const
 
 // 超时时间常量（毫秒）
 export const TIMEOUTS = {
   DEFAULT_API: 5000,            // 默认API超时
   LOCATION_REQUEST: 20000,      // 浏览器定位超时
-  WEATHER_REQUEST: 5000,        // 天气API超时
-  GEOCODING_REQUEST: 5000       // 逆地理编码超时
+  WEATHER_REQUEST: 5000         // 天气API超时
 } as const
 
 // 天气图标映射 - 彩云天气代码到emoji
@@ -112,29 +110,3 @@ export const GEOLOCATION_DEFAULT_OPTIONS = {
 export const UPDATE_INTERVALS = {
   WEATHER_REFRESH: 15 * 60 * 1000   // 15分钟
 }
-
-// 位置服务提供商配置
-export const GEOLOCATION_PROVIDERS: GeolocationProviderConfig[] = [
-  {
-    name: 'geolocation-api',
-    baseURL: 'browser-api',
-    timeout: TIMEOUTS.LOCATION_REQUEST,
-    maxRetries: 1
-  }
-]
-
-// 天气服务提供商配置
-export const WEATHER_PROVIDERS: WeatherProviderConfig[] = [
-  {
-    name: 'caiyun',
-    baseURL: 'https://api.caiyunapp.com/v2.6',
-    timeout: TIMEOUTS.WEATHER_REQUEST,
-    requiresToken: true
-  },
-  {
-    name: 'open-meteo',
-    baseURL: 'https://api.open-meteo.com/v1',
-    timeout: TIMEOUTS.WEATHER_REQUEST,
-    requiresToken: false
-  }
-]

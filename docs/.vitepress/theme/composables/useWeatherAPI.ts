@@ -10,17 +10,18 @@ import {
   WEATHER_ICON_MAP,
   WEATHER_DESC_MAP,
   CACHE_KEYS,
+  CACHE_DURATION,
   TIMEOUTS
 } from '../utils/constants'
 import {
-  withTimeout,
+  fetchJsonWithTimeout,
   getEnvToken,
   isServerSide,
   formatTemperature,
   generateWeatherCacheKey,
   devLog
 } from '../utils/helpers'
-import { useCache } from './useLocalStorage'
+import { useCache, clearCacheByPrefix } from './useLocalStorage'
 
 // 天气API状态
 export interface WeatherState {
@@ -74,8 +75,7 @@ export function useWeatherAPI() {
 
     try {
       const url = `https://api.caiyunapp.com/v2.6/${token}/${lon},${lat}/realtime`
-      const response = await withTimeout(fetch(url), TIMEOUTS.WEATHER_REQUEST)
-      const data = await response.json()
+      const data = await fetchJsonWithTimeout(url, TIMEOUTS.WEATHER_REQUEST)
 
       if (data.status === 'ok' && data.result && data.result.realtime) {
         const realtime = data.result.realtime
@@ -98,11 +98,11 @@ export function useWeatherAPI() {
   const fetchFromOpenMeteo = async (lat: number, lon: number): Promise<WeatherData | null> => {
     try {
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`
-      const response = await withTimeout(fetch(url), TIMEOUTS.WEATHER_REQUEST)
-      const data = await response.json()
+      const data = await fetchJsonWithTimeout(url, TIMEOUTS.WEATHER_REQUEST)
 
       const current = data.current
-      if (!current || !current.temperature_2m || current.weather_code === undefined) {
+      // 注意：不能用 !current.temperature_2m 判空，0°C 是合法温度
+      if (!current || current.temperature_2m === undefined || current.temperature_2m === null || current.weather_code === undefined) {
         throw new Error('Open-Meteo返回数据异常')
       }
 
@@ -140,7 +140,7 @@ export function useWeatherAPI() {
     try {
       // 生成缓存键
       const cacheKey = generateWeatherCacheKey(location.latitude, location.longitude)
-      const weatherCache = useCache<WeatherData>(cacheKey, 10 * 60 * 1000) // 10分钟缓存
+      const weatherCache = useCache<WeatherData>(cacheKey, CACHE_DURATION.WEATHER)
 
       // 检查缓存
       const cachedWeather = weatherCache.get()
@@ -197,23 +197,21 @@ export function useWeatherAPI() {
   }
 
   /**
-   * 刷新天气数据
+   * 刷新天气数据（先清掉该坐标的缓存，否则拿到的还是旧数据）
    */
   const refreshWeather = async (location: LocationData): Promise<WeatherData | null> => {
     devLog.log('[useWeatherAPI] 🔄 刷新天气数据...')
-    // 清除相关缓存
     const cacheKey = generateWeatherCacheKey(location.latitude, location.longitude)
-    // 这里可以实现缓存清除逻辑
+    useCache<WeatherData>(cacheKey, CACHE_DURATION.WEATHER).clear()
     return fetchWeather(location)
   }
 
   /**
-   * 清除天气缓存
+   * 清除所有天气缓存
    */
   const clearWeatherCache = (): void => {
     devLog.log('[useWeatherAPI] 🗑️ 清除所有天气缓存')
-    // 可以遍历所有以天气前缀开头的缓存键并清除
-    // 这个实现需要根据具体的localStorage管理策略来调整
+    clearCacheByPrefix(CACHE_KEYS.WEATHER_PREFIX)
   }
 
   /**

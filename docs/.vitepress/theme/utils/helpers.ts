@@ -3,7 +3,7 @@
  * @description 提供通用的工具函数
  */
 
-import type { WeatherData } from '../types/weather'
+import { CACHE_KEYS } from './constants'
 
 /**
  * 开发环境日志工具
@@ -32,30 +32,43 @@ export const devLog = {
 }
 
 /**
- * 异步操作超时封装
- * @param promise - 原始Promise
+ * 带超时的 JSON 请求，超时会真正 abort 底层请求
+ *
+ * 这是浏览器侧唯一的超时约定。不要再写 `Promise.race([fetch(url), timeout])`——
+ * 那种写法只是让调用方提前拿到 reject，底层请求仍在跑，连接不会被释放。
+ *
+ * @param url - 请求地址
  * @param ms - 超时时间（毫秒）
- * @returns Promise<T>
+ * @param init - fetch 配置
+ * @returns 解析后的 JSON
  */
-export async function withTimeout<T>(promise: Promise<T>, ms = 5000): Promise<T> {
+export async function fetchJsonWithTimeout<T = any>(
+  url: string,
+  ms = 5000,
+  init: RequestInit = {}
+): Promise<T> {
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), ms)
+  const timeoutId = setTimeout(() => controller.abort(), ms)
 
   try {
-    // @ts-expect-error - 需要处理AbortController类型
-    const result = await promise
-    return result as T
+    const response = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      ...init,
+      signal: controller.signal,
+    })
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    return (await response.json()) as T
   } finally {
-    clearTimeout(timeout)
+    clearTimeout(timeoutId)
   }
 }
 
 /**
- * 安全地解析JSON
+ * 安全地解析JSON（仅本文件内部使用）
  * @param str - JSON字符串
  * @returns 解析结果或null
  */
-export function safeJSONParse<T = any>(str: string): T | null {
+function safeJSONParse<T = any>(str: string): T | null {
   try {
     return JSON.parse(str) as T
   } catch {
@@ -140,60 +153,11 @@ export function formatTemperature(temperature: number): number {
 }
 
 /**
- * 生成地理位置缓存键
+ * 生成天气缓存键
  * @param lat - 纬度
  * @param lon - 经度
  * @returns 缓存键
  */
 export function generateWeatherCacheKey(lat: number, lon: number): string {
-  return `nav-weather:realtime:${lat.toFixed(2)},${lon.toFixed(2)}`
-}
-
-/**
- * 检查缓存是否过期
- * @param cacheTime - 缓存时间戳
- * @param maxAge - 最大存活时间（毫秒）
- * @returns 是否过期
- */
-export function isCacheExpired(cacheTime: number, maxAge: number): boolean {
-  return Date.now() - cacheTime > maxAge
-}
-
-/**
- * 创建延迟执行的Promise
- * @param ms - 延迟时间（毫秒）
- * @returns Promise<void>
- */
-export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-/**
- * 重试异步操作
- * @param operation - 异步操作函数
- * @param maxRetries - 最大重试次数
- * @param delayMs - 重试间隔（毫秒）
- * @returns Promise<T>
- */
-export async function retryAsync<T>(
-  operation: () => Promise<T>,
-  maxRetries = 3,
-  delayMs = 1000
-): Promise<T> {
-  let lastError: Error | undefined
-
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await operation()
-    } catch (error) {
-      lastError = error as Error
-      console.warn(`[RetryAsync] 第 ${i + 1} 次尝试失败:`, error)
-
-      if (i < maxRetries - 1) {
-        await delay(delayMs * (i + 1)) // 指数退避
-      }
-    }
-  }
-
-  throw lastError || new Error('所有重试均失败')
+  return `${CACHE_KEYS.WEATHER_PREFIX}${lat.toFixed(2)},${lon.toFixed(2)}`
 }
