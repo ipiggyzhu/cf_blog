@@ -26,9 +26,10 @@ img {
   content-visibility: auto;
 }
 
-/* 减少重绘 */
+/* 减少重绘
+   不能加 .VPHome：fullImg 模式下 .tk-banner 用负 margin-top 上移到导航栏底下，
+   paint containment 会把超出 .VPHome 的这一截裁掉，导航栏变成白底白字 */
 .tk-banner,
-.VPHome,
 .VPDoc {
   contain: layout style paint;
 }
